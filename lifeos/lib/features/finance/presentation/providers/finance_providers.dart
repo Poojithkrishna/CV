@@ -46,23 +46,3 @@ final StreamProviderFamily<Account?, String> accountByIdProvider =
     StreamProvider.family<Account?, String>((ref, id) {
   return ref.watch(accountRepositoryProvider).watchAccount(id);
 });
-
-/// Derived, always-in-sync net worth summary computed straight from the
-/// active-accounts stream rather than a separate DB query, so it updates
-/// the instant any account balance changes.
-final Provider<AsyncValue<NetWorthSummary>> netWorthSummaryProvider =
-    Provider<AsyncValue<NetWorthSummary>>((ref) {
-  final AsyncValue<List<Account>> accounts = ref.watch(activeAccountsProvider);
-  return accounts.whenData((List<Account> list) {
-    double assets = 0;
-    double liabilities = 0;
-    for (final Account account in list) {
-      if (account.type.isLiability) {
-        liabilities += account.currentBalance.abs();
-      } else {
-        assets += account.currentBalance;
-      }
-    }
-    return (assets: assets, liabilities: liabilities, netWorth: assets - liabilities);
-  });
-});

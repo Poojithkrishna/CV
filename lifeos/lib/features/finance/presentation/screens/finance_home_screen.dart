@@ -6,6 +6,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/account.dart';
 import '../../domain/entities/transaction_entry.dart';
 import '../providers/finance_providers.dart';
+import '../providers/net_worth_provider.dart';
 import '../providers/transaction_providers.dart';
 import '../widgets/account_card.dart';
 import '../widgets/net_worth_summary_card.dart';
@@ -13,9 +14,10 @@ import '../widgets/transaction_tile.dart';
 
 const int _recentTransactionsLimit = 5;
 
-/// Entry point for the Finance module: net worth summary, accounts, and a
-/// peek at recent transactions. Credit cards, loans, bills and analytics
-/// land here as their own sections in later passes.
+/// Entry point for the Finance module: net worth summary, quick links to
+/// Credit Cards/Loans/Categories, accounts, and a peek at recent
+/// transactions. Bills, investments and analytics land here as their own
+/// sections in later passes.
 class FinanceHomeScreen extends ConsumerWidget {
   const FinanceHomeScreen({super.key});
 
@@ -32,11 +34,6 @@ class FinanceHomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Finance'),
         actions: [
-          IconButton(
-            tooltip: 'Categories',
-            icon: const Icon(Icons.category_outlined),
-            onPressed: () => context.push('/finance/categories'),
-          ),
           IconButton(
             tooltip: 'Add account',
             icon: const Icon(Icons.add_card_outlined),
@@ -73,6 +70,36 @@ class FinanceHomeScreen extends ConsumerWidget {
                       loading: () => const SizedBox(height: 140),
                       error: (_, __) => const SizedBox.shrink(),
                       data: (summary) => NetWorthSummaryCard(summary: summary),
+                    ),
+                  ),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  sliver: SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: 40,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: [
+                          _ToolChip(
+                            icon: Icons.credit_card_outlined,
+                            label: 'Credit Cards',
+                            onTap: () => context.push('/finance/credit-cards'),
+                          ),
+                          const SizedBox(width: 8),
+                          _ToolChip(
+                            icon: Icons.handshake_outlined,
+                            label: 'Loans',
+                            onTap: () => context.push('/finance/loans'),
+                          ),
+                          const SizedBox(width: 8),
+                          _ToolChip(
+                            icon: Icons.category_outlined,
+                            label: 'Categories',
+                            onTap: () => context.push('/finance/categories'),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -174,6 +201,23 @@ class FinanceHomeScreen extends ConsumerWidget {
           },
         ),
       ),
+    );
+  }
+}
+
+class _ToolChip extends StatelessWidget {
+  const _ToolChip({required this.icon, required this.label, required this.onTap});
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ActionChip(
+      avatar: Icon(icon, size: 18),
+      label: Text(label),
+      onPressed: onTap,
     );
   }
 }

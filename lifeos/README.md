@@ -27,6 +27,19 @@ Built feature by feature. So far:
   deleting an account cascades to its transactions. Finance home now shows
   recent transactions with a "See all" list, and every account links to its
   own transaction history.
+- ✅ **Finance → Credit Cards & Loans**: standalone from the Accounts
+  ledger (a credit card's usage and a loan's remaining balance don't need
+  a full transaction history to make sense, so they're tracked directly).
+  Credit cards track limit/usage/available credit, statement & due days,
+  reward points, cashback, annual fee, and EMIs (equated monthly
+  installments, tracked independently of usage since banks handle that
+  accounting differently card to card) with a "mark month paid" action.
+  Loans support either direction (money you lent vs. borrowed), a person/
+  phone/due date/reminder flag, and atomic partial-payment recording
+  (`LoansDao.recordPayment`/`deletePayment`, mirroring `TransactionsDao`'s
+  pattern) with full payment history. Both fold into the dashboard's net
+  worth via `net_worth_provider.dart`, which combines accounts, card usage
+  (a liability) and loans (an asset when given, a liability when borrowed).
 - 🚧 Every other module (Fitness, Habits, Goals, Creator Studio,
   Entertainment, Journal, Calendar, Gamification) has a placeholder screen
   wired into navigation, ready for its own feature pass — see
@@ -98,10 +111,12 @@ during active development to regenerate on save.
 flutter test
 ```
 
-Covers: `CreateAccount`/`CreateTransaction`/`CreateCategory` use-case
-validation, `AccountsDao` and `TransactionsDao` behaviour (including the
-income/expense/transfer/edit/delete balance math) against an in-memory
-SQLite database, and `AccountCard` widget rendering.
+Covers: `CreateAccount`/`CreateTransaction`/`CreateCategory`/
+`CreateCreditCard`/`CreateLoan`/`RecordLoanPayment` use-case validation,
+`AccountsDao`/`TransactionsDao`/`CreditCardsDao`/`CardEmisDao`/`LoansDao`
+behaviour (balance and payment math, including edit/delete reverting the
+right effect) against an in-memory SQLite database, and `AccountCard`
+widget rendering.
 
 ## Data & privacy
 
@@ -110,7 +125,10 @@ Everything is stored locally in a single SQLite database
 no network calls beyond what a future notifications/backup feature adds
 explicitly. Biometric app-lock and local notifications are declared as
 dependencies/permissions already (`local_auth`, `flutter_local_notifications`)
-so wiring them up doesn't require another platform-config pass.
+so wiring them up doesn't require another platform-config pass. A loan's
+"remind me before it's due" toggle is stored already (`Loan.reminderEnabled`)
+but doesn't schedule anything yet — actually firing local notifications for
+it is part of that future notifications pass, not a half-built feature here.
 
 ## Next up
 
@@ -118,7 +136,7 @@ Suggested order for the next feature passes (say which one you want and
 it'll get the same full treatment — models → repository → use cases →
 providers → UI → widgets → validation → tests):
 
-1. Finance: Credit Cards, Loans, Bills/Recurring payments, Analytics
+1. Finance: Bills/Recurring payments, Investments & Assets, Analytics
 2. Fitness: Workout Plans + Workout Tracker
 3. Habits & Goals
 4. Gaming Creator Studio pipeline

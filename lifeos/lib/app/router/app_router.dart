@@ -7,9 +7,16 @@ import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/entertainment/presentation/screens/entertainment_home_screen.dart';
 import '../../features/finance/presentation/screens/account_detail_screen.dart';
 import '../../features/finance/presentation/screens/account_form_screen.dart';
+import '../../features/finance/presentation/screens/card_emi_form_screen.dart';
 import '../../features/finance/presentation/screens/categories_screen.dart';
 import '../../features/finance/presentation/screens/category_form_screen.dart';
+import '../../features/finance/presentation/screens/credit_card_detail_screen.dart';
+import '../../features/finance/presentation/screens/credit_card_form_screen.dart';
+import '../../features/finance/presentation/screens/credit_cards_list_screen.dart';
 import '../../features/finance/presentation/screens/finance_home_screen.dart';
+import '../../features/finance/presentation/screens/loan_detail_screen.dart';
+import '../../features/finance/presentation/screens/loan_form_screen.dart';
+import '../../features/finance/presentation/screens/loans_list_screen.dart';
 import '../../features/finance/presentation/screens/transaction_form_screen.dart';
 import '../../features/finance/presentation/screens/transactions_list_screen.dart';
 import '../../features/fitness/presentation/screens/fitness_home_screen.dart';
@@ -97,6 +104,52 @@ final GoRouter appRouter = GoRouter(
                   path: 'categories/:id/edit',
                   builder: (context, state) => CategoryFormScreen(
                     categoryId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'credit-cards',
+                  builder: (context, state) => const CreditCardsListScreen(),
+                ),
+                GoRoute(
+                  path: 'credit-cards/new',
+                  builder: (context, state) => const CreditCardFormScreen(),
+                ),
+                GoRoute(
+                  path: 'credit-cards/:id',
+                  builder: (context, state) => CreditCardDetailScreen(
+                    cardId: state.pathParameters['id']!,
+                  ),
+                ),
+                GoRoute(
+                  path: 'credit-cards/:id/edit',
+                  builder: (context, state) => CreditCardFormScreen(
+                    cardId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'credit-cards/:id/emis/new',
+                  builder: (context, state) => CardEmiFormScreen(
+                    cardId: state.pathParameters['id']!,
+                  ),
+                ),
+                GoRoute(
+                  path: 'loans',
+                  builder: (context, state) => const LoansListScreen(),
+                ),
+                GoRoute(
+                  path: 'loans/new',
+                  builder: (context, state) => const LoanFormScreen(),
+                ),
+                GoRoute(
+                  path: 'loans/:id',
+                  builder: (context, state) => LoanDetailScreen(
+                    loanId: state.pathParameters['id']!,
+                  ),
+                ),
+                GoRoute(
+                  path: 'loans/:id/edit',
+                  builder: (context, state) => LoanFormScreen(
+                    loanId: state.pathParameters['id'],
                   ),
                 ),
               ],

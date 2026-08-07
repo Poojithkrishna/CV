@@ -6,10 +6,17 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import '../../features/finance/data/daos/accounts_dao.dart';
+import '../../features/finance/data/daos/card_emis_dao.dart';
 import '../../features/finance/data/daos/categories_dao.dart';
+import '../../features/finance/data/daos/credit_cards_dao.dart';
+import '../../features/finance/data/daos/loans_dao.dart';
 import '../../features/finance/data/daos/transactions_dao.dart';
 import '../../features/finance/data/tables/accounts_table.dart';
+import '../../features/finance/data/tables/card_emis_table.dart';
 import '../../features/finance/data/tables/categories_table.dart';
+import '../../features/finance/data/tables/credit_cards_table.dart';
+import '../../features/finance/data/tables/loan_payments_table.dart';
+import '../../features/finance/data/tables/loans_table.dart';
 import '../../features/finance/data/tables/transactions_table.dart';
 import 'default_categories.dart';
 
@@ -23,8 +30,23 @@ part 'app_database.g.dart';
 /// Bump [schemaVersion] and add a migration step whenever a table changes
 /// shape — never edit an already-released table in place.
 @DriftDatabase(
-  tables: [Accounts, Categories, Transactions],
-  daos: [AccountsDao, CategoriesDao, TransactionsDao],
+  tables: [
+    Accounts,
+    Categories,
+    Transactions,
+    CreditCards,
+    CardEmis,
+    Loans,
+    LoanPayments,
+  ],
+  daos: [
+    AccountsDao,
+    CategoriesDao,
+    TransactionsDao,
+    CreditCardsDao,
+    CardEmisDao,
+    LoansDao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -34,7 +56,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -47,6 +69,14 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(categories);
             await m.createTable(transactions);
             await _seedDefaultCategories();
+          }
+          if (from < 3) {
+            await m.createTable(creditCards);
+            await m.createTable(cardEmis);
+          }
+          if (from < 4) {
+            await m.createTable(loans);
+            await m.createTable(loanPayments);
           }
         },
       );

@@ -6,7 +6,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_gradients.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/gradient_card.dart';
-import '../../../finance/presentation/providers/finance_providers.dart';
+import '../../../finance/presentation/providers/net_worth_provider.dart';
 import '../widgets/module_summary_card.dart';
 
 /// The LifeOS home screen: a single glance at every module. Finance's net
