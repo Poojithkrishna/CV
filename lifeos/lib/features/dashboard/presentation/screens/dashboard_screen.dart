@@ -7,6 +7,7 @@ import '../../../../app/theme/app_gradients.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/gradient_card.dart';
 import '../../../finance/presentation/providers/net_worth_provider.dart';
+import '../../../fitness/presentation/providers/workout_plan_providers.dart';
 import '../widgets/module_summary_card.dart';
 
 /// The LifeOS home screen: a single glance at every module. Finance's net
@@ -21,6 +22,13 @@ class DashboardScreen extends ConsumerWidget {
     final AsyncValue netWorth = ref.watch(netWorthSummaryProvider);
     final String netWorthValue = netWorth.when(
       data: (summary) => AppFormatters.currencyCompact(summary.netWorth),
+      loading: () => '—',
+      error: (_, __) => '—',
+    );
+
+    final AsyncValue activePlan = ref.watch(currentActivePlanProvider);
+    final String activePlanValue = activePlan.when(
+      data: (plan) => plan?.name ?? 'No active plan',
       loading: () => '—',
       error: (_, __) => '—',
     );
@@ -100,7 +108,7 @@ class DashboardScreen extends ConsumerWidget {
               ),
               ModuleSummaryCard(
                 label: 'Current workout',
-                value: 'No active plan',
+                value: activePlanValue,
                 subtitle: 'Fitness',
                 icon: Icons.fitness_center_rounded,
                 gradient: AppGradients.fitness,

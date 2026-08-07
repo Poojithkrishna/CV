@@ -8,7 +8,7 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../domain/entities/credit_card.dart';
 import '../providers/credit_card_form_controller.dart';
 import '../providers/credit_card_providers.dart';
-import '../widgets/color_theme_picker.dart';
+import '../../../../core/widgets/color_theme_picker.dart';
 
 final Uuid _uuid = Uuid();
 

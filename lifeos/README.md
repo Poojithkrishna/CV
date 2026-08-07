@@ -52,9 +52,31 @@ Built feature by feature. So far:
   worth (an upcoming bill is a forecast, not a balance-sheet liability —
   counting it would double-count against the cash sitting in the account
   that'll pay it). The list screen surfaces overdue items first.
-- 🚧 Every other module (Fitness, Habits, Goals, Creator Studio,
-  Entertainment, Journal, Calendar, Gamification) has a placeholder screen
-  wired into navigation, ready for its own feature pass — see
+- ✅ **Fitness → Exercise Library, Workout Plans & Workout Tracker**: the
+  spec's core Fitness loop, built as one pass since each part depends on
+  the last.
+  - **Exercise Library**: muscle group + equipment, seeded with ~25
+    common exercises across every muscle group.
+  - **Workout Plans**: unlimited plans (Gym/Home/Dumbbells/Bodyweight/
+    Resistance Bands/Travel), each with named days (e.g. "Push Day") and
+    per-day exercise targets (sets/reps/weight/rest). Only one plan is
+    ever active — `WorkoutPlansDao.setActivePlan` deactivates every other
+    plan and activates the chosen one atomically, enforcing that
+    "radio-button" invariant without a unique index. The active plan
+    surfaces on both the Fitness home screen and the main dashboard.
+  - **Workout Tracker**: starting a workout (from a plan day, or ad hoc)
+    creates a `WorkoutSession`; logging a set calls `WorkoutSessionsDao
+    .logSet`, which — atomically — checks the exercise's historical max
+    weight (across every past session, warmups excluded) to flag a new
+    PR before inserting. Each exercise card shows the last time it was
+    trained and a suggested next weight (`WorkoutStats.suggestNextWeight`:
+    nudge the weight up if the last set met the target reps, otherwise
+    repeat it), a rest timer between working sets, and running session
+    volume (`WorkoutStats.sessionVolume`). A finished session becomes a
+    read-only history entry.
+- 🚧 Every other module (Habits, Goals, Creator Studio, Entertainment,
+  Journal, Calendar, Gamification) has a placeholder screen wired into
+  navigation, ready for its own feature pass — see
   `lib/features/<module>/presentation/screens/*_home_screen.dart`.
 
 ## Architecture
@@ -123,15 +145,17 @@ during active development to regenerate on save.
 flutter test
 ```
 
-Covers: `CreateAccount`/`CreateTransaction`/`CreateCategory`/
-`CreateCreditCard`/`CreateLoan`/`RecordLoanPayment`/`CreateRecurringPayment`
-use-case validation, `RecurrenceFrequency`'s date math (including leap-year
-and month-length clamping) and `MarkRecurringPaymentPaid`'s orchestration
-(with/without a linked account, amount overrides, rejection of invalid
-amounts), `AccountsDao`/`TransactionsDao`/`CreditCardsDao`/`CardEmisDao`/
-`LoansDao` behaviour (balance and payment math, including edit/delete
-reverting the right effect) against an in-memory SQLite database, and
-`AccountCard` widget rendering.
+Covers: use-case validation across Finance (`CreateAccount`/
+`CreateTransaction`/`CreateCategory`/`CreateCreditCard`/`CreateLoan`/
+`RecordLoanPayment`/`CreateRecurringPayment`) and Fitness (`LogSet`/
+`CreateWorkoutPlan`/`AddExerciseToDay`); `RecurrenceFrequency`'s date math
+(leap years, month-length clamping) and `MarkRecurringPaymentPaid`'s
+orchestration; `WorkoutStats`'s volume and progression-suggestion math;
+DAO behaviour against an in-memory SQLite database for `AccountsDao`/
+`TransactionsDao`/`CreditCardsDao`/`CardEmisDao`/`LoansDao` (balance and
+payment math, including edit/delete reverting the right effect) and for
+`WorkoutSessionsDao`/`WorkoutPlansDao` (PR detection, active-plan
+switching); and `AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -152,7 +176,8 @@ it'll get the same full treatment — models → repository → use cases →
 providers → UI → widgets → validation → tests):
 
 1. Finance: Investments & Assets, Analytics
-2. Fitness: Workout Plans + Workout Tracker
+2. Fitness: Progress Photos, Measurements, Nutrition, Water, Supplements,
+   Cardio, Recovery, Body Weight & Strength Progress analytics
 3. Habits & Goals
 4. Gaming Creator Studio pipeline
 5. Entertainment Library

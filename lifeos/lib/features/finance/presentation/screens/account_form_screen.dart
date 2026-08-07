@@ -10,7 +10,7 @@ import '../../domain/entities/account_type.dart';
 import '../providers/account_form_controller.dart';
 import '../providers/finance_providers.dart';
 import '../widgets/account_type_selector.dart';
-import '../widgets/color_theme_picker.dart';
+import '../../../../core/widgets/color_theme_picker.dart';
 
 final Uuid _uuid = Uuid();
 

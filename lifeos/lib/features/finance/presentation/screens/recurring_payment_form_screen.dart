@@ -13,7 +13,7 @@ import '../providers/recurring_payment_form_controller.dart';
 import '../providers/recurring_payment_providers.dart';
 import '../widgets/account_picker_field.dart';
 import '../widgets/category_picker_field.dart';
-import '../widgets/color_theme_picker.dart';
+import '../../../../core/widgets/color_theme_picker.dart';
 
 final Uuid _uuid = Uuid();
 

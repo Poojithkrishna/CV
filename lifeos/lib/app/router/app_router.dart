@@ -22,7 +22,17 @@ import '../../features/finance/presentation/screens/recurring_payment_form_scree
 import '../../features/finance/presentation/screens/recurring_payments_list_screen.dart';
 import '../../features/finance/presentation/screens/transaction_form_screen.dart';
 import '../../features/finance/presentation/screens/transactions_list_screen.dart';
+import '../../features/fitness/domain/entities/plan_exercise.dart';
+import '../../features/fitness/presentation/screens/exercise_form_screen.dart';
+import '../../features/fitness/presentation/screens/exercise_library_screen.dart';
 import '../../features/fitness/presentation/screens/fitness_home_screen.dart';
+import '../../features/fitness/presentation/screens/plan_exercise_form_screen.dart';
+import '../../features/fitness/presentation/screens/start_workout_screen.dart';
+import '../../features/fitness/presentation/screens/workout_history_screen.dart';
+import '../../features/fitness/presentation/screens/workout_plan_detail_screen.dart';
+import '../../features/fitness/presentation/screens/workout_plan_form_screen.dart';
+import '../../features/fitness/presentation/screens/workout_plans_list_screen.dart';
+import '../../features/fitness/presentation/screens/workout_session_screen.dart';
 import '../../features/gamification/presentation/screens/gamification_home_screen.dart';
 import '../../features/goals/presentation/screens/goals_home_screen.dart';
 import '../../features/habits/presentation/screens/habits_home_screen.dart';
@@ -192,6 +202,72 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: '/fitness',
               builder: (context, state) => const FitnessHomeScreen(),
+              routes: [
+                GoRoute(
+                  path: 'exercises',
+                  builder: (context, state) => const ExerciseLibraryScreen(),
+                ),
+                GoRoute(
+                  path: 'exercises/new',
+                  builder: (context, state) => const ExerciseFormScreen(),
+                ),
+                GoRoute(
+                  path: 'exercises/:id/edit',
+                  builder: (context, state) => ExerciseFormScreen(
+                    exerciseId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'plans',
+                  builder: (context, state) => const WorkoutPlansListScreen(),
+                ),
+                GoRoute(
+                  path: 'plans/new',
+                  builder: (context, state) => const WorkoutPlanFormScreen(),
+                ),
+                GoRoute(
+                  path: 'plans/:id',
+                  builder: (context, state) => WorkoutPlanDetailScreen(
+                    planId: state.pathParameters['id']!,
+                  ),
+                ),
+                GoRoute(
+                  path: 'plans/:id/edit',
+                  builder: (context, state) => WorkoutPlanFormScreen(
+                    planId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'days/:dayId/exercises/new',
+                  builder: (context, state) => PlanExerciseFormScreen(
+                    dayId: state.pathParameters['dayId']!,
+                  ),
+                ),
+                GoRoute(
+                  path: 'days/:dayId/exercises/:id/edit',
+                  builder: (context, state) => PlanExerciseFormScreen(
+                    dayId: state.pathParameters['dayId']!,
+                    planExercise: state.extra as PlanExercise?,
+                  ),
+                ),
+                GoRoute(
+                  path: 'workouts',
+                  builder: (context, state) => const WorkoutHistoryScreen(),
+                ),
+                GoRoute(
+                  path: 'workouts/start',
+                  builder: (context, state) => StartWorkoutScreen(
+                    planId: state.uri.queryParameters['planId'],
+                    dayId: state.uri.queryParameters['dayId'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'workouts/:sessionId',
+                  builder: (context, state) => WorkoutSessionScreen(
+                    sessionId: state.pathParameters['sessionId']!,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

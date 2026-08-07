@@ -5,48 +5,48 @@ import 'package:uuid/uuid.dart';
 import '../../../../app/theme/app_gradients.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_text_field.dart';
-import '../../domain/entities/category.dart';
-import '../../domain/entities/category_type.dart';
-import '../providers/category_form_controller.dart';
-import '../providers/category_providers.dart';
-import '../widgets/category_icon_picker.dart';
 import '../../../../core/widgets/color_theme_picker.dart';
+import '../../domain/entities/workout_plan.dart';
+import '../../domain/entities/workout_plan_type.dart';
+import '../providers/workout_plan_form_controller.dart';
+import '../providers/workout_plan_providers.dart';
 
 final Uuid _uuid = Uuid();
 
-class CategoryFormScreen extends ConsumerStatefulWidget {
-  const CategoryFormScreen({super.key, this.categoryId});
+class WorkoutPlanFormScreen extends ConsumerStatefulWidget {
+  const WorkoutPlanFormScreen({super.key, this.planId});
 
-  final String? categoryId;
+  final String? planId;
 
-  bool get isEditing => categoryId != null;
+  bool get isEditing => planId != null;
 
   @override
-  ConsumerState<CategoryFormScreen> createState() => _CategoryFormScreenState();
+  ConsumerState<WorkoutPlanFormScreen> createState() => _WorkoutPlanFormScreenState();
 }
 
-class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
+class _WorkoutPlanFormScreenState extends ConsumerState<WorkoutPlanFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _notesController = TextEditingController();
 
-  CategoryType _type = CategoryType.expense;
+  WorkoutPlanType _type = WorkoutPlanType.gym;
   int _colorValue = AppGradients.palette.first.colors.first.value;
-  String? _iconKey;
-  Category? _original;
+  WorkoutPlan? _original;
   bool _prefilled = false;
 
   @override
   void dispose() {
     _nameController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
-  void _prefillFrom(Category category) {
-    _original = category;
-    _nameController.text = category.name;
-    _type = category.type;
-    _colorValue = category.colorValue;
-    _iconKey = category.iconKey;
+  void _prefillFrom(WorkoutPlan plan) {
+    _original = plan;
+    _nameController.text = plan.name;
+    _notesController.text = plan.notes ?? '';
+    _type = plan.type;
+    _colorValue = plan.colorValue;
     _prefilled = true;
   }
 
@@ -54,21 +54,21 @@ class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final DateTime now = DateTime.now();
-    final Category category = Category(
+    final WorkoutPlan plan = WorkoutPlan(
       id: _original?.id ?? _uuid.v4(),
       name: _nameController.text.trim(),
       type: _type,
-      colorValue: _colorValue,
-      iconKey: _iconKey,
+      notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+      isActive: _original?.isActive ?? false,
       isArchived: _original?.isArchived ?? false,
-      sortOrder: _original?.sortOrder ?? 0,
+      colorValue: _colorValue,
       createdAt: _original?.createdAt ?? now,
       updatedAt: now,
     );
 
     final result = await ref
-        .read(categoryFormControllerProvider.notifier)
-        .save(category, isEditing: widget.isEditing);
+        .read(workoutPlanFormControllerProvider.notifier)
+        .save(plan, isEditing: widget.isEditing);
 
     if (!mounted) return;
     result.when(
@@ -82,25 +82,24 @@ class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
   @override
   Widget build(BuildContext context) {
     if (widget.isEditing && !_prefilled) {
-      final AsyncValue<Category?> categoryAsync =
-          ref.watch(categoryByIdProvider(widget.categoryId!));
-      return categoryAsync.when(
+      final AsyncValue<WorkoutPlan?> planAsync = ref.watch(workoutPlanByIdProvider(widget.planId!));
+      return planAsync.when(
         loading: () => Scaffold(
-          appBar: AppBar(title: const Text('Edit category')),
+          appBar: AppBar(title: const Text('Edit plan')),
           body: const Center(child: CircularProgressIndicator()),
         ),
         error: (error, stack) => Scaffold(
-          appBar: AppBar(title: const Text('Edit category')),
-          body: Center(child: Text('Could not load category: $error')),
+          appBar: AppBar(title: const Text('Edit plan')),
+          body: Center(child: Text('Could not load plan: $error')),
         ),
-        data: (Category? category) {
-          if (category == null) {
+        data: (WorkoutPlan? plan) {
+          if (plan == null) {
             return Scaffold(
-              appBar: AppBar(title: const Text('Edit category')),
-              body: const Center(child: Text('Category not found.')),
+              appBar: AppBar(title: const Text('Edit plan')),
+              body: const Center(child: Text('Plan not found.')),
             );
           }
-          _prefillFrom(category);
+          _prefillFrom(plan);
           return _buildForm(context);
         },
       );
@@ -109,30 +108,32 @@ class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
   }
 
   Widget _buildForm(BuildContext context) {
-    final AsyncValue<void> formState = ref.watch(categoryFormControllerProvider);
+    final AsyncValue<void> formState = ref.watch(workoutPlanFormControllerProvider);
     final bool isSaving = formState.isLoading;
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.isEditing ? 'Edit category' : 'New category')),
+      appBar: AppBar(title: Text(widget.isEditing ? 'Edit plan' : 'New workout plan')),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
           children: [
             AppTextField(
-              label: 'Category name',
+              label: 'Plan name',
               controller: _nameController,
-              prefixIcon: Icons.label_outline_rounded,
-              validator: (value) => Validators.required(value, field: 'Category name'),
+              prefixIcon: Icons.event_note_outlined,
+              validator: (value) => Validators.required(value, field: 'Plan name'),
             ),
             const SizedBox(height: 16),
             Text('Type', style: Theme.of(context).textTheme.labelLarge),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
+              runSpacing: 8,
               children: [
-                for (final CategoryType type in CategoryType.values)
+                for (final WorkoutPlanType type in WorkoutPlanType.values)
                   ChoiceChip(
+                    avatar: Icon(type.icon, size: 16),
                     label: Text(type.label),
                     selected: type == _type,
                     onSelected: (_) => setState(() => _type = type),
@@ -146,13 +147,12 @@ class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
               selectedColorValue: _colorValue,
               onChanged: (value) => setState(() => _colorValue = value),
             ),
-            const SizedBox(height: 20),
-            Text('Icon', style: Theme.of(context).textTheme.labelLarge),
-            const SizedBox(height: 8),
-            CategoryIconPicker(
-              selectedKey: _iconKey,
-              color: Color(_colorValue),
-              onChanged: (key) => setState(() => _iconKey = key),
+            const SizedBox(height: 16),
+            AppTextField(
+              label: 'Notes (optional)',
+              controller: _notesController,
+              prefixIcon: Icons.notes_rounded,
+              maxLines: 3,
             ),
             const SizedBox(height: 28),
             FilledButton(
@@ -163,7 +163,7 @@ class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(widget.isEditing ? 'Save changes' : 'Create category'),
+                  : Text(widget.isEditing ? 'Save changes' : 'Create plan'),
             ),
           ],
         ),

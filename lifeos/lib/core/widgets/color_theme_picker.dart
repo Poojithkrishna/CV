@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app/theme/app_gradients.dart';
+import '../../app/theme/app_gradients.dart';
 
-/// Lets the user pick one of the app's preset gradients as an account's
-/// (or, later, habit's / project's) color theme. Stores just the ARGB
-/// value of the gradient's first stop, since that's all the domain layer
-/// needs to reconstruct a solid accent color.
+/// Lets the user pick one of the app's preset gradients as an entity's
+/// (account, category, workout plan, ...) color theme. Stores just the
+/// ARGB value of the gradient's first stop, since that's all the domain
+/// layer needs to reconstruct a solid accent color.
 class ColorThemePicker extends StatelessWidget {
   const ColorThemePicker({
     super.key,

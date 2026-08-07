@@ -20,7 +20,17 @@ import '../../features/finance/data/tables/loan_payments_table.dart';
 import '../../features/finance/data/tables/loans_table.dart';
 import '../../features/finance/data/tables/recurring_payments_table.dart';
 import '../../features/finance/data/tables/transactions_table.dart';
+import '../../features/fitness/data/daos/exercises_dao.dart';
+import '../../features/fitness/data/daos/workout_plans_dao.dart';
+import '../../features/fitness/data/daos/workout_sessions_dao.dart';
+import '../../features/fitness/data/tables/exercises_table.dart';
+import '../../features/fitness/data/tables/logged_sets_table.dart';
+import '../../features/fitness/data/tables/plan_exercises_table.dart';
+import '../../features/fitness/data/tables/workout_days_table.dart';
+import '../../features/fitness/data/tables/workout_plans_table.dart';
+import '../../features/fitness/data/tables/workout_sessions_table.dart';
 import 'default_categories.dart';
+import 'default_exercises.dart';
 
 part 'app_database.g.dart';
 
@@ -41,6 +51,12 @@ part 'app_database.g.dart';
     Loans,
     LoanPayments,
     RecurringPayments,
+    Exercises,
+    WorkoutPlans,
+    WorkoutDays,
+    PlanExercises,
+    WorkoutSessions,
+    LoggedSets,
   ],
   daos: [
     AccountsDao,
@@ -50,6 +66,9 @@ part 'app_database.g.dart';
     CardEmisDao,
     LoansDao,
     RecurringPaymentsDao,
+    ExercisesDao,
+    WorkoutPlansDao,
+    WorkoutSessionsDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -60,13 +79,14 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) async {
           await m.createAll();
           await _seedDefaultCategories();
+          await _seedDefaultExercises();
         },
         onUpgrade: (Migrator m, int from, int to) async {
           if (from < 2) {
@@ -85,12 +105,31 @@ class AppDatabase extends _$AppDatabase {
           if (from < 5) {
             await m.createTable(recurringPayments);
           }
+          if (from < 6) {
+            await m.createTable(exercises);
+            await _seedDefaultExercises();
+          }
+          if (from < 7) {
+            await m.createTable(workoutPlans);
+            await m.createTable(workoutDays);
+            await m.createTable(planExercises);
+          }
+          if (from < 8) {
+            await m.createTable(workoutSessions);
+            await m.createTable(loggedSets);
+          }
         },
       );
 
   Future<void> _seedDefaultCategories() async {
     await batch((b) {
       b.insertAll(categories, buildDefaultCategorySeed(DateTime.now()));
+    });
+  }
+
+  Future<void> _seedDefaultExercises() async {
+    await batch((b) {
+      b.insertAll(exercises, buildDefaultExerciseSeed(DateTime.now()));
     });
   }
 }
