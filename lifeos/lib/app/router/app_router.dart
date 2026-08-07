@@ -7,7 +7,11 @@ import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/entertainment/presentation/screens/entertainment_home_screen.dart';
 import '../../features/finance/presentation/screens/account_detail_screen.dart';
 import '../../features/finance/presentation/screens/account_form_screen.dart';
+import '../../features/finance/presentation/screens/categories_screen.dart';
+import '../../features/finance/presentation/screens/category_form_screen.dart';
 import '../../features/finance/presentation/screens/finance_home_screen.dart';
+import '../../features/finance/presentation/screens/transaction_form_screen.dart';
+import '../../features/finance/presentation/screens/transactions_list_screen.dart';
 import '../../features/fitness/presentation/screens/fitness_home_screen.dart';
 import '../../features/gamification/presentation/screens/gamification_home_screen.dart';
 import '../../features/goals/presentation/screens/goals_home_screen.dart';
@@ -57,6 +61,42 @@ final GoRouter appRouter = GoRouter(
                   path: 'accounts/:id/edit',
                   builder: (context, state) => AccountFormScreen(
                     accountId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'accounts/:id/transactions',
+                  builder: (context, state) => TransactionsListScreen(
+                    accountId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'transactions',
+                  builder: (context, state) => const TransactionsListScreen(),
+                ),
+                GoRoute(
+                  path: 'transactions/new',
+                  builder: (context, state) => TransactionFormScreen(
+                    initialAccountId: state.uri.queryParameters['accountId'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'transactions/:id/edit',
+                  builder: (context, state) => TransactionFormScreen(
+                    transactionId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'categories',
+                  builder: (context, state) => const CategoriesScreen(),
+                ),
+                GoRoute(
+                  path: 'categories/new',
+                  builder: (context, state) => const CategoryFormScreen(),
+                ),
+                GoRoute(
+                  path: 'categories/:id/edit',
+                  builder: (context, state) => CategoryFormScreen(
+                    categoryId: state.pathParameters['id'],
                   ),
                 ),
               ],

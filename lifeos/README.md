@@ -18,6 +18,15 @@ Built feature by feature. So far:
   domain entity + repository + use cases, Riverpod providers, list/detail/
   form UI, validation, unit + widget tests). Net worth on the dashboard is
   computed live from this.
+- ✅ **Finance → Categories & Transactions**: income/expense/transfer
+  entries, each atomically adjusting its account's (or, for a transfer,
+  both accounts') balance in a single Drift `transaction()` — see
+  `TransactionsDao` in `lib/features/finance/data/daos/transactions_dao.dart`.
+  Categories are seeded with sensible defaults on first run (`ON DELETE SET
+  NULL`, so deleting a category never destroys transaction history), while
+  deleting an account cascades to its transactions. Finance home now shows
+  recent transactions with a "See all" list, and every account links to its
+  own transaction history.
 - 🚧 Every other module (Fitness, Habits, Goals, Creator Studio,
   Entertainment, Journal, Calendar, Gamification) has a placeholder screen
   wired into navigation, ready for its own feature pass — see
@@ -89,8 +98,10 @@ during active development to regenerate on save.
 flutter test
 ```
 
-Covers: `CreateAccount` use-case validation, `AccountsDao` behaviour
-against an in-memory SQLite database, and `AccountCard` widget rendering.
+Covers: `CreateAccount`/`CreateTransaction`/`CreateCategory` use-case
+validation, `AccountsDao` and `TransactionsDao` behaviour (including the
+income/expense/transfer/edit/delete balance math) against an in-memory
+SQLite database, and `AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -107,13 +118,12 @@ Suggested order for the next feature passes (say which one you want and
 it'll get the same full treatment — models → repository → use cases →
 providers → UI → widgets → validation → tests):
 
-1. Finance: Categories + Transactions (income/expense), then Transfers
-2. Finance: Credit Cards, Loans, Bills/Recurring payments, Analytics
-3. Fitness: Workout Plans + Workout Tracker
-4. Habits & Goals
-5. Gaming Creator Studio pipeline
-6. Entertainment Library
-7. Journal
-8. Calendar & Tasks
-9. Gamification (ranks, XP, attributes, achievements, Life Score) —
+1. Finance: Credit Cards, Loans, Bills/Recurring payments, Analytics
+2. Fitness: Workout Plans + Workout Tracker
+3. Habits & Goals
+4. Gaming Creator Studio pipeline
+5. Entertainment Library
+6. Journal
+7. Calendar & Tasks
+8. Gamification (ranks, XP, attributes, achievements, Life Score) —
    wiring dashboard stats to real data from the modules above as they land

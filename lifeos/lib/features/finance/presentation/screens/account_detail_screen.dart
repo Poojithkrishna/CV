@@ -17,8 +17,8 @@ class AccountDetailScreen extends ConsumerWidget {
       context,
       title: 'Delete account?',
       message:
-          'This permanently removes the account. Any linked transactions will keep '
-          'a reference to a deleted account until you build the Transactions module.',
+          'This permanently removes the account and every transaction linked to it '
+          '(including transfers to or from it). This cannot be undone.',
     );
     if (!confirmed) return;
 
@@ -127,6 +127,13 @@ class AccountDetailScreen extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text(account.notes!),
               ],
+              const SizedBox(height: 24),
+              OutlinedButton.icon(
+                onPressed: () =>
+                    context.push('/finance/accounts/${account.id}/transactions'),
+                icon: const Icon(Icons.receipt_long_outlined),
+                label: const Text('View transactions'),
+              ),
             ],
           ),
         );

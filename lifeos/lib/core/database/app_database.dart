@@ -6,7 +6,12 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import '../../features/finance/data/daos/accounts_dao.dart';
+import '../../features/finance/data/daos/categories_dao.dart';
+import '../../features/finance/data/daos/transactions_dao.dart';
 import '../../features/finance/data/tables/accounts_table.dart';
+import '../../features/finance/data/tables/categories_table.dart';
+import '../../features/finance/data/tables/transactions_table.dart';
+import 'default_categories.dart';
 
 part 'app_database.g.dart';
 
@@ -18,8 +23,8 @@ part 'app_database.g.dart';
 /// Bump [schemaVersion] and add a migration step whenever a table changes
 /// shape — never edit an already-released table in place.
 @DriftDatabase(
-  tables: [Accounts],
-  daos: [AccountsDao],
+  tables: [Accounts, Categories, Transactions],
+  daos: [AccountsDao, CategoriesDao, TransactionsDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -29,18 +34,28 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) async {
           await m.createAll();
+          await _seedDefaultCategories();
         },
         onUpgrade: (Migrator m, int from, int to) async {
-          // Add `if (from < N) { ... }` migration steps here as the schema
-          // grows across future modules.
+          if (from < 2) {
+            await m.createTable(categories);
+            await m.createTable(transactions);
+            await _seedDefaultCategories();
+          }
         },
       );
+
+  Future<void> _seedDefaultCategories() async {
+    await batch((b) {
+      b.insertAll(categories, buildDefaultCategorySeed(DateTime.now()));
+    });
+  }
 }
 
 LazyDatabase _openConnection() {
