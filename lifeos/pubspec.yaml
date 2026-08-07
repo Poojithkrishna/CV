@@ -1,0 +1,57 @@
+name: lifeos
+description: >
+  LifeOS — a premium, offline-first personal operating system combining
+  Finance, Fitness, Habits, Goals, Creator Studio, Entertainment, Journal,
+  Calendar and Gamification into a single Android app.
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+  flutter: ">=3.22.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.6.1
+
+  # Local database (offline-first, SQLite via Drift)
+  drift: ^2.20.3
+  sqlite3_flutter_libs: ^0.5.24
+  sqlite3: ^2.4.6
+  path_provider: ^2.1.4
+  path: ^1.9.0
+
+  # Routing
+  go_router: ^14.6.1
+
+  # Notifications & biometrics (wired up in later modules)
+  flutter_local_notifications: ^18.0.1
+  local_auth: ^2.3.0
+
+  # Formatting & utility
+  intl: ^0.19.0
+  uuid: ^4.5.1
+
+  # Charts (finance & habit analytics)
+  fl_chart: ^0.69.2
+
+  # Fonts / visuals
+  google_fonts: ^6.2.1
+
+  # Small persisted preferences (theme mode, onboarding flags, etc.)
+  shared_preferences: ^2.3.3
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  drift_dev: ^2.20.3
+  build_runner: ^2.4.13
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,121 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../features/calendar/presentation/screens/calendar_home_screen.dart';
+import '../../features/creator_studio/presentation/screens/creator_studio_home_screen.dart';
+import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../features/entertainment/presentation/screens/entertainment_home_screen.dart';
+import '../../features/finance/presentation/screens/account_detail_screen.dart';
+import '../../features/finance/presentation/screens/account_form_screen.dart';
+import '../../features/finance/presentation/screens/finance_home_screen.dart';
+import '../../features/fitness/presentation/screens/fitness_home_screen.dart';
+import '../../features/gamification/presentation/screens/gamification_home_screen.dart';
+import '../../features/goals/presentation/screens/goals_home_screen.dart';
+import '../../features/habits/presentation/screens/habits_home_screen.dart';
+import '../../features/journal/presentation/screens/journal_home_screen.dart';
+import '../../features/more/presentation/screens/more_home_screen.dart';
+import '../../features/settings/presentation/screens/settings_home_screen.dart';
+import 'app_shell.dart';
+
+/// Root navigation graph. The five bottom-nav tabs (Home, Finance, Habits,
+/// Fitness, More) are [StatefulShellRoute] branches so each keeps its own
+/// back stack and scroll position when switching tabs; every other screen
+/// (module detail pages, forms) is a plain top-level route pushed on top.
+final GoRouter appRouter = GoRouter(
+  initialLocation: '/dashboard',
+  routes: [
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        return AppShell(navigationShell: navigationShell);
+      },
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/dashboard',
+              builder: (context, state) => const DashboardScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/finance',
+              builder: (context, state) => const FinanceHomeScreen(),
+              routes: [
+                GoRoute(
+                  path: 'accounts/new',
+                  builder: (context, state) => const AccountFormScreen(),
+                ),
+                GoRoute(
+                  path: 'accounts/:id',
+                  builder: (context, state) => AccountDetailScreen(
+                    accountId: state.pathParameters['id']!,
+                  ),
+                ),
+                GoRoute(
+                  path: 'accounts/:id/edit',
+                  builder: (context, state) => AccountFormScreen(
+                    accountId: state.pathParameters['id'],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/habits',
+              builder: (context, state) => const HabitsHomeScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/fitness',
+              builder: (context, state) => const FitnessHomeScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/more',
+              builder: (context, state) => const MoreHomeScreen(),
+            ),
+          ],
+        ),
+      ],
+    ),
+    GoRoute(
+      path: '/goals',
+      builder: (context, state) => const GoalsHomeScreen(),
+    ),
+    GoRoute(
+      path: '/creator-studio',
+      builder: (context, state) => const CreatorStudioHomeScreen(),
+    ),
+    GoRoute(
+      path: '/entertainment',
+      builder: (context, state) => const EntertainmentHomeScreen(),
+    ),
+    GoRoute(
+      path: '/journal',
+      builder: (context, state) => const JournalHomeScreen(),
+    ),
+    GoRoute(
+      path: '/calendar',
+      builder: (context, state) => const CalendarHomeScreen(),
+    ),
+    GoRoute(
+      path: '/gamification',
+      builder: (context, state) => const GamificationHomeScreen(),
+    ),
+    GoRoute(
+      path: '/settings',
+      builder: (context, state) => const SettingsHomeScreen(),
+    ),
+  ],
+);
