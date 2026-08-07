@@ -13,6 +13,7 @@ class AccountPickerField extends ConsumerWidget {
     required this.selectedAccountId,
     required this.onChanged,
     this.excludeAccountId,
+    this.required = true,
   });
 
   final String label;
@@ -22,6 +23,11 @@ class AccountPickerField extends ConsumerWidget {
   /// Hides one account from the list — used so a transfer's destination
   /// picker can't select the same account as the source.
   final String? excludeAccountId;
+
+  /// Whether leaving this field empty should fail validation. Some
+  /// callers (e.g. a recurring payment that isn't tracked against a
+  /// specific account) want the field to stay optional.
+  final bool required;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -45,7 +51,7 @@ class AccountPickerField extends ConsumerWidget {
               DropdownMenuItem(value: account.id, child: Text(account.name)),
           ],
           onChanged: onChanged,
-          validator: (value) => value == null ? 'Choose an account' : null,
+          validator: required ? (value) => value == null ? 'Choose an account' : null : null,
         );
       },
     );

@@ -40,6 +40,18 @@ Built feature by feature. So far:
   pattern) with full payment history. Both fold into the dashboard's net
   worth via `net_worth_provider.dart`, which combines accounts, card usage
   (a liability) and loans (an asset when given, a liability when borrowed).
+- ✅ **Finance → Bills & Recurring Payments**: one `RecurringPayment` entity
+  covers both (a bill *is* a recurring payment) — name, expected amount,
+  frequency (weekly/monthly/quarterly/yearly, with month arithmetic
+  clamped to the target month's real length — 31 Jan → 28/29 Feb, not
+  3 Mar), next due date, optional linked account/category, reminder-days-
+  before and an auto-pay flag. "Mark as paid" doesn't run its own ledger —
+  `MarkRecurringPaymentPaid` composes the existing `CreateTransaction` use
+  case (logging a real expense against the linked account, if any) with
+  advancing `nextDueDate`, then updates the schedule. Not folded into net
+  worth (an upcoming bill is a forecast, not a balance-sheet liability —
+  counting it would double-count against the cash sitting in the account
+  that'll pay it). The list screen surfaces overdue items first.
 - 🚧 Every other module (Fitness, Habits, Goals, Creator Studio,
   Entertainment, Journal, Calendar, Gamification) has a placeholder screen
   wired into navigation, ready for its own feature pass — see
@@ -112,11 +124,14 @@ flutter test
 ```
 
 Covers: `CreateAccount`/`CreateTransaction`/`CreateCategory`/
-`CreateCreditCard`/`CreateLoan`/`RecordLoanPayment` use-case validation,
-`AccountsDao`/`TransactionsDao`/`CreditCardsDao`/`CardEmisDao`/`LoansDao`
-behaviour (balance and payment math, including edit/delete reverting the
-right effect) against an in-memory SQLite database, and `AccountCard`
-widget rendering.
+`CreateCreditCard`/`CreateLoan`/`RecordLoanPayment`/`CreateRecurringPayment`
+use-case validation, `RecurrenceFrequency`'s date math (including leap-year
+and month-length clamping) and `MarkRecurringPaymentPaid`'s orchestration
+(with/without a linked account, amount overrides, rejection of invalid
+amounts), `AccountsDao`/`TransactionsDao`/`CreditCardsDao`/`CardEmisDao`/
+`LoansDao` behaviour (balance and payment math, including edit/delete
+reverting the right effect) against an in-memory SQLite database, and
+`AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -136,7 +151,7 @@ Suggested order for the next feature passes (say which one you want and
 it'll get the same full treatment — models → repository → use cases →
 providers → UI → widgets → validation → tests):
 
-1. Finance: Bills/Recurring payments, Investments & Assets, Analytics
+1. Finance: Investments & Assets, Analytics
 2. Fitness: Workout Plans + Workout Tracker
 3. Habits & Goals
 4. Gaming Creator Studio pipeline

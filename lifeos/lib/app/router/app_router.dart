@@ -17,6 +17,9 @@ import '../../features/finance/presentation/screens/finance_home_screen.dart';
 import '../../features/finance/presentation/screens/loan_detail_screen.dart';
 import '../../features/finance/presentation/screens/loan_form_screen.dart';
 import '../../features/finance/presentation/screens/loans_list_screen.dart';
+import '../../features/finance/presentation/screens/recurring_payment_detail_screen.dart';
+import '../../features/finance/presentation/screens/recurring_payment_form_screen.dart';
+import '../../features/finance/presentation/screens/recurring_payments_list_screen.dart';
 import '../../features/finance/presentation/screens/transaction_form_screen.dart';
 import '../../features/finance/presentation/screens/transactions_list_screen.dart';
 import '../../features/fitness/presentation/screens/fitness_home_screen.dart';
@@ -150,6 +153,26 @@ final GoRouter appRouter = GoRouter(
                   path: 'loans/:id/edit',
                   builder: (context, state) => LoanFormScreen(
                     loanId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'recurring-payments',
+                  builder: (context, state) => const RecurringPaymentsListScreen(),
+                ),
+                GoRoute(
+                  path: 'recurring-payments/new',
+                  builder: (context, state) => const RecurringPaymentFormScreen(),
+                ),
+                GoRoute(
+                  path: 'recurring-payments/:id',
+                  builder: (context, state) => RecurringPaymentDetailScreen(
+                    paymentId: state.pathParameters['id']!,
+                  ),
+                ),
+                GoRoute(
+                  path: 'recurring-payments/:id/edit',
+                  builder: (context, state) => RecurringPaymentFormScreen(
+                    paymentId: state.pathParameters['id'],
                   ),
                 ),
               ],

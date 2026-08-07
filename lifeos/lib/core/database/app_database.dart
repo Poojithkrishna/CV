@@ -10,6 +10,7 @@ import '../../features/finance/data/daos/card_emis_dao.dart';
 import '../../features/finance/data/daos/categories_dao.dart';
 import '../../features/finance/data/daos/credit_cards_dao.dart';
 import '../../features/finance/data/daos/loans_dao.dart';
+import '../../features/finance/data/daos/recurring_payments_dao.dart';
 import '../../features/finance/data/daos/transactions_dao.dart';
 import '../../features/finance/data/tables/accounts_table.dart';
 import '../../features/finance/data/tables/card_emis_table.dart';
@@ -17,6 +18,7 @@ import '../../features/finance/data/tables/categories_table.dart';
 import '../../features/finance/data/tables/credit_cards_table.dart';
 import '../../features/finance/data/tables/loan_payments_table.dart';
 import '../../features/finance/data/tables/loans_table.dart';
+import '../../features/finance/data/tables/recurring_payments_table.dart';
 import '../../features/finance/data/tables/transactions_table.dart';
 import 'default_categories.dart';
 
@@ -38,6 +40,7 @@ part 'app_database.g.dart';
     CardEmis,
     Loans,
     LoanPayments,
+    RecurringPayments,
   ],
   daos: [
     AccountsDao,
@@ -46,6 +49,7 @@ part 'app_database.g.dart';
     CreditCardsDao,
     CardEmisDao,
     LoansDao,
+    RecurringPaymentsDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -56,7 +60,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -77,6 +81,9 @@ class AppDatabase extends _$AppDatabase {
           if (from < 4) {
             await m.createTable(loans);
             await m.createTable(loanPayments);
+          }
+          if (from < 5) {
+            await m.createTable(recurringPayments);
           }
         },
       );

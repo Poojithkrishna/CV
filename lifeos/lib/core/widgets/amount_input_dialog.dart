@@ -10,8 +10,11 @@ Future<double?> showAmountInputDialog(
   required String title,
   String label = 'Amount',
   double? maxAmount,
+  double? initialValue,
 }) async {
-  final TextEditingController controller = TextEditingController();
+  final TextEditingController controller = TextEditingController(
+    text: initialValue != null ? initialValue.toStringAsFixed(2) : '',
+  );
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   final double? result = await showDialog<double>(

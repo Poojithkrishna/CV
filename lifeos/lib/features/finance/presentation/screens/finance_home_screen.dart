@@ -94,6 +94,12 @@ class FinanceHomeScreen extends ConsumerWidget {
                           ),
                           const SizedBox(width: 8),
                           _ToolChip(
+                            icon: Icons.receipt_long_outlined,
+                            label: 'Bills',
+                            onTap: () => context.push('/finance/recurring-payments'),
+                          ),
+                          const SizedBox(width: 8),
+                          _ToolChip(
                             icon: Icons.category_outlined,
                             label: 'Categories',
                             onTap: () => context.push('/finance/categories'),
