@@ -29,6 +29,13 @@ import '../../features/fitness/data/tables/plan_exercises_table.dart';
 import '../../features/fitness/data/tables/workout_days_table.dart';
 import '../../features/fitness/data/tables/workout_plans_table.dart';
 import '../../features/fitness/data/tables/workout_sessions_table.dart';
+import '../../features/goals/data/daos/goals_dao.dart';
+import '../../features/goals/data/tables/goal_habit_links_table.dart';
+import '../../features/goals/data/tables/goals_table.dart';
+import '../../features/goals/data/tables/milestones_table.dart';
+import '../../features/habits/data/daos/habits_dao.dart';
+import '../../features/habits/data/tables/habit_entries_table.dart';
+import '../../features/habits/data/tables/habits_table.dart';
 import 'default_categories.dart';
 import 'default_exercises.dart';
 
@@ -57,6 +64,11 @@ part 'app_database.g.dart';
     PlanExercises,
     WorkoutSessions,
     LoggedSets,
+    Habits,
+    HabitEntries,
+    Goals,
+    Milestones,
+    GoalHabitLinks,
   ],
   daos: [
     AccountsDao,
@@ -69,6 +81,8 @@ part 'app_database.g.dart';
     ExercisesDao,
     WorkoutPlansDao,
     WorkoutSessionsDao,
+    HabitsDao,
+    GoalsDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -79,7 +93,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -117,6 +131,15 @@ class AppDatabase extends _$AppDatabase {
           if (from < 8) {
             await m.createTable(workoutSessions);
             await m.createTable(loggedSets);
+          }
+          if (from < 9) {
+            await m.createTable(habits);
+            await m.createTable(habitEntries);
+          }
+          if (from < 10) {
+            await m.createTable(goals);
+            await m.createTable(milestones);
+            await m.createTable(goalHabitLinks);
           }
         },
       );

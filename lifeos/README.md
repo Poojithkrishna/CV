@@ -74,9 +74,32 @@ Built feature by feature. So far:
     repeat it), a rest timer between working sets, and running session
     volume (`WorkoutStats.sessionVolume`). A finished session becomes a
     read-only history entry.
-- 🚧 Every other module (Habits, Goals, Creator Studio, Entertainment,
-  Journal, Calendar, Gamification) has a placeholder screen wired into
-  navigation, ready for its own feature pass — see
+- ✅ **Habits**: six habit types (Yes/No, Counter, Timer, Duration,
+  Checklist, Collection) share one storage model — every type except
+  Checklist is a numeric `progressValue` against a `targetValue` (Yes/No
+  is just that pattern with an implicit target of 1), with a
+  `HabitEntry` per habit per period (day/week/month, or custom weekdays)
+  upserted atomically by `HabitsDao.logProgress`/`toggleChecklistItem` so
+  rapid taps never create duplicate rows for the same period. Checklist
+  habits track checked-item indices separately per period. `HabitStats`
+  (pure, DB-free) computes current/longest streak — the in-progress
+  current period never breaks a streak before it's actually missed, and
+  unscheduled custom days are skipped rather than counted as misses —
+  plus completion rate and a heatmap (partial credit for numeric types).
+  The dashboard's "Habit completion" tile is wired to a real weekly
+  average across active habits.
+- ✅ **Goals**: a `Goal` optionally breaks down into ordered `Milestone`s;
+  when any exist, `GoalStats.progress` is just the completed fraction,
+  otherwise it falls back to the goal's own `progressValue`/`targetValue`
+  (same numeric model as habits). Goals can link to any number of Habits
+  via a `GoalHabitLink` join table (purely informational — logging the
+  habit doesn't move the goal's progress, it's just surfaced together on
+  the goal's detail screen) so a goal like "Run a marathon" can show its
+  linked "Go for a run" habit alongside its own milestones. The
+  dashboard's "Active goals" tile is wired to the real count.
+- 🚧 Every other module (Creator Studio, Entertainment, Journal, Calendar,
+  Gamification) has a placeholder screen wired into navigation, ready for
+  its own feature pass — see
   `lib/features/<module>/presentation/screens/*_home_screen.dart`.
 
 ## Architecture
@@ -147,15 +170,20 @@ flutter test
 
 Covers: use-case validation across Finance (`CreateAccount`/
 `CreateTransaction`/`CreateCategory`/`CreateCreditCard`/`CreateLoan`/
-`RecordLoanPayment`/`CreateRecurringPayment`) and Fitness (`LogSet`/
-`CreateWorkoutPlan`/`AddExerciseToDay`); `RecurrenceFrequency`'s date math
-(leap years, month-length clamping) and `MarkRecurringPaymentPaid`'s
+`RecordLoanPayment`/`CreateRecurringPayment`), Fitness (`LogSet`/
+`CreateWorkoutPlan`/`AddExerciseToDay`), Habits (`CreateHabit`) and Goals
+(`CreateGoal`/`AddMilestone`); `RecurrenceFrequency`'s date math (leap
+years, month-length clamping) and `MarkRecurringPaymentPaid`'s
 orchestration; `WorkoutStats`'s volume and progression-suggestion math;
-DAO behaviour against an in-memory SQLite database for `AccountsDao`/
-`TransactionsDao`/`CreditCardsDao`/`CardEmisDao`/`LoansDao` (balance and
-payment math, including edit/delete reverting the right effect) and for
-`WorkoutSessionsDao`/`WorkoutPlansDao` (PR detection, active-plan
-switching); and `AccountCard` widget rendering.
+`HabitStats`'s streak/completion-rate/heatmap math (including custom
+weekday schedules) and `GoalStats`'s milestone-vs-numeric progress
+fallback; DAO behaviour against an in-memory SQLite database for
+`AccountsDao`/`TransactionsDao`/`CreditCardsDao`/`CardEmisDao`/`LoansDao`
+(balance and payment math, including edit/delete reverting the right
+effect), `WorkoutSessionsDao`/`WorkoutPlansDao` (PR detection,
+active-plan switching), `HabitsDao` (atomic period upserts, floored at
+zero, checklist toggling) and `GoalsDao` (milestone toggling, habit
+linking, cascading deletes); and `AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -178,10 +206,9 @@ providers → UI → widgets → validation → tests):
 1. Finance: Investments & Assets, Analytics
 2. Fitness: Progress Photos, Measurements, Nutrition, Water, Supplements,
    Cardio, Recovery, Body Weight & Strength Progress analytics
-3. Habits & Goals
-4. Gaming Creator Studio pipeline
-5. Entertainment Library
-6. Journal
-7. Calendar & Tasks
-8. Gamification (ranks, XP, attributes, achievements, Life Score) —
+3. Gaming Creator Studio pipeline
+4. Entertainment Library
+5. Journal
+6. Calendar & Tasks
+7. Gamification (ranks, XP, attributes, achievements, Life Score) —
    wiring dashboard stats to real data from the modules above as they land

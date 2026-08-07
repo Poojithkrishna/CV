@@ -54,7 +54,7 @@ class _RestTimerBannerState extends State<RestTimerBanner> {
               width: 28,
               height: 28,
               child: CircularProgressIndicator(
-                value: progress.clamp(0, 1),
+                value: progress.clamp(0, 1).toDouble(),
                 strokeWidth: 3,
                 backgroundColor: colorScheme.onPrimaryContainer.withOpacity(0.2),
               ),

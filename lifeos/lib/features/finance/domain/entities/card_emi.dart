@@ -31,13 +31,15 @@ class CardEmi {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  int get remainingMonths => (tenureMonths - monthsPaid).clamp(0, tenureMonths);
+  int get remainingMonths => (tenureMonths - monthsPaid).clamp(0, tenureMonths).toInt();
 
-  double get remainingAmount => (totalAmount - (monthlyAmount * monthsPaid)).clamp(0, totalAmount);
+  double get remainingAmount =>
+      (totalAmount - (monthlyAmount * monthsPaid)).clamp(0, totalAmount).toDouble();
 
   bool get isPaidOff => monthsPaid >= tenureMonths;
 
-  double get progress => tenureMonths == 0 ? 1 : (monthsPaid / tenureMonths).clamp(0, 1);
+  double get progress =>
+      tenureMonths == 0 ? 1 : (monthsPaid / tenureMonths).clamp(0, 1).toDouble();
 
   CardEmi copyWith({
     String? description,

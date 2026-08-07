@@ -24,7 +24,7 @@ enum RecurrenceFrequency {
     final int totalMonths = (date.year * 12 + (date.month - 1)) + months;
     final int year = totalMonths ~/ 12;
     final int month = totalMonths % 12 + 1;
-    final int day = date.day.clamp(1, _daysInMonth(year, month));
+    final int day = date.day.clamp(1, _daysInMonth(year, month)).toInt();
     return DateTime(year, month, day, date.hour, date.minute);
   }
 

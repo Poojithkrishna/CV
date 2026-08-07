@@ -34,8 +34,12 @@ import '../../features/fitness/presentation/screens/workout_plan_form_screen.dar
 import '../../features/fitness/presentation/screens/workout_plans_list_screen.dart';
 import '../../features/fitness/presentation/screens/workout_session_screen.dart';
 import '../../features/gamification/presentation/screens/gamification_home_screen.dart';
-import '../../features/goals/presentation/screens/goals_home_screen.dart';
-import '../../features/habits/presentation/screens/habits_home_screen.dart';
+import '../../features/goals/presentation/screens/goal_detail_screen.dart';
+import '../../features/goals/presentation/screens/goal_form_screen.dart';
+import '../../features/goals/presentation/screens/goals_list_screen.dart';
+import '../../features/habits/presentation/screens/habit_detail_screen.dart';
+import '../../features/habits/presentation/screens/habit_form_screen.dart';
+import '../../features/habits/presentation/screens/habits_list_screen.dart';
 import '../../features/journal/presentation/screens/journal_home_screen.dart';
 import '../../features/more/presentation/screens/more_home_screen.dart';
 import '../../features/settings/presentation/screens/settings_home_screen.dart';
@@ -193,7 +197,25 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/habits',
-              builder: (context, state) => const HabitsHomeScreen(),
+              builder: (context, state) => const HabitsListScreen(),
+              routes: [
+                GoRoute(
+                  path: 'new',
+                  builder: (context, state) => const HabitFormScreen(),
+                ),
+                GoRoute(
+                  path: ':id',
+                  builder: (context, state) => HabitDetailScreen(
+                    habitId: state.pathParameters['id']!,
+                  ),
+                ),
+                GoRoute(
+                  path: ':id/edit',
+                  builder: (context, state) => HabitFormScreen(
+                    habitId: state.pathParameters['id'],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -283,7 +305,25 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/goals',
-      builder: (context, state) => const GoalsHomeScreen(),
+      builder: (context, state) => const GoalsListScreen(),
+      routes: [
+        GoRoute(
+          path: 'new',
+          builder: (context, state) => const GoalFormScreen(),
+        ),
+        GoRoute(
+          path: ':id',
+          builder: (context, state) => GoalDetailScreen(
+            goalId: state.pathParameters['id']!,
+          ),
+        ),
+        GoRoute(
+          path: ':id/edit',
+          builder: (context, state) => GoalFormScreen(
+            goalId: state.pathParameters['id'],
+          ),
+        ),
+      ],
     ),
     GoRoute(
       path: '/creator-studio',

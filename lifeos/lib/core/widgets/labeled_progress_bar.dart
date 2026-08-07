@@ -36,7 +36,7 @@ class LabeledProgressBar extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: LinearProgressIndicator(
-            value: progress.clamp(0, 1),
+            value: progress.clamp(0, 1).toDouble(),
             minHeight: 8,
             backgroundColor: trackColor,
             valueColor: color != null ? AlwaysStoppedAnimation(color) : null,

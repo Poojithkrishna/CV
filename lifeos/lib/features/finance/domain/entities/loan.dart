@@ -36,7 +36,8 @@ class Loan {
 
   bool get isSettled => remainingAmount <= 0;
 
-  double get progress => principalAmount <= 0 ? 1 : (amountPaid / principalAmount).clamp(0, 1);
+  double get progress =>
+      principalAmount <= 0 ? 1 : (amountPaid / principalAmount).clamp(0, 1).toDouble();
 
   /// Signed contribution to net worth: a loan given is money owed to you
   /// (an asset); a loan borrowed is money you owe (a liability).

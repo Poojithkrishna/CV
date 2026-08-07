@@ -8,12 +8,16 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/gradient_card.dart';
 import '../../../finance/presentation/providers/net_worth_provider.dart';
 import '../../../fitness/presentation/providers/workout_plan_providers.dart';
+import '../../../goals/domain/entities/goal.dart';
+import '../../../goals/presentation/providers/goal_providers.dart';
+import '../../../habits/presentation/providers/habit_providers.dart';
 import '../widgets/module_summary_card.dart';
 
 /// The LifeOS home screen: a single glance at every module. Finance's net
-/// worth tile is wired to real data; every other tile is a placeholder
-/// until that module's own feature pass lands, but they're already
-/// tappable so the whole app is navigable end to end.
+/// worth, Fitness's active plan, Habits' weekly completion and Goals'
+/// active count tiles are wired to real data; every other tile is a
+/// placeholder until that module's own feature pass lands, but they're
+/// already tappable so the whole app is navigable end to end.
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -29,6 +33,20 @@ class DashboardScreen extends ConsumerWidget {
     final AsyncValue activePlan = ref.watch(currentActivePlanProvider);
     final String activePlanValue = activePlan.when(
       data: (plan) => plan?.name ?? 'No active plan',
+      loading: () => '—',
+      error: (_, __) => '—',
+    );
+
+    final AsyncValue<double> habitCompletion = ref.watch(habitsWeeklyCompletionProvider);
+    final String habitCompletionValue = habitCompletion.when(
+      data: (rate) => '${(rate * 100).toStringAsFixed(0)}%',
+      loading: () => '—',
+      error: (_, __) => '—',
+    );
+
+    final AsyncValue<List<Goal>> activeGoals = ref.watch(activeGoalsProvider);
+    final String activeGoalsValue = activeGoals.when(
+      data: (goals) => '${goals.length}',
       loading: () => '—',
       error: (_, __) => '—',
     );
@@ -116,7 +134,7 @@ class DashboardScreen extends ConsumerWidget {
               ),
               ModuleSummaryCard(
                 label: 'Habit completion',
-                value: '— %',
+                value: habitCompletionValue,
                 subtitle: 'This week',
                 icon: Icons.local_fire_department_rounded,
                 gradient: AppGradients.habits,
@@ -124,7 +142,7 @@ class DashboardScreen extends ConsumerWidget {
               ),
               ModuleSummaryCard(
                 label: 'Active goals',
-                value: '0',
+                value: activeGoalsValue,
                 subtitle: 'Goals',
                 icon: Icons.flag_rounded,
                 gradient: AppGradients.goals,
