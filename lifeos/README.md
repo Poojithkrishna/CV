@@ -382,8 +382,9 @@ Built feature by feature. So far:
   `AppWidgetProvider` subclass reading the shared preferences the
   plugin already writes to, a gradient-background layout matching the
   Gamification module's own color, and a tap target that launches
-  `MainActivity` via `HomeWidgetLaunchIntent` — no deep link into a
-  specific screen, just the same as tapping the app icon. `buildHomeWidgetData`
+  `MainActivity` via `HomeWidgetLaunchIntent` (each section now
+  deep-links to its own screen — see "Widget deep-linking" further
+  down). `buildHomeWidgetData`
   is unit tested (the loaded and not-yet-loaded gamification-snapshot
   cases, and that it always emits exactly its five keys); the Kotlin
   provider and XML resources aren't — there's no Dart test harness for
@@ -464,6 +465,27 @@ Built feature by feature. So far:
   from scratch, with a plain-language nudge ("open the app on a few
   different days...") in place of the chart until there are at least
   two points to draw a line between.
+- ✅ **Widget deep-linking**: tapping the home screen widget used to
+  always open the dashboard, no matter which value on it you actually
+  tapped. The rank/XP block, net worth, habit completion and today's
+  schedule are now four independently tappable sections
+  (`widget_gamification_section`/`widget_finance_section`/
+  `widget_habits_section`/`widget_calendar_section` in
+  `lifeos_widget.xml`), each wired to its own `PendingIntent` in
+  `LifeOsWidgetProvider` carrying a distinct `lifeos://widget/<section>`
+  URI; tapping padding or a gap between sections still falls through to
+  `widget_root`'s own dashboard-bound intent, so there's always a
+  sensible fallback. On the Flutter side, `routeForWidgetTap` (in
+  `core/home_widget/home_widget_deep_link.dart`) is a small pure
+  function mapping that URI to a route — kept separate from the actual
+  plugin/router calls in `home_widget_deep_link_service.dart`, the same
+  pure-logic/thin-orchestration split as `buildHomeWidgetData` versus
+  `HomeWidgetSyncService`. Two entry points cover both ways a tap can
+  reach Flutter: `handleInitialWidgetLaunch` (awaited in `main()` before
+  `runApp`, so a cold start opened from the widget lands directly on
+  the target screen instead of flashing the dashboard first) for when
+  the tap launches the process fresh, and `listenForWidgetTaps`
+  (`HomeWidget.widgetClicked`) for when the app was already alive.
 
 ## Architecture
 
@@ -609,7 +631,9 @@ mapping (both the loaded and not-yet-loaded gamification-snapshot cases,
 and that it always emits exactly its five widget keys); `GamificationDao`'s
 `upsertTodaysSnapshot` (a new date inserts, the same date updates in place
 rather than duplicating, distinct dates are kept and ordered ascending);
-and `AccountCard` widget rendering.
+`routeForWidgetTap`'s URI-to-route mapping (every known section, a null
+uri, an unrecognized section, a path with no segments, and a mismatched
+scheme/host); and `AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -665,7 +689,10 @@ card on the Gamification home screen charts Life Score day by day,
 backed by a new `LifeScoreSnapshots` table recorded each time the app
 is opened (see "Life Score history/trend chart" above).
 
+The home screen widget's four sections each deep-link to their own
+screen now, instead of every tap opening the dashboard regardless of
+what was tapped (see "Widget deep-linking" above).
+
 There's no outstanding polish item left from the original spec or from
-any pass since. Future work is open-ended from here: say what you'd
-like next (deep-linking the widget to a specific screen, or anything
-else) and it'll get the same full treatment.
+any pass since. Future work is open-ended from here — say what you'd
+like next and it'll get the same full treatment.

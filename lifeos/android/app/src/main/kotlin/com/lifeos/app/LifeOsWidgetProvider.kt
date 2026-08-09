@@ -3,6 +3,7 @@ package com.lifeos.app
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
@@ -29,10 +30,29 @@ class LifeOsWidgetProvider : HomeWidgetProvider() {
                 )
                 setTextViewText(R.id.widget_schedule, widgetData.getString("schedule_summary", "—"))
 
-                val launchIntent = HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java)
-                setOnClickPendingIntent(R.id.widget_root, launchIntent)
+                // Each section carries its own `lifeos://widget/<section>` URI
+                // as the launch intent's data, so the Flutter side (see
+                // core/home_widget/home_widget_deep_link.dart) can route
+                // straight to that module instead of always opening the
+                // dashboard. Tapping padding/gaps outside any section falls
+                // through to widget_root's own dashboard-bound intent.
+                setOnClickPendingIntent(R.id.widget_root, launchIntentFor(context, "dashboard"))
+                setOnClickPendingIntent(
+                    R.id.widget_gamification_section,
+                    launchIntentFor(context, "gamification")
+                )
+                setOnClickPendingIntent(R.id.widget_finance_section, launchIntentFor(context, "finance"))
+                setOnClickPendingIntent(R.id.widget_habits_section, launchIntentFor(context, "habits"))
+                setOnClickPendingIntent(R.id.widget_calendar_section, launchIntentFor(context, "calendar"))
             }
             appWidgetManager.updateAppWidget(widgetId, views)
         }
     }
+
+    private fun launchIntentFor(context: Context, section: String) =
+        HomeWidgetLaunchIntent.getActivity(
+            context,
+            MainActivity::class.java,
+            Uri.parse("lifeos://widget/$section")
+        )
 }

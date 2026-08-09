@@ -7,33 +7,43 @@
     android:background="@drawable/lifeos_widget_background"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/widget_title"
+    <!-- Tapping this section deep-links to Gamification specifically;
+         tapping elsewhere in the widget (padding, gaps) falls back to
+         widget_root's own click target — see LifeOsWidgetProvider. -->
+    <LinearLayout
+        android:id="@+id/widget_gamification_section"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LIFEOS"
-        android:textColor="#CCFFFFFF"
-        android:textSize="11sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.15" />
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/widget_rank"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Mortal"
-        android:textColor="#FFFFFFFF"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LIFEOS"
+            android:textColor="#CCFFFFFF"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.15" />
 
-    <TextView
-        android:id="@+id/widget_xp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0 XP"
-        android:textColor="#CCFFFFFF"
-        android:textSize="12sp" />
+        <TextView
+            android:id="@+id/widget_rank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Mortal"
+            android:textColor="#FFFFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_xp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 XP"
+            android:textColor="#CCFFFFFF"
+            android:textSize="12sp" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,6 +53,7 @@
         android:weightSum="3">
 
         <LinearLayout
+            android:id="@+id/widget_finance_section"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -66,6 +77,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/widget_habits_section"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -89,6 +101,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/widget_calendar_section"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
