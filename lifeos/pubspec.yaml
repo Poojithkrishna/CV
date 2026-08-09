@@ -27,8 +27,12 @@ dependencies:
   # Routing
   go_router: ^14.6.1
 
-  # Notifications & biometrics (wired up in later modules)
+  # Notifications & biometrics
   flutter_local_notifications: ^18.0.1
+  # zonedSchedule (the only scheduling API flutter_local_notifications
+  # 16+ exposes) needs an IANA timezone, hence both packages below.
+  timezone: ^0.9.4
+  flutter_timezone: ^2.1.0
   local_auth: ^2.3.0
 
   # Formatting & utility

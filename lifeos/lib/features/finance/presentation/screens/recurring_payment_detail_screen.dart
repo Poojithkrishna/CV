@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/providers/notification_provider.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/amount_input_dialog.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../domain/entities/recurring_payment.dart';
+import '../notifications/recurring_payment_reminders.dart';
 import '../providers/recurring_payment_providers.dart';
 
 class RecurringPaymentDetailScreen extends ConsumerWidget {
@@ -26,16 +28,18 @@ class RecurringPaymentDetailScreen extends ConsumerWidget {
         .call(payment, actualAmount: amount);
     if (!context.mounted) return;
 
-    result.when(
-      ok: (updated) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Next due ${AppFormatters.shortDate(updated.nextDueDate)}'),
-        ),
-      ),
-      err: (failure) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(failure.message)),
-      ),
-    );
+    if (result.isOk) {
+      final RecurringPayment updated = result.valueOrNull!;
+      await syncRecurringPaymentReminder(ref.read(notificationServiceProvider), updated);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Next due ${AppFormatters.shortDate(updated.nextDueDate)}')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.failureOrNull!.message)),
+      );
+    }
   }
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
@@ -48,12 +52,16 @@ class RecurringPaymentDetailScreen extends ConsumerWidget {
     if (!confirmed) return;
     final result = await ref.read(deleteRecurringPaymentUseCaseProvider).call(paymentId);
     if (!context.mounted) return;
-    result.when(
-      ok: (_) => context.pop(),
-      err: (failure) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(failure.message)),
-      ),
-    );
+
+    if (result.isOk) {
+      await cancelRecurringPaymentReminder(ref.read(notificationServiceProvider), paymentId);
+      if (!context.mounted) return;
+      context.pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.failureOrNull!.message)),
+      );
+    }
   }
 
   @override

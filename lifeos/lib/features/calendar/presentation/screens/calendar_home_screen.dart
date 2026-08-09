@@ -4,11 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/providers/notification_provider.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/gradient_card.dart';
 import '../../domain/entities/calendar_event.dart';
 import '../../domain/entities/calendar_task.dart';
 import '../../domain/services/calendar_stats.dart';
+import '../notifications/calendar_reminders.dart';
 import '../providers/calendar_providers.dart';
 import '../widgets/calendar_event_tile.dart';
 import '../widgets/calendar_task_tile.dart';
@@ -60,6 +62,14 @@ class _CalendarHomeScreenState extends ConsumerState<CalendarHomeScreen> {
     } else {
       context.push('/calendar/events/new');
     }
+  }
+
+  Future<void> _toggleTaskDone(CalendarTask task) async {
+    await ref.read(toggleTaskDoneUseCaseProvider).call(task.id);
+    await syncTaskReminder(
+      ref.read(notificationServiceProvider),
+      task.copyWith(isDone: !task.isDone),
+    );
   }
 
   @override
@@ -194,7 +204,7 @@ class _CalendarHomeScreenState extends ConsumerState<CalendarHomeScreen> {
               CalendarTaskTile(
                 task: task,
                 onTap: () => context.push('/calendar/tasks/${task.id}/edit'),
-                onToggleDone: () => ref.read(toggleTaskDoneUseCaseProvider).call(task.id),
+                onToggleDone: () => _toggleTaskDone(task),
               ),
           ],
         ],

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/providers/notification_provider.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../domain/entities/loan.dart';
 import '../../domain/entities/loan_direction.dart';
+import '../notifications/loan_reminders.dart';
 import '../providers/loan_form_controller.dart';
 import '../providers/loan_providers.dart';
 
@@ -96,12 +98,16 @@ class _LoanFormScreenState extends ConsumerState<LoanFormScreen> {
         .save(loan, isEditing: widget.isEditing);
 
     if (!mounted) return;
-    result.when(
-      ok: (_) => Navigator.of(context).pop(),
-      err: (failure) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(failure.message)),
-      ),
-    );
+
+    if (result.isOk) {
+      await syncLoanReminder(ref.read(notificationServiceProvider), result.valueOrNull!);
+      if (!mounted) return;
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.failureOrNull!.message)),
+      );
+    }
   }
 
   @override

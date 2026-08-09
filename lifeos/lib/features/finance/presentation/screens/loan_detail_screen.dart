@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/providers/notification_provider.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/amount_input_dialog.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/labeled_progress_bar.dart';
 import '../../domain/entities/loan.dart';
 import '../../domain/entities/loan_payment.dart';
+import '../notifications/loan_reminders.dart';
 import '../providers/loan_providers.dart';
 import '../widgets/loan_payment_tile.dart';
 
@@ -38,12 +40,19 @@ class LoanDetailScreen extends ConsumerWidget {
 
     final result = await ref.read(recordLoanPaymentUseCaseProvider).call(loan, payment);
     if (!context.mounted) return;
-    result.when(
-      ok: (_) {},
-      err: (failure) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(failure.message)),
-      ),
-    );
+
+    if (result.isOk) {
+      // The payment stream hasn't necessarily refreshed yet, so derive
+      // whether this payment just settled the loan directly rather than
+      // re-reading it.
+      if (loan.remainingAmount - amount <= 0) {
+        await cancelLoanReminder(ref.read(notificationServiceProvider), loan.id);
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.failureOrNull!.message)),
+      );
+    }
   }
 
   Future<void> _deletePayment(BuildContext context, WidgetRef ref, String paymentId) async {
@@ -65,12 +74,16 @@ class LoanDetailScreen extends ConsumerWidget {
     if (!confirmed) return;
     final result = await ref.read(deleteLoanUseCaseProvider).call(loanId);
     if (!context.mounted) return;
-    result.when(
-      ok: (_) => context.pop(),
-      err: (failure) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(failure.message)),
-      ),
-    );
+
+    if (result.isOk) {
+      await cancelLoanReminder(ref.read(notificationServiceProvider), loanId);
+      if (!context.mounted) return;
+      context.pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.failureOrNull!.message)),
+      );
+    }
   }
 
   @override

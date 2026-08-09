@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../app/theme/app_gradients.dart';
+import '../../../../core/providers/notification_provider.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../domain/entities/category_type.dart';
 import '../../domain/entities/recurrence_frequency.dart';
 import '../../domain/entities/recurring_payment.dart';
+import '../notifications/recurring_payment_reminders.dart';
 import '../providers/recurring_payment_form_controller.dart';
 import '../providers/recurring_payment_providers.dart';
 import '../widgets/account_picker_field.dart';
@@ -106,12 +108,16 @@ class _RecurringPaymentFormScreenState extends ConsumerState<RecurringPaymentFor
         .save(payment, isEditing: widget.isEditing);
 
     if (!mounted) return;
-    result.when(
-      ok: (_) => Navigator.of(context).pop(),
-      err: (failure) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(failure.message)),
-      ),
-    );
+
+    if (result.isOk) {
+      await syncRecurringPaymentReminder(ref.read(notificationServiceProvider), result.valueOrNull!);
+      if (!mounted) return;
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.failureOrNull!.message)),
+      );
+    }
   }
 
   @override

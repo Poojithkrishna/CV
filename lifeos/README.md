@@ -238,9 +238,8 @@ Built feature by feature. So far:
   transaction as `GoalsDao.toggleMilestone`. `CalendarEvent` is
   start/end-time-driven instead (with an all-day flag and optional
   location); `CreateEvent`/`UpdateEvent` reject an end time before the
-  start. Both carry a `reminderEnabled` flag, stored but not yet wired
-  to `flutter_local_notifications` — same "declared, not yet firing"
-  state as `Loan.reminderEnabled`. The home hub is a 7-day week-strip
+  start. Both carry a `reminderEnabled` flag, now wired to a real local
+  notification — see the Notifications section below. The home hub is a 7-day week-strip
   date picker over a merged events-then-tasks agenda for the selected
   day (`CalendarStats.tasksOnDate`/`eventsOnDate`), with a bottom-sheet
   chooser on the FAB for "New task" vs. "New event" — no calendar-grid
@@ -277,6 +276,36 @@ Built feature by feature. So far:
   touched this round, and only with a new, non-breaking method. The
   dashboard's cultivation card (previously a hardcoded "Mortal / 0 XP")
   now shows the real rank, XP and progress bar to the next rank.
+- ✅ **Local notifications**: every `reminderEnabled`/`reminderDaysBefore`
+  flag across the app (Loans, Recurring Payments, Calendar tasks and
+  events) now actually schedules a device notification, through a single
+  `core/notifications/NotificationService` wrapping
+  `flutter_local_notifications` — channel setup, permission requests
+  (`POST_NOTIFICATIONS`, exact-alarm) and timezone resolution
+  (`flutter_timezone` + `timezone`, since `zonedSchedule` needs an IANA
+  zone) all happen once, in `main()`, before `runApp` (via a pre-built
+  `ProviderContainer` + `UncontrolledProviderScope`, so nothing can try
+  to schedule a reminder before the plugin's ready). Reminder *timing*
+  per entity is a small pure function per module
+  (`loanReminderTime`/`recurringPaymentReminderTime`/`taskReminderTime`/
+  `eventReminderTime`) — Loans fire 1 day before their due date (no
+  per-loan lead-time field to configure), Recurring Payments fire
+  `reminderDaysBefore` days before `nextDueDate`, Calendar tasks fire at
+  their exact time-block if one's set (else 9 AM that day), and Calendar
+  events fire 30 minutes before a timed start (else 9 AM day-of for an
+  all-day event) — kept separate from the plugin-calling orchestration
+  around them so the date math is unit-testable without mocking a
+  platform channel, the same "pure logic, thin orchestration" split
+  every other module's Stats service already uses. Notification ids are
+  `Object.hash(entityId, moduleSalt)` masked positive (flutter_local_-
+  notifications needs a plain int), so a loan and a calendar task can
+  never collide and cancel each other's reminder. Reminders are
+  (re)synced from the four form screens' save/delete, from "record
+  payment"/"mark as paid" (a loan reminder cancels once a payment
+  settles it; a bill's reminder reschedules against its new due date),
+  and from the Calendar home screen's done-checkbox toggle (a completed
+  task's reminder cancels) — every place these four entities actually
+  get created, changed or removed in the app.
 
 ## Architecture
 
@@ -408,19 +437,25 @@ round-tripping as null), `CalendarDao` (due-date/start-time ordering
 across its two tables, `toggleTaskDone`'s flip-and-idempotent behavior
 including a no-op for a missing id) and `GamificationDao`
 (`unlockAchievement` never re-unlocking or overwriting an already-earned
-achievement's timestamp); and `AccountCard` widget rendering.
+achievement's timestamp); the notification id helpers' determinism,
+cross-module non-collision and always-non-negative range, and each
+module's pure reminder-time function — `loanReminderTime`,
+`recurringPaymentReminderTime`, `taskReminderTime` and
+`eventReminderTime` — kept deliberately separate from the
+`NotificationService` orchestration around them so this math is
+unit-testable without mocking a platform channel; and `AccountCard`
+widget rendering.
 
 ## Data & privacy
 
 Everything is stored locally in a single SQLite database
 (`<app documents dir>/lifeos.sqlite`) via Drift — there is no backend and
-no network calls beyond what a future notifications/backup feature adds
-explicitly. Biometric app-lock and local notifications are declared as
-dependencies/permissions already (`local_auth`, `flutter_local_notifications`)
-so wiring them up doesn't require another platform-config pass. A loan's
-"remind me before it's due" toggle is stored already (`Loan.reminderEnabled`)
-but doesn't schedule anything yet — actually firing local notifications for
-it is part of that future notifications pass, not a half-built feature here.
+no network calls beyond what a future backup feature adds explicitly.
+Local notifications are on-device only (`flutter_local_notifications`,
+no push service, no server round-trip). Biometric app-lock is declared
+as a dependency already (`local_auth`) so wiring it up doesn't require
+another platform-config pass, but isn't wired into app startup or
+Settings yet.
 
 ## Next up
 
@@ -430,13 +465,13 @@ Gamification — has now had its full feature pass (models → repository →
 use cases → providers → UI → widgets → validation → tests), and the
 dashboard's every tile is wired to real, live data.
 
+Local notifications are now wired up too — every `reminderEnabled`/
+`reminderDaysBefore` flag (Loans, Recurring Payments, Calendar tasks and
+events) actually schedules a device notification (see the
+Notifications section above).
+
 What's left is polish rather than new modules — say which one you want
 and it'll get the same full treatment:
 
-1. Local notifications: `flutter_local_notifications` is already a
-   dependency, and several entities already carry a `reminderEnabled`/
-   `reminderDaysBefore` flag (Loans, Recurring Payments, Calendar tasks
-   and events), but nothing actually schedules or fires a notification
-   yet.
-2. Biometric app-lock: `local_auth` is already a dependency but isn't
+1. Biometric app-lock: `local_auth` is already a dependency but isn't
    wired into app startup or Settings yet.

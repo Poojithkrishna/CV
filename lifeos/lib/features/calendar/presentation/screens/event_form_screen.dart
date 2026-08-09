@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../app/theme/app_gradients.dart';
+import '../../../../core/providers/notification_provider.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/color_theme_picker.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../domain/entities/calendar_event.dart';
+import '../notifications/calendar_reminders.dart';
 import '../providers/calendar_providers.dart';
 import '../providers/event_form_controller.dart';
 
@@ -116,12 +118,16 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
         .save(event, isEditing: widget.isEditing);
 
     if (!mounted) return;
-    result.when(
-      ok: (_) => Navigator.of(context).pop(),
-      err: (failure) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(failure.message)),
-      ),
-    );
+
+    if (result.isOk) {
+      await syncEventReminder(ref.read(notificationServiceProvider), result.valueOrNull!);
+      if (!mounted) return;
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.failureOrNull!.message)),
+      );
+    }
   }
 
   Future<void> _delete() async {
@@ -135,12 +141,16 @@ class _EventFormScreenState extends ConsumerState<EventFormScreen> {
     if (!confirmed) return;
     final result = await ref.read(deleteEventUseCaseProvider).call(id);
     if (!mounted) return;
-    result.when(
-      ok: (_) => Navigator.of(context).pop(),
-      err: (failure) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(failure.message)),
-      ),
-    );
+
+    if (result.isOk) {
+      await cancelEventReminder(ref.read(notificationServiceProvider), id);
+      if (!mounted) return;
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.failureOrNull!.message)),
+      );
+    }
   }
 
   @override
