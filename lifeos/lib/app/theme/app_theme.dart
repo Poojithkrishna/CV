@@ -100,7 +100,7 @@ class AppTheme {
           ),
           textStyle: const TextStyle(fontWeight: FontWeight.w600),
           elevation: 6,
-          shadowColor: AppColors.brandViolet.withOpacity(0.5),
+          shadowColor: AppColors.brandMid.withOpacity(0.5),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
@@ -108,16 +108,17 @@ class AppTheme {
         elevation: 0,
         height: 68,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        // A violet glow pill behind the selected icon instead of Material's
-        // flat default indicator — the one piece of chrome visible on
-        // every screen, so it carries a lot of the "premium" impression.
-        indicatorColor: AppColors.brandViolet.withOpacity(isDark ? 0.28 : 0.16),
+        // A soft silver glow pill behind the selected icon instead of
+        // Material's flat default indicator — the one piece of chrome
+        // visible on every screen, so it carries a lot of the "premium"
+        // impression.
+        indicatorColor: AppColors.brandMid.withOpacity(isDark ? 0.28 : 0.16),
         indicatorShape: const StadiumBorder(),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final bool selected = states.contains(WidgetState.selected);
           return IconThemeData(
             color: selected
-                ? (isDark ? Colors.white : AppColors.brandDeepViolet)
+                ? (isDark ? Colors.white : AppColors.brandDeep)
                 : colorScheme.onSurfaceVariant,
           );
         }),

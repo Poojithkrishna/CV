@@ -5,43 +5,51 @@ import 'package:flutter/material.dart';
 /// must adapt to light/dark mode; this file exists for the handful of
 /// brand-fixed accents (module colors, gradients) that stay constant
 /// across themes.
+///
+/// The palette is deliberately achromatic — black, grey and white/silver,
+/// taken directly from the app icon's own artwork — rather than an invented
+/// hue. A seed color still has to exist for Material 3's `ColorScheme.
+/// fromSeed` (it needs *some* color to derive tones from), so [seed] is a
+/// true neutral gray, which keeps the derived scheme's accents close to
+/// grayscale too instead of introducing a hue of its own.
 class AppColors {
   AppColors._();
 
-  // Seed used to derive the Material 3 dynamic color scheme — a deeper,
-  // more saturated violet than stock Material purple, so the derived
-  // scheme reads as "Demon Origin" rather than a default M3 app.
-  static const Color seed = Color(0xFF7C1FE0);
+  static const Color seed = Color(0xFF8A8A8A);
 
-  // The signature Demon Origin brand duo — crimson bleeding into violet —
-  // used for the app icon, splash, brand wordmark and hero glows. Anything
-  // meant to feel like "the app itself" rather than a specific module
-  // pulls from this pair instead of the seed-derived scheme.
-  static const Color brandCrimson = Color(0xFFF43F5E);
-  static const Color brandViolet = Color(0xFF7C3AED);
-  static const Color brandDeepViolet = Color(0xFF4C1D95);
+  // The signature Demon Origin brand duo — bright silver fading to a
+  // darker graphite — used for the app icon, splash, brand wordmark and
+  // hero glows. Anything meant to feel like "the app itself" rather than a
+  // specific module pulls from this trio instead of the seed-derived
+  // scheme.
+  static const Color brandBright = Color(0xFFF2F2F2);
+  static const Color brandMid = Color(0xFFA6A6A6);
+  static const Color brandDeep = Color(0xFF454545);
 
-  // Per-module accent colors, used for dashboard cards, icons and charts
-  // so each life area is instantly recognizable.
-  static const Color finance = Color(0xFF22C55E);
-  static const Color fitness = Color(0xFFEF4444);
-  static const Color habits = Color(0xFFF59E0B);
-  static const Color goals = Color(0xFF3B82F6);
-  static const Color creatorStudio = Color(0xFFEC4899);
-  static const Color entertainment = Color(0xFF8B5CF6);
-  static const Color journal = Color(0xFF14B8A6);
-  static const Color calendar = Color(0xFF06B6D4);
-  static const Color gamification = Color(0xFFDC2626);
+  // Every module shares this one neutral tone by design — the app tells
+  // modules apart by icon and label, not by giving each one its own hue
+  // (see ModuleSummaryCard). Kept as separate named constants so call
+  // sites stay self-documenting about which module they mean.
+  static const Color _moduleGray = Color(0xFFAFAFAF);
+  static const Color finance = _moduleGray;
+  static const Color fitness = _moduleGray;
+  static const Color habits = _moduleGray;
+  static const Color goals = _moduleGray;
+  static const Color creatorStudio = _moduleGray;
+  static const Color entertainment = _moduleGray;
+  static const Color journal = _moduleGray;
+  static const Color calendar = _moduleGray;
+  static const Color gamification = _moduleGray;
 
-  static const Color income = Color(0xFF22C55E);
-  static const Color expense = Color(0xFFEF4444);
-  static const Color transfer = Color(0xFF3B82F6);
+  // Money direction is conveyed by the arrow icon (see TransactionType)
+  // plus brightness here — bright for inflow, muted for outflow — rather
+  // than a green/red hue, so it stays inside the grayscale palette.
+  static const Color income = Color(0xFFF2F2F2);
+  static const Color expense = Color(0xFF8E8E8E);
+  static const Color transfer = Color(0xFFBDBDBD);
 
-  // Deeper, violet-tinted near-blacks (rather than neutral gray-black) so
-  // the whole dark theme carries a faint trace of the brand hue even on
-  // plain surfaces.
-  static const Color darkSurface = Color(0xFF0B0712);
-  static const Color darkSurfaceElevated = Color(0xFF16101F);
+  static const Color darkSurface = Color(0xFF0A0A0A);
+  static const Color darkSurfaceElevated = Color(0xFF171717);
   static const Color darkGlassBorder = Color(0x33FFFFFF);
   static const Color lightGlassBorder = Color(0x1F000000);
 

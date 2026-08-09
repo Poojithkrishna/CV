@@ -12,7 +12,7 @@ import '../providers/content_studio_providers.dart';
 
 const int _recentLimit = 5;
 const LinearGradient _gradient = LinearGradient(
-  colors: [AppColors.creatorStudio, Color(0xFF831843)],
+  colors: [AppColors.creatorStudio, Color(0xFF1A1A1A)],
 );
 
 /// Entry point for the Creator Studio module: weekly upload progress,

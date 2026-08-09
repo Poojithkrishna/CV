@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../domain/entities/monthly_totals.dart';
 
 /// A grouped bar chart — income and expense side by side per month, oldest
@@ -19,8 +20,8 @@ class IncomeExpenseChart extends StatelessWidget {
         .map((m) => m.income > m.expense ? m.income : m.expense)
         .fold<double>(0, (a, b) => a > b ? a : b);
     final double maxY = maxValue <= 0 ? 1 : maxValue * 1.2;
-    const Color incomeColor = Color(0xFF16A34A);
-    const Color expenseColor = Color(0xFFDC2626);
+    const Color incomeColor = AppColors.income;
+    const Color expenseColor = AppColors.expense;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

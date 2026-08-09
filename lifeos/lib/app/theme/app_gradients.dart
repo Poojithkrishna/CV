@@ -7,51 +7,32 @@ import 'app_colors.dart';
 class AppGradients {
   AppGradients._();
 
-  /// The signature Demon Origin brand gradient — crimson bleeding into
-  /// violet, matching the app icon and splash. Used for the brand wordmark,
-  /// the dashboard hero glow and anything meant to feel like "the app"
-  /// rather than a specific module.
+  /// The signature Demon Origin brand gradient — bright silver fading to
+  /// graphite, matching the app icon and splash. Used for the brand
+  /// wordmark, the dashboard hero glow and anything meant to feel like "the
+  /// app" rather than a specific module.
   static const LinearGradient brand = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [AppColors.brandCrimson, AppColors.brandViolet],
+    colors: [AppColors.brandBright, AppColors.brandMid],
   );
 
-  static const LinearGradient primary = LinearGradient(
+  // All five of these share one graphite gradient by design — the app's
+  // own chrome (dashboard hero card, module headers) stays inside the
+  // black/grey/white palette; only `palette` below (the user's own
+  // account/habit color picker) offers real hues, since that's the user's
+  // personalization, not the app's branding.
+  static const LinearGradient _graphite = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF9333EA), Color(0xFF4C1D95)],
+    colors: [Color(0xFF3A3A3A), Color(0xFF111111)],
   );
-
-  static const LinearGradient finance = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF22C55E), Color(0xFF0F7A3D)],
-  );
-
-  static const LinearGradient fitness = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFFEF4444), Color(0xFF991B1B)],
-  );
-
-  static const LinearGradient habits = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFFF59E0B), Color(0xFFB45309)],
-  );
-
-  static const LinearGradient goals = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
-  );
-
-  static const LinearGradient gamification = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFFDC2626), Color(0xFF450A0A)],
-  );
+  static const LinearGradient primary = _graphite;
+  static const LinearGradient finance = _graphite;
+  static const LinearGradient fitness = _graphite;
+  static const LinearGradient habits = _graphite;
+  static const LinearGradient goals = _graphite;
+  static const LinearGradient gamification = _graphite;
 
   /// Glassmorphism overlay used on top of background art/images.
   static LinearGradient glass(Brightness brightness) {
@@ -81,15 +62,19 @@ class AppGradients {
         ),
       ];
 
-  /// Returns a fixed set of gradients users can pick from when customizing
-  /// an account / habit / project color theme.
+  /// A fixed set of gradients users can pick from when customizing an
+  /// account / habit / project color theme. Unlike the app's own chrome,
+  /// this stays colorful on purpose — it's the user's personalization, not
+  /// Demon Origin's branding, so restricting it to grayscale would just
+  /// take away a feature (telling their own accounts/habits apart at a
+  /// glance) for no benefit.
   static const List<LinearGradient> palette = [
-    primary,
-    finance,
-    fitness,
-    habits,
-    goals,
-    gamification,
+    LinearGradient(colors: [Color(0xFF9333EA), Color(0xFF4C1D95)]),
+    LinearGradient(colors: [Color(0xFF22C55E), Color(0xFF0F7A3D)]),
+    LinearGradient(colors: [Color(0xFFEF4444), Color(0xFF991B1B)]),
+    LinearGradient(colors: [Color(0xFFF59E0B), Color(0xFFB45309)]),
+    LinearGradient(colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)]),
+    LinearGradient(colors: [Color(0xFFDC2626), Color(0xFF450A0A)]),
     LinearGradient(colors: [Color(0xFF06B6D4), Color(0xFF0E7490)]),
     LinearGradient(colors: [Color(0xFFEC4899), Color(0xFF9D174D)]),
     LinearGradient(colors: [Color(0xFF8B5CF6), Color(0xFF5B21B6)]),

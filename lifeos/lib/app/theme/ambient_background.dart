@@ -65,13 +65,13 @@ class _AmbientBackgroundState extends State<AmbientBackground>
                 Positioned(
                   top: -120,
                   right: -80,
-                  child: _GlowOrb(color: AppColors.brandCrimson, size: 320, intensity: breathe),
+                  child: _GlowOrb(color: AppColors.brandBright, size: 320, intensity: breathe),
                 ),
                 Positioned(
                   bottom: -140,
                   left: -100,
                   child: _GlowOrb(
-                      color: AppColors.brandViolet, size: 360, intensity: 1.25 - breathe),
+                      color: AppColors.brandMid, size: 360, intensity: 1.25 - breathe),
                 ),
               ],
             );

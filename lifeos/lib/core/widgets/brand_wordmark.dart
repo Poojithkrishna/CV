@@ -53,7 +53,7 @@ class BrandWordmark extends StatelessWidget {
           child: Text(
             'DEMON ORIGIN',
             style: style.copyWith(
-              color: AppColors.brandViolet.withOpacity(0.65),
+              color: AppColors.brandMid.withOpacity(0.65),
             ),
           ),
         ),

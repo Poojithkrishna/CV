@@ -232,7 +232,6 @@ class DashboardScreen extends ConsumerWidget {
                 value: netWorthValue,
                 subtitle: 'Finance',
                 icon: Icons.account_balance_wallet_rounded,
-                gradient: AppGradients.finance,
                 onTap: () => context.go('/finance'),
               ),
               ModuleSummaryCard(
@@ -240,7 +239,6 @@ class DashboardScreen extends ConsumerWidget {
                 value: activePlanValue,
                 subtitle: 'Fitness',
                 icon: Icons.fitness_center_rounded,
-                gradient: AppGradients.fitness,
                 onTap: () => context.go('/fitness'),
               ),
               ModuleSummaryCard(
@@ -248,7 +246,6 @@ class DashboardScreen extends ConsumerWidget {
                 value: habitCompletionValue,
                 subtitle: 'This week',
                 icon: Icons.local_fire_department_rounded,
-                gradient: AppGradients.habits,
                 onTap: () => context.go('/habits'),
               ),
               ModuleSummaryCard(
@@ -256,7 +253,6 @@ class DashboardScreen extends ConsumerWidget {
                 value: activeGoalsValue,
                 subtitle: 'Goals',
                 icon: Icons.flag_rounded,
-                gradient: AppGradients.goals,
                 onTap: () => context.push('/goals'),
               ),
               ModuleSummaryCard(
@@ -264,9 +260,6 @@ class DashboardScreen extends ConsumerWidget {
                 value: weeklyUploadsValue,
                 subtitle: 'Creator Studio',
                 icon: Icons.videocam_rounded,
-                gradient: LinearGradient(
-                  colors: [AppColors.creatorStudio, const Color(0xFF831843)],
-                ),
                 onTap: () => context.push('/creator-studio'),
               ),
               ModuleSummaryCard(
@@ -274,9 +267,6 @@ class DashboardScreen extends ConsumerWidget {
                 value: currentlyPlayingValue,
                 subtitle: 'Entertainment',
                 icon: Icons.movie_filter_rounded,
-                gradient: LinearGradient(
-                  colors: [AppColors.entertainment, const Color(0xFF4C1D95)],
-                ),
                 onTap: () => context.push('/entertainment'),
               ),
               ModuleSummaryCard(
@@ -284,9 +274,6 @@ class DashboardScreen extends ConsumerWidget {
                 value: journalValue,
                 subtitle: 'Journal',
                 icon: Icons.menu_book_rounded,
-                gradient: LinearGradient(
-                  colors: [AppColors.journal, const Color(0xFF115E59)],
-                ),
                 onTap: () => context.push('/journal'),
               ),
               ModuleSummaryCard(
@@ -294,9 +281,6 @@ class DashboardScreen extends ConsumerWidget {
                 value: todaysScheduleValue,
                 subtitle: 'Calendar',
                 icon: Icons.calendar_month_rounded,
-                gradient: LinearGradient(
-                  colors: [AppColors.calendar, const Color(0xFF164E63)],
-                ),
                 onTap: () => context.push('/calendar'),
               ),
             ],

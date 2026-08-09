@@ -13,7 +13,7 @@ import '../widgets/journal_entry_card.dart';
 
 const int _recentLimit = 5;
 const LinearGradient _gradient = LinearGradient(
-  colors: [AppColors.journal, Color(0xFF115E59)],
+  colors: [AppColors.journal, Color(0xFF1A1A1A)],
 );
 
 /// Entry point for the Journal module: today's streak, one-tap shortcuts

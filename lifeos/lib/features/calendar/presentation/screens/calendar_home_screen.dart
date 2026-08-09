@@ -17,7 +17,7 @@ import '../widgets/calendar_task_tile.dart';
 
 const int _weekStripDays = 7;
 const LinearGradient _gradient = LinearGradient(
-  colors: [AppColors.calendar, Color(0xFF164E63)],
+  colors: [AppColors.calendar, Color(0xFF1A1A1A)],
 );
 
 /// Entry point for the Calendar & Tasks module: a week-strip day picker,

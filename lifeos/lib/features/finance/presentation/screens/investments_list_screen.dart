@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/investment.dart';
@@ -42,7 +43,7 @@ class InvestmentsListScreen extends ConsumerWidget {
               investments.fold<double>(0, (sum, i) => sum + i.currentValue);
           final double totalGain = totalCurrent - totalInvested;
           final bool isGain = totalGain >= 0;
-          final Color gainColor = isGain ? const Color(0xFF16A34A) : const Color(0xFFDC2626);
+          final Color gainColor = isGain ? AppColors.income : AppColors.expense;
 
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),

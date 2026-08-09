@@ -13,7 +13,7 @@ import '../widgets/media_item_card.dart';
 
 const int _sectionLimit = 5;
 const LinearGradient _gradient = LinearGradient(
-  colors: [AppColors.entertainment, Color(0xFF4C1D95)],
+  colors: [AppColors.entertainment, Color(0xFF1A1A1A)],
 );
 
 /// Entry point for the Entertainment module: what's currently in

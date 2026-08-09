@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/category_spending.dart';
@@ -58,7 +59,7 @@ class FinanceAnalyticsScreen extends ConsumerWidget {
                         child: _StatCard(
                           label: 'Income',
                           value: AppFormatters.currencyCompact(totalIncome),
-                          color: const Color(0xFF16A34A),
+                          color: AppColors.income,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -66,7 +67,7 @@ class FinanceAnalyticsScreen extends ConsumerWidget {
                         child: _StatCard(
                           label: 'Expense',
                           value: AppFormatters.currencyCompact(totalExpense),
-                          color: const Color(0xFFDC2626),
+                          color: AppColors.expense,
                         ),
                       ),
                       const SizedBox(width: 12),

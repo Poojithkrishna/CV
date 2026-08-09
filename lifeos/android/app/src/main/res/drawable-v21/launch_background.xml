@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Shown while Flutter initializes: the same crimson-violet-on-black
-     brand gradient as the app icon, with the emblem centered, so the
+<!-- Shown while Flutter initializes: the same graphite-on-black brand
+     gradient as the app icon, with the emblem centered, so the
      cold-start moment already feels like Demon Origin instead of a
      blank flash. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
@@ -9,8 +9,8 @@
             <gradient
                 android:type="linear"
                 android:angle="315"
-                android:startColor="#1B0F2E"
-                android:endColor="#0A0610" />
+                android:startColor="#1A1A1A"
+                android:endColor="#0A0A0A" />
         </shape>
     </item>
     <item android:gravity="center">

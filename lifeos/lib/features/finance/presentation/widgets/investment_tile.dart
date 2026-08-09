@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/entities/investment.dart';
 
@@ -13,7 +14,7 @@ class InvestmentTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color color = Color(investment.colorValue);
     final bool isGain = investment.gainLoss >= 0;
-    final Color gainColor = isGain ? const Color(0xFF16A34A) : const Color(0xFFDC2626);
+    final Color gainColor = isGain ? AppColors.income : AppColors.expense;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
