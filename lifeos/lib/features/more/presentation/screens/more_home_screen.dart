@@ -18,9 +18,8 @@ class MoreHomeScreen extends StatelessWidget {
     _MoreEntry('Journal', Icons.menu_book_rounded, AppColors.journal, '/journal'),
     _MoreEntry(
         'Calendar & Tasks', Icons.calendar_month_rounded, AppColors.calendar, '/calendar'),
-    _MoreEntry('Cultivation', Icons.local_fire_department_rounded,
-        AppColors.gamification, '/gamification'),
-    _MoreEntry('Settings', Icons.settings_rounded, Color(0xFF64748B), '/settings'),
+    _MoreEntry('Cultivation', Icons.shield_moon_rounded, AppColors.gamification, '/gamification'),
+    _MoreEntry('Settings', Icons.settings_rounded, Color(0xFF8A8A8A), '/settings'),
   ];
 
   @override

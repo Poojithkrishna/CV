@@ -10,11 +10,17 @@ import 'app_colors.dart';
 class AppTheme {
   AppTheme._();
 
-  /// The angular, sci-fi display face used only for brand moments (the
+  /// The mythic/gothic display face used only for brand moments (the
   /// "DEMON ORIGIN" wordmark, rank-up celebrations) — never for dense body
-  /// or list text, where its wide letterforms hurt legibility. See
-  /// `BrandWordmark`.
-  static String get displayFontFamily => GoogleFonts.orbitron().fontFamily!;
+  /// or list text, where its inscriptional caps hurt legibility at small
+  /// sizes. See `BrandWordmark`.
+  static String get displayFontFamily => GoogleFonts.cinzel().fontFamily!;
+
+  /// The angular sci-fi-HUD face for "readout" moments — stat numbers,
+  /// section eyebrows, anything meant to feel like a targeting display
+  /// rather than prose. Pairs the mythic wordmark with a futuristic
+  /// counterpart rather than picking one mood over the other.
+  static String get hudFontFamily => GoogleFonts.rajdhani().fontFamily!;
 
   static ThemeData light() => _buildTheme(Brightness.light);
 
@@ -23,11 +29,54 @@ class AppTheme {
   static ThemeData _buildTheme(Brightness brightness) {
     final bool isDark = brightness == Brightness.dark;
 
-    final ColorScheme colorScheme = ColorScheme.fromSeed(
-      seedColor: AppColors.seed,
-      brightness: brightness,
-      surface: isDark ? AppColors.darkSurface : const Color(0xFFFBFAFF),
-    );
+    // Built explicitly rather than via `ColorScheme.fromSeed` — a
+    // seed with zero chroma (a true gray) still leaves Material's tonal
+    // palette algorithm to pick an arbitrary hue for secondary/tertiary
+    // roles, which is where a faint, unwanted blue crept into radio
+    // buttons, sliders and the FAB. Every role below is a literal
+    // black/grey/white value instead, and `surfaceTint` is pinned to
+    // transparent so Material 3's elevation tint overlay (which defaults
+    // to tinting elevated surfaces with `primary`) can't reintroduce a
+    // hue on cards, dialogs or the bottom sheet.
+    final ColorScheme colorScheme = isDark
+        ? const ColorScheme.dark(
+            primary: Color(0xFFF2F2F2),
+            onPrimary: Color(0xFF141414),
+            primaryContainer: Color(0xFF2A2A2A),
+            onPrimaryContainer: Color(0xFFF2F2F2),
+            secondary: Color(0xFFBDBDBD),
+            onSecondary: Color(0xFF141414),
+            secondaryContainer: Color(0xFF262626),
+            onSecondaryContainer: Color(0xFFF2F2F2),
+            tertiary: Color(0xFF9E9E9E),
+            onTertiary: Color(0xFF141414),
+            surface: AppColors.darkSurface,
+            onSurface: Color(0xFFF2F2F2),
+            onSurfaceVariant: Color(0xFFA6A6A6),
+            surfaceContainerHigh: Color(0xFF1F1F1F),
+            outline: Color(0xFF4A4A4A),
+            outlineVariant: Color(0xFF2E2E2E),
+            surfaceTint: Colors.transparent,
+          )
+        : const ColorScheme.light(
+            primary: Color(0xFF262626),
+            onPrimary: Color(0xFFFAFAFA),
+            primaryContainer: Color(0xFFE3E3E3),
+            onPrimaryContainer: Color(0xFF141414),
+            secondary: Color(0xFF5C5C5C),
+            onSecondary: Color(0xFFFAFAFA),
+            secondaryContainer: Color(0xFFE9E9E9),
+            onSecondaryContainer: Color(0xFF141414),
+            tertiary: Color(0xFF757575),
+            onTertiary: Color(0xFFFAFAFA),
+            surface: Color(0xFFFBFAFF),
+            onSurface: Color(0xFF1A1A1A),
+            onSurfaceVariant: Color(0xFF5C5C5C),
+            surfaceContainerHigh: Color(0xFFEDEDF2),
+            outline: Color(0xFFBDBDBD),
+            outlineVariant: Color(0xFFDADADA),
+            surfaceTint: Colors.transparent,
+          );
 
     final TextTheme textTheme = GoogleFonts.manropeTextTheme(
       isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme,
@@ -55,6 +104,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         elevation: 0,
         color: isDark ? AppColors.darkSurfaceElevated : Colors.white,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
@@ -106,8 +156,12 @@ class AppTheme {
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: isDark ? AppColors.darkSurfaceElevated : Colors.white,
         elevation: 0,
-        height: 68,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        height: 64,
+        // Icon-only nav — labels stay attached for accessibility/tooltips
+        // but never paint, matching a HUD dock rather than a labeled tab
+        // bar.
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+        surfaceTintColor: Colors.transparent,
         // A soft silver glow pill behind the selected icon instead of
         // Material's flat default indicator — the one piece of chrome
         // visible on every screen, so it carries a lot of the "premium"
@@ -124,15 +178,26 @@ class AppTheme {
         }),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
         ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: isDark ? AppColors.darkSurfaceElevated : Colors.white,
+        surfaceTintColor: Colors.transparent,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
+      ),
+      dialogTheme: DialogThemeData(
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: isDark ? AppColors.darkSurfaceElevated : Colors.white,
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        surfaceTintColor: Colors.transparent,
+        color: isDark ? AppColors.darkSurfaceElevated : Colors.white,
       ),
       dividerTheme: DividerThemeData(
         color: isDark ? AppColors.darkGlassBorder : AppColors.lightGlassBorder,

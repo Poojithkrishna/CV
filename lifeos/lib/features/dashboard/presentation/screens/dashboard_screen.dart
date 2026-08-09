@@ -7,8 +7,11 @@ import '../../../../app/theme/app_gradients.dart';
 import '../../../../core/home_widget/home_widget_data.dart';
 import '../../../../core/providers/home_widget_provider.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../app/theme/app_theme.dart';
 import '../../../../core/widgets/brand_wordmark.dart';
 import '../../../../core/widgets/gradient_card.dart';
+import '../../../../core/widgets/hud_frame.dart';
+import '../../../../core/widgets/radial_gauge.dart';
 import '../../../creator_studio/domain/entities/content_goal.dart';
 import '../../../creator_studio/domain/entities/content_project.dart';
 import '../../../creator_studio/domain/services/content_pipeline_stats.dart';
@@ -157,66 +160,77 @@ class DashboardScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(24),
               boxShadow: AppGradients.glowShadow(AppColors.gamification),
             ),
-            child: GradientCard(
-              gradient: AppGradients.gamification,
-              onTap: () => context.push('/gamification'),
-              child: gamificationSnapshot.when(
-                data: (snapshot) => Row(
-                  children: [
-                    Icon(snapshot.rank.icon, size: 36),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            snapshot.rank.label,
-                            style:
-                                const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '${snapshot.xp} XP · ${snapshot.rank.flavorTitle}',
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                          const SizedBox(height: 10),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: LinearProgressIndicator(
-                              value: snapshot.progressToNextRank,
-                              minHeight: 6,
-                              backgroundColor: Colors.white24,
-                              valueColor: const AlwaysStoppedAnimation(Colors.white),
-                            ),
-                          ),
-                        ],
+            child: HudFrame(
+              child: GradientCard(
+                gradient: AppGradients.gamification,
+                onTap: () => context.push('/gamification'),
+                child: gamificationSnapshot.when(
+                  data: (snapshot) => Row(
+                    children: [
+                      RadialGauge(
+                        value: snapshot.progressToNextRank,
+                        size: 76,
+                        strokeWidth: 5,
+                        child: Icon(snapshot.rank.icon, size: 30),
                       ),
-                    ),
-                  ],
-                ),
-                loading: () => const Row(
-                  children: [
-                    Icon(Icons.local_fire_department_rounded, size: 36),
-                    SizedBox(width: 16),
-                    Expanded(child: Text('Loading cultivation progress…')),
-                  ],
-                ),
-                error: (_, __) => const Row(
-                  children: [
-                    Icon(Icons.local_fire_department_rounded, size: 36),
-                    SizedBox(width: 16),
-                    Expanded(child: Text('Cultivation progress unavailable')),
-                  ],
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'RANK',
+                              style: TextStyle(
+                                fontFamily: AppTheme.hudFontFamily,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 2,
+                                color: Colors.white.withOpacity(0.6),
+                              ),
+                            ),
+                            Text(
+                              snapshot.rank.label,
+                              style:
+                                  const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${snapshot.xp} XP · ${snapshot.rank.flavorTitle}',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  loading: () => const Row(
+                    children: [
+                      Icon(Icons.shield_moon_rounded, size: 36),
+                      SizedBox(width: 16),
+                      Expanded(child: Text('Loading cultivation progress…')),
+                    ],
+                  ),
+                  error: (_, __) => const Row(
+                    children: [
+                      Icon(Icons.shield_moon_rounded, size: 36),
+                      SizedBox(width: 16),
+                      Expanded(child: Text('Cultivation progress unavailable')),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
           const SizedBox(height: 20),
           Text(
-            'Your modules',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            'YOUR MODULES',
+            style: TextStyle(
+              fontFamily: AppTheme.hudFontFamily,
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 2,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 12),
           GridView.count(

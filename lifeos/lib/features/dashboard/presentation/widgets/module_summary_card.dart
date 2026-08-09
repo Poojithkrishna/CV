@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/theme/app_theme.dart';
 import '../../../../core/widgets/glass_card.dart';
 
 /// One tile on the dashboard grid representing a module's current state.
@@ -55,9 +56,10 @@ class ModuleSummaryCard extends StatelessWidget {
           Text(
             subtitle.toUpperCase(),
             style: TextStyle(
-              fontSize: 11,
+              fontFamily: AppTheme.hudFontFamily,
+              fontSize: 12,
               fontWeight: FontWeight.w700,
-              letterSpacing: 0.6,
+              letterSpacing: 1.2,
               color: Colors.white.withOpacity(0.55),
             ),
             maxLines: 1,

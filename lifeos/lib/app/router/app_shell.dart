@@ -9,15 +9,17 @@ class AppShell extends StatelessWidget {
 
   final StatefulNavigationShell navigationShell;
 
+  // Icon-only dock (labels stay attached for accessibility/tooltips but
+  // never paint — see NavigationBarThemeData.labelBehavior in app_theme.dart).
   static const List<_Destination> _destinations = [
-    _Destination('/dashboard', Icons.dashboard_outlined, Icons.dashboard_rounded, 'Home'),
+    _Destination('/dashboard', Icons.auto_awesome_outlined, Icons.auto_awesome_rounded, 'Home'),
     _Destination('/finance', Icons.account_balance_wallet_outlined,
         Icons.account_balance_wallet_rounded, 'Finance'),
     _Destination('/habits', Icons.local_fire_department_outlined,
         Icons.local_fire_department_rounded, 'Habits'),
     _Destination(
         '/fitness', Icons.fitness_center_outlined, Icons.fitness_center_rounded, 'Fitness'),
-    _Destination('/more', Icons.grid_view_outlined, Icons.grid_view_rounded, 'More'),
+    _Destination('/more', Icons.hexagon_outlined, Icons.hexagon_rounded, 'More'),
   ];
 
   @override
