@@ -6,7 +6,7 @@ class ProgressPhotos extends Table {
   DateTimeColumn get date => dateTime()();
 
   /// Absolute path under the app's own documents directory — see
-  /// `savePhotoFile`/`deletePhotoFile` in `core/utils/photo_storage.dart`.
+  /// `saveImageFile`/`deleteImageFile` in `core/utils/photo_storage.dart`.
   TextColumn get filePath => text()();
 
   /// Stored as [PhotoCategory.name].

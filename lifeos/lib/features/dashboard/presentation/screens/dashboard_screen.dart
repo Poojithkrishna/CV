@@ -6,6 +6,10 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_gradients.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/gradient_card.dart';
+import '../../../creator_studio/domain/entities/content_goal.dart';
+import '../../../creator_studio/domain/entities/content_project.dart';
+import '../../../creator_studio/domain/services/content_pipeline_stats.dart';
+import '../../../creator_studio/presentation/providers/content_studio_providers.dart';
 import '../../../finance/presentation/providers/net_worth_provider.dart';
 import '../../../fitness/presentation/providers/workout_plan_providers.dart';
 import '../../../goals/domain/entities/goal.dart';
@@ -14,10 +18,11 @@ import '../../../habits/presentation/providers/habit_providers.dart';
 import '../widgets/module_summary_card.dart';
 
 /// The LifeOS home screen: a single glance at every module. Finance's net
-/// worth, Fitness's active plan, Habits' weekly completion and Goals'
-/// active count tiles are wired to real data; every other tile is a
-/// placeholder until that module's own feature pass lands, but they're
-/// already tappable so the whole app is navigable end to end.
+/// worth, Fitness's active plan, Habits' weekly completion, Goals' active
+/// count and Creator Studio's weekly-upload tiles are wired to real data;
+/// every other tile is a placeholder until that module's own feature pass
+/// lands, but they're already tappable so the whole app is navigable end
+/// to end.
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -47,6 +52,21 @@ class DashboardScreen extends ConsumerWidget {
     final AsyncValue<List<Goal>> activeGoals = ref.watch(activeGoalsProvider);
     final String activeGoalsValue = activeGoals.when(
       data: (goals) => '${goals.length}',
+      loading: () => '—',
+      error: (_, __) => '—',
+    );
+
+    final AsyncValue<List<ContentProject>> contentProjects = ref.watch(allContentProjectsProvider);
+    final AsyncValue<ContentGoal?> contentGoal = ref.watch(contentGoalProvider);
+    final String weeklyUploadsValue = contentProjects.when(
+      data: (projects) {
+        final DateTime now = DateTime.now();
+        final DateTime weekAgo =
+            DateTime(now.year, now.month, now.day).subtract(const Duration(days: 6));
+        final int uploads = ContentPipelineStats.publishedSince(projects, weekAgo).length;
+        final int target = contentGoal.valueOrNull?.weeklyUploadTarget ?? 1;
+        return '$uploads / $target';
+      },
       loading: () => '—',
       error: (_, __) => '—',
     );
@@ -150,7 +170,7 @@ class DashboardScreen extends ConsumerWidget {
               ),
               ModuleSummaryCard(
                 label: 'Weekly uploads',
-                value: '0 / —',
+                value: weeklyUploadsValue,
                 subtitle: 'Creator Studio',
                 icon: Icons.videocam_rounded,
                 gradient: LinearGradient(

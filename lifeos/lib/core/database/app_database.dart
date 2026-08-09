@@ -5,6 +5,10 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import '../../features/creator_studio/data/daos/content_studio_dao.dart';
+import '../../features/creator_studio/data/tables/clips_table.dart';
+import '../../features/creator_studio/data/tables/content_goal_table.dart';
+import '../../features/creator_studio/data/tables/content_projects_table.dart';
 import '../../features/finance/data/daos/accounts_dao.dart';
 import '../../features/finance/data/daos/assets_dao.dart';
 import '../../features/finance/data/daos/card_emis_dao.dart';
@@ -108,6 +112,9 @@ part 'app_database.g.dart';
     SupplementLogEntries,
     CardioSessions,
     RecoveryEntries,
+    ContentProjects,
+    Clips,
+    ContentGoals,
   ],
   daos: [
     AccountsDao,
@@ -132,6 +139,7 @@ part 'app_database.g.dart';
     SupplementsDao,
     CardioSessionsDao,
     RecoveryDao,
+    ContentStudioDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -142,7 +150,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 14;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -152,6 +160,7 @@ class AppDatabase extends _$AppDatabase {
           await _seedDefaultExercises();
           await _seedDefaultFoods();
           await _seedDefaultGoalRows();
+          await _seedDefaultContentGoal();
         },
         onUpgrade: (Migrator m, int from, int to) async {
           if (from < 2) {
@@ -214,6 +223,12 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(cardioSessions);
             await m.createTable(recoveryEntries);
           }
+          if (from < 14) {
+            await m.createTable(contentProjects);
+            await m.createTable(clips);
+            await m.createTable(contentGoals);
+            await _seedDefaultContentGoal();
+          }
         },
       );
 
@@ -244,6 +259,15 @@ class AppDatabase extends _$AppDatabase {
     );
     await into(nutritionGoals).insert(
       NutritionGoalsCompanion.insert(id: kDefaultNutritionGoalId, updatedAt: now),
+    );
+  }
+
+  /// Seeds the single-row Creator Studio weekly-upload goal settings
+  /// table so the app has a sensible default target from the very first
+  /// launch.
+  Future<void> _seedDefaultContentGoal() async {
+    await into(contentGoals).insert(
+      ContentGoalsCompanion.insert(id: kDefaultContentGoalId, updatedAt: DateTime.now()),
     );
   }
 }

@@ -159,9 +159,36 @@ Built feature by feature. So far:
   the goal's detail screen) so a goal like "Run a marathon" can show its
   linked "Go for a run" habit alongside its own milestones. The
   dashboard's "Active goals" tile is wired to the real count.
-- 🚧 Every other module (Creator Studio, Entertainment, Journal, Calendar,
-  Gamification) has a placeholder screen wired into navigation, ready for
-  its own feature pass — see
+- ✅ **Gaming Creator Studio**: the Idea → Recording → Editing → Thumbnail →
+  Upload → Published pipeline, a Clip Library and upload Analytics.
+  - **Pipeline**: `ContentProject` moves through six `ContentStage`s on a
+    horizontally-scrolling kanban board, one column per stage; chevron
+    buttons on each card call `MoveProjectToStage`, which stamps
+    `publishedDate` the first time (and only the first time) a project
+    reaches Published — moving it back out for edits never clears that
+    original date. Views/likes/comments are plain manually-editable
+    counters (no live YouTube/Twitch API — this is an offline app), and a
+    thumbnail can be captured or picked via `image_picker`.
+  - **Clip Library**: a separate `Clip` entity for raw highlights, each
+    optionally linked to a pipeline project via a nullable
+    `linkedProjectId` foreign key with `ON DELETE SET NULL` — deleting the
+    project the clip came from unlinks it rather than destroying it,
+    mirroring how Finance categories survive account deletion. A 2-column
+    thumbnail grid, same picker as project thumbnails.
+  - **Analytics**: weekly upload progress against an editable
+    `ContentGoal` target (a singleton settings row, same pattern as the
+    Fitness Water/Nutrition daily goals), total views/likes/comments,
+    average views per published project, and a per-stage pipeline
+    breakdown — all pure aggregation in `ContentPipelineStats` (no table
+    of its own). The dashboard's "Weekly uploads" tile is wired to the
+    real published-this-week count.
+  - `core/utils/photo_storage.dart` was generalized from a Fitness-only
+    `progress_photos` helper into a shared `saveImageFile(..., subdirectory:
+    ...)`/`deleteImageFile(...)` utility, now reused by both Fitness
+    progress photos and Creator Studio thumbnails.
+- 🚧 Every other module (Entertainment, Journal, Calendar, Gamification)
+  has a placeholder screen wired into navigation, ready for its own
+  feature pass — see
   `lib/features/<module>/presentation/screens/*_home_screen.dart`.
 
 ## Architecture
@@ -236,8 +263,11 @@ Covers: use-case validation across Finance (`CreateAccount`/
 `CreateAsset`), Fitness (`LogSet`/`CreateWorkoutPlan`/
 `AddExerciseToDay`/`LogBodyWeight`/`CreateFoodItem`/`LogFood`/
 `LogCardioSession`/`LogRecovery`/`CreateSupplement`/
-`ToggleSupplementTaken`/`AddProgressPhoto`), Habits (`CreateHabit`) and
-Goals (`CreateGoal`/`AddMilestone`); `RecurrenceFrequency`'s date math
+`ToggleSupplementTaken`/`AddProgressPhoto`), Habits (`CreateHabit`),
+Goals (`CreateGoal`/`AddMilestone`) and Creator Studio
+(`CreateContentProject`/`CreateClip`/`UpdateContentGoal`/
+`MoveProjectToStage`, including the first-publish-only `publishedDate`
+stamping); `RecurrenceFrequency`'s date math
 (leap years, month-length clamping) and `MarkRecurringPaymentPaid`'s
 orchestration; `WorkoutStats`'s volume and progression-suggestion math,
 `StrengthProgressStats`'s Epley 1RM estimate and same-day-best
@@ -246,9 +276,11 @@ collapsing; `HabitStats`'s streak/completion-rate/heatmap math
 progress fallback, `BodyWeightStats`/`MeasurementStats`'s N-day trend
 deltas, `CardioStats`'s weekly totals, `RecoveryStats`'s
 logged-components-only score average, `NutritionStats`'s macro
-totaling/meal grouping and `FinanceAnalytics`'s category totals/monthly
+totaling/meal grouping, `FinanceAnalytics`'s category totals/monthly
 income-vs-expense bucketing (including transfer exclusion and
-empty-month buckets); DAO behaviour against an in-memory SQLite
+empty-month buckets) and `ContentPipelineStats`'s stage counts/
+published-since filtering/view-like-comment totals/average views; DAO
+behaviour against an in-memory SQLite
 database for `AccountsDao`/`TransactionsDao`/`CreditCardsDao`/
 `CardEmisDao`/`LoansDao` (balance and payment math, including
 edit/delete reverting the right effect), `InvestmentsDao`/`AssetsDao`
@@ -260,8 +292,12 @@ habit linking, cascading deletes), `BodyWeightDao`/`MeasurementsDao`/
 `WaterDao` (accumulating daily total floored at zero, goal upsert),
 `SupplementsDao` (the same toggle-upsert as habit checklist items),
 `CardioSessionsDao`/`ProgressPhotosDao` (straightforward CRUD, category
-filtering) and `NutritionDao` (the food-item join query, seeded starter
-library, cascading deletes); and `AccountCard` widget rendering.
+filtering), `NutritionDao` (the food-item join query, seeded starter
+library, cascading deletes) and `ContentStudioDao` (sort-ordered/
+captured-at-ordered streams, deleting a linked project setting a clip's
+`linkedProjectId` to null rather than cascading, and the singleton goal
+row's upsert never crashing on a re-save); and `AccountCard` widget
+rendering.
 
 ## Data & privacy
 
@@ -281,9 +317,8 @@ Suggested order for the next feature passes (say which one you want and
 it'll get the same full treatment — models → repository → use cases →
 providers → UI → widgets → validation → tests):
 
-1. Gaming Creator Studio pipeline
-2. Entertainment Library
-3. Journal
-4. Calendar & Tasks
-5. Gamification (ranks, XP, attributes, achievements, Life Score) —
+1. Entertainment Library
+2. Journal
+3. Calendar & Tasks
+4. Gamification (ranks, XP, attributes, achievements, Life Score) —
    wiring dashboard stats to real data from the modules above as they land

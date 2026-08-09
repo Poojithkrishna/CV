@@ -42,7 +42,7 @@ class ProgressPhotoRepositoryImpl implements ProgressPhotoRepository {
       final row = await _dao.getPhoto(id);
       await _dao.deletePhoto(id);
       if (row != null) {
-        await deletePhotoFile(row.filePath);
+        await deleteImageFile(row.filePath);
       }
       return const Result.ok(null);
     } catch (e) {

@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/calendar/presentation/screens/calendar_home_screen.dart';
+import '../../features/creator_studio/presentation/screens/clip_form_screen.dart';
+import '../../features/creator_studio/presentation/screens/clip_library_screen.dart';
+import '../../features/creator_studio/presentation/screens/content_analytics_screen.dart';
+import '../../features/creator_studio/presentation/screens/content_pipeline_screen.dart';
+import '../../features/creator_studio/presentation/screens/content_project_form_screen.dart';
 import '../../features/creator_studio/presentation/screens/creator_studio_home_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/entertainment/presentation/screens/entertainment_home_screen.dart';
@@ -474,6 +479,40 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/creator-studio',
       builder: (context, state) => const CreatorStudioHomeScreen(),
+      routes: [
+        GoRoute(
+          path: 'pipeline',
+          builder: (context, state) => const ContentPipelineScreen(),
+        ),
+        GoRoute(
+          path: 'projects/new',
+          builder: (context, state) => const ContentProjectFormScreen(),
+        ),
+        GoRoute(
+          path: 'projects/:id/edit',
+          builder: (context, state) => ContentProjectFormScreen(
+            projectId: state.pathParameters['id'],
+          ),
+        ),
+        GoRoute(
+          path: 'clips',
+          builder: (context, state) => const ClipLibraryScreen(),
+        ),
+        GoRoute(
+          path: 'clips/new',
+          builder: (context, state) => const ClipFormScreen(),
+        ),
+        GoRoute(
+          path: 'clips/:id/edit',
+          builder: (context, state) => ClipFormScreen(
+            clipId: state.pathParameters['id'],
+          ),
+        ),
+        GoRoute(
+          path: 'analytics',
+          builder: (context, state) => const ContentAnalyticsScreen(),
+        ),
+      ],
     ),
     GoRoute(
       path: '/entertainment',

@@ -80,7 +80,8 @@ class _ProgressPhotosScreenState extends ConsumerState<ProgressPhotosScreen> {
     if (category == null) return;
 
     final String id = _uuid.v4();
-    final String savedPath = await savePhotoFile(picked.path, id);
+    final String savedPath =
+        await saveImageFile(picked.path, id, subdirectory: 'progress_photos');
     final DateTime now = DateTime.now();
     final ProgressPhoto photo = ProgressPhoto(
       id: id,
