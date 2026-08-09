@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
 
+import 'app_colors.dart';
+
 /// Reusable gradients for the "premium glassmorphism" look used across
 /// dashboard tiles, account cards and module headers.
 class AppGradients {
   AppGradients._();
 
+  /// The signature Demon Origin brand gradient — crimson bleeding into
+  /// violet, matching the app icon and splash. Used for the brand wordmark,
+  /// the dashboard hero glow and anything meant to feel like "the app"
+  /// rather than a specific module.
+  static const LinearGradient brand = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [AppColors.brandCrimson, AppColors.brandViolet],
+  );
+
   static const LinearGradient primary = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF7C4DFF), Color(0xFF5B21B6)],
+    colors: [Color(0xFF9333EA), Color(0xFF4C1D95)],
   );
 
   static const LinearGradient finance = LinearGradient(
@@ -52,6 +64,22 @@ class AppGradients {
           : [Colors.white.withOpacity(0.55), Colors.white.withOpacity(0.25)],
     );
   }
+
+  /// A soft ambient-glow shadow in [color], for emphasis surfaces (hero
+  /// cards, the selected nav icon, primary buttons) that should look like
+  /// they're lit from behind rather than merely elevated.
+  static List<BoxShadow> glowShadow(Color color, {double intensity = 1}) => [
+        BoxShadow(
+          color: color.withOpacity(0.35 * intensity),
+          blurRadius: 24 * intensity,
+          spreadRadius: 1,
+        ),
+        BoxShadow(
+          color: color.withOpacity(0.18 * intensity),
+          blurRadius: 48 * intensity,
+          spreadRadius: 4,
+        ),
+      ];
 
   /// Returns a fixed set of gradients users can pick from when customizing
   /// an account / habit / project color theme.

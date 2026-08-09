@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/providers/app_lock_provider.dart';
 import '../../../../core/providers/theme_mode_provider.dart';
+import '../../../../core/widgets/brand_wordmark.dart';
 
 class SettingsHomeScreen extends ConsumerWidget {
   const SettingsHomeScreen({super.key});
@@ -130,7 +131,7 @@ class SettingsHomeScreen extends ConsumerWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.info_outline_rounded),
-              title: const Text('Demon Origin'),
+              title: const BrandWordmark(fontSize: 16),
               subtitle: const Text('v0.1.0 — personal build'),
             ),
           ),

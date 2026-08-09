@@ -7,6 +7,7 @@ import '../../../../app/theme/app_gradients.dart';
 import '../../../../core/home_widget/home_widget_data.dart';
 import '../../../../core/providers/home_widget_provider.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/widgets/brand_wordmark.dart';
 import '../../../../core/widgets/gradient_card.dart';
 import '../../../creator_studio/domain/entities/content_goal.dart';
 import '../../../creator_studio/domain/entities/content_project.dart';
@@ -137,7 +138,7 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Demon Origin'),
+        title: const BrandWordmark(),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
@@ -148,55 +149,65 @@ class DashboardScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          GradientCard(
-            gradient: AppGradients.gamification,
-            onTap: () => context.push('/gamification'),
-            child: gamificationSnapshot.when(
-              data: (snapshot) => Row(
-                children: [
-                  Icon(snapshot.rank.icon, size: 36),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          snapshot.rank.label,
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${snapshot.xp} XP · ${snapshot.rank.flavorTitle}',
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        const SizedBox(height: 10),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: LinearProgressIndicator(
-                            value: snapshot.progressToNextRank,
-                            minHeight: 6,
-                            backgroundColor: Colors.white24,
-                            valueColor: const AlwaysStoppedAnimation(Colors.white),
+          Container(
+            // Ambient glow behind the rank/XP hero card — the first thing
+            // seen on launch, so it's the highest-leverage spot for the
+            // "lit from within" premium feel.
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: AppGradients.glowShadow(AppColors.gamification),
+            ),
+            child: GradientCard(
+              gradient: AppGradients.gamification,
+              onTap: () => context.push('/gamification'),
+              child: gamificationSnapshot.when(
+                data: (snapshot) => Row(
+                  children: [
+                    Icon(snapshot.rank.icon, size: 36),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            snapshot.rank.label,
+                            style:
+                                const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 2),
+                          Text(
+                            '${snapshot.xp} XP · ${snapshot.rank.flavorTitle}',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          const SizedBox(height: 10),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: LinearProgressIndicator(
+                              value: snapshot.progressToNextRank,
+                              minHeight: 6,
+                              backgroundColor: Colors.white24,
+                              valueColor: const AlwaysStoppedAnimation(Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              loading: () => const Row(
-                children: [
-                  Icon(Icons.local_fire_department_rounded, size: 36),
-                  SizedBox(width: 16),
-                  Expanded(child: Text('Loading cultivation progress…')),
-                ],
-              ),
-              error: (_, __) => const Row(
-                children: [
-                  Icon(Icons.local_fire_department_rounded, size: 36),
-                  SizedBox(width: 16),
-                  Expanded(child: Text('Cultivation progress unavailable')),
-                ],
+                  ],
+                ),
+                loading: () => const Row(
+                  children: [
+                    Icon(Icons.local_fire_department_rounded, size: 36),
+                    SizedBox(width: 16),
+                    Expanded(child: Text('Loading cultivation progress…')),
+                  ],
+                ),
+                error: (_, __) => const Row(
+                  children: [
+                    Icon(Icons.local_fire_department_rounded, size: 36),
+                    SizedBox(width: 16),
+                    Expanded(child: Text('Cultivation progress unavailable')),
+                  ],
+                ),
               ),
             ),
           ),

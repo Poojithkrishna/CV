@@ -6,8 +6,8 @@ import 'app_lock_gate.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 
-class LifeOsApp extends ConsumerWidget {
-  const LifeOsApp({super.key});
+class DemonOriginApp extends ConsumerWidget {
+  const DemonOriginApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

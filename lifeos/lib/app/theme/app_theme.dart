@@ -10,6 +10,12 @@ import 'app_colors.dart';
 class AppTheme {
   AppTheme._();
 
+  /// The angular, sci-fi display face used only for brand moments (the
+  /// "DEMON ORIGIN" wordmark, rank-up celebrations) — never for dense body
+  /// or list text, where its wide letterforms hurt legibility. See
+  /// `BrandWordmark`.
+  static String get displayFontFamily => GoogleFonts.orbitron().fontFamily!;
+
   static ThemeData light() => _buildTheme(Brightness.light);
 
   static ThemeData dark() => _buildTheme(Brightness.dark);
@@ -90,6 +96,8 @@ class AppTheme {
             borderRadius: BorderRadius.circular(16),
           ),
           textStyle: const TextStyle(fontWeight: FontWeight.w600),
+          elevation: 6,
+          shadowColor: AppColors.brandViolet.withOpacity(0.5),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
@@ -97,6 +105,19 @@ class AppTheme {
         elevation: 0,
         height: 68,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        // A violet glow pill behind the selected icon instead of Material's
+        // flat default indicator — the one piece of chrome visible on
+        // every screen, so it carries a lot of the "premium" impression.
+        indicatorColor: AppColors.brandViolet.withOpacity(isDark ? 0.28 : 0.16),
+        indicatorShape: const StadiumBorder(),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          final bool selected = states.contains(WidgetState.selected);
+          return IconThemeData(
+            color: selected
+                ? (isDark ? Colors.white : AppColors.brandDeepViolet)
+                : colorScheme.onSurfaceVariant,
+          );
+        }),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         shape: RoundedRectangleBorder(

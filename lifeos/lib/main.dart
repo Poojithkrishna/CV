@@ -37,5 +37,5 @@ Future<void> main() async {
   );
   await handleNotificationActionResponse(container, await notificationService.initialLaunchResponse());
 
-  runApp(UncontrolledProviderScope(container: container, child: const LifeOsApp()));
+  runApp(UncontrolledProviderScope(container: container, child: const DemonOriginApp()));
 }
