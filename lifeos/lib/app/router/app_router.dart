@@ -76,6 +76,7 @@ import '../../features/journal/presentation/screens/journal_entry_form_screen.da
 import '../../features/journal/presentation/screens/journal_history_screen.dart';
 import '../../features/journal/presentation/screens/journal_home_screen.dart';
 import '../../features/more/presentation/screens/more_home_screen.dart';
+import '../../features/settings/presentation/screens/backup_screen.dart';
 import '../../features/settings/presentation/screens/settings_home_screen.dart';
 import 'app_shell.dart';
 
@@ -596,6 +597,12 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsHomeScreen(),
+      routes: [
+        GoRoute(
+          path: 'backup',
+          builder: (context, state) => const BackupScreen(),
+        ),
+      ],
     ),
   ],
 );

@@ -51,6 +51,11 @@ dependencies:
   # Small persisted preferences (theme mode, onboarding flags, etc.)
   shared_preferences: ^2.3.3
 
+  # Backup export/restore: picking a backup file to restore, and
+  # sharing an exported one to wherever the user wants to save it.
+  file_picker: ^8.1.3
+  share_plus: ^10.1.2
+
   cupertino_icons: ^1.0.8
 
 dev_dependencies:

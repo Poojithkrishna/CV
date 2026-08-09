@@ -332,6 +332,34 @@ Built feature by feature. So far:
   there's no pure logic to extract here, just a persisted bool and a
   platform plugin call, and this project's tests are for domain/data
   logic, not for mocking platform channels.
+- ✅ **Backup & Restore**: raw SQLite file operations rather than a
+  hand-rolled JSON export of every table — a straight file copy is a
+  full-fidelity backup by construction, and since Drift tracks its own
+  schema version *inside* the database file (the standard SQLite
+  `user_version` pragma), restoring an older backup into a newer app
+  build just upgrades in place through the normal migration path the
+  next time it's opened, with no separate backup-versioning scheme
+  needed. Export runs SQLite's own `VACUUM INTO` — a consistent,
+  compacted snapshot taken safely even while the live database is open,
+  unlike copying the raw file out from under an active connection —
+  then hands the result to `share_plus` so the user can save it
+  anywhere (Drive, email, Files, wherever). Restore validates the
+  chosen file's first 16 bytes against the real SQLite3 header before
+  going anywhere near the live database (refusing to silently clobber
+  everything with an arbitrary file), then closes the live connection
+  and overwrites its file — deliberately *not* attempting to hot-swap
+  the running `AppDatabase` back to life afterward, since that would
+  mean either racing Riverpod's provider-invalidation timing or relying
+  on a database connection tolerating being closed twice, neither of
+  which is worth the risk for an operation this rare and this
+  destructive. Instead LifeOS closes itself (`SystemNavigator.pop()`)
+  and picks the restored file up fresh on next launch, the same way
+  every ordinary launch already opens the database. `BackupService`'s
+  file-header validation and the `VACUUM INTO` export/reopen round-trip
+  are unit tested (the latter against a real `AppDatabase.forTesting`,
+  the same in-memory-database pattern every DAO test already uses); the
+  `path_provider`-dependent path resolution isn't, consistent with how
+  every other platform-plugin call in this app is left untested.
 
 ## Architecture
 
@@ -469,19 +497,28 @@ module's pure reminder-time function — `loanReminderTime`,
 `recurringPaymentReminderTime`, `taskReminderTime` and
 `eventReminderTime` — kept deliberately separate from the
 `NotificationService` orchestration around them so this math is
-unit-testable without mocking a platform channel; and `AccountCard`
+unit-testable without mocking a platform channel; `BackupService`'s
+SQLite-header validation (a real file, plain text, a too-short file, a
+missing file) and its `VACUUM INTO` export round-tripping back through
+a fresh `AppDatabase` with the exported data intact; and `AccountCard`
 widget rendering.
 
 ## Data & privacy
 
 Everything is stored locally in a single SQLite database
 (`<app documents dir>/lifeos.sqlite`) via Drift — there is no backend and
-no network calls beyond what a future backup feature adds explicitly.
-Local notifications are on-device only (`flutter_local_notifications`,
-no push service, no server round-trip). App Lock authenticates entirely
-on-device too (`local_auth` — biometrics or the phone's own device
-credential), so there's nothing to configure server-side and no
-account/password of ours to manage.
+no network calls, period. Local notifications are on-device only
+(`flutter_local_notifications`, no push service, no server round-trip).
+App Lock authenticates entirely on-device too (`local_auth` —
+biometrics or the phone's own device credential), so there's nothing to
+configure server-side and no account/password of ours to manage.
+Backup export hands the file to whatever the user picks from Android's
+own share sheet (Drive, email, a file manager, anything already
+installed) — LifeOS itself never uploads it anywhere; restoring reads
+only the single file the user explicitly chose. Backup files are plain
+database files with no encryption of their own layered on top, so they
+carry the same sensitivity as everything else in the app and are worth
+sharing with the same care.
 
 ## Next up
 
@@ -491,14 +528,15 @@ Gamification — has now had its full feature pass (models → repository →
 use cases → providers → UI → widgets → validation → tests), and the
 dashboard's every tile is wired to real, live data.
 
-Local notifications and biometric App Lock are now wired up too — every
-`reminderEnabled`/`reminderDaysBefore` flag (Loans, Recurring Payments,
-Calendar tasks and events) actually schedules a device notification,
-and Settings has a real App Lock toggle (see the two sections above).
+Local notifications, biometric App Lock and Backup & Restore are all
+wired up too — every `reminderEnabled`/`reminderDaysBefore` flag (Loans,
+Recurring Payments, Calendar tasks and events) actually schedules a
+device notification, Settings has a real App Lock toggle, and Settings
+→ Backup & Restore can export everything to a file (shared however the
+user likes) or replace everything from a previously exported one (see
+the three sections above).
 
-Both dependencies called out in earlier passes as "declared but not
-wired" are now fully wired — there's no outstanding polish item left
-from the original spec. Future passes are open-ended from here: say
-what you'd like next (a backup/export feature, widgets, richer
-Gamification content, or anything else) and it'll get the same full
-treatment.
+There's no outstanding polish item left from the original spec or from
+any pass since. Future work is open-ended from here: say what you'd
+like next (Home screen widgets, richer Gamification content, or
+anything else) and it'll get the same full treatment.

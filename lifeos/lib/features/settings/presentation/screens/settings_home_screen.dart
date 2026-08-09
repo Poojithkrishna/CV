@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/providers/app_lock_provider.dart';
 import '../../../../core/providers/theme_mode_provider.dart';
@@ -98,6 +99,28 @@ class SettingsHomeScreen extends ConsumerWidget {
                     subtitle: const Text('Require biometrics or device unlock to open LifeOS'),
                     value: appLockEnabled,
                     onChanged: (value) => _setAppLockEnabled(context, ref, value),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+                    child: Text('Data', style: Theme.of(context).textTheme.labelLarge),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.backup_outlined),
+                    title: const Text('Backup & Restore'),
+                    subtitle: const Text('Export everything, or restore from a backup file'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/settings/backup'),
                   ),
                 ],
               ),
