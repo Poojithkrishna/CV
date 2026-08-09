@@ -37,7 +37,10 @@ class AppTheme {
       useMaterial3: true,
       brightness: brightness,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: colorScheme.surface,
+      // Dark mode leaves this transparent so AmbientBackground (mounted
+      // once above the router — see DemonOriginApp) shows through on every
+      // screen; light mode keeps a plain opaque surface.
+      scaffoldBackgroundColor: isDark ? Colors.transparent : colorScheme.surface,
       textTheme: textTheme,
       fontFamily: GoogleFonts.manrope().fontFamily,
       appBarTheme: AppBarTheme(

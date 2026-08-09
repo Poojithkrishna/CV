@@ -138,7 +138,7 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const BrandWordmark(),
+        title: const BrandLockup(),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),

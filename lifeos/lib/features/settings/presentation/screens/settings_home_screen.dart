@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/providers/app_lock_provider.dart';
 import '../../../../core/providers/theme_mode_provider.dart';
+import '../../../../core/widgets/app_icon_mark.dart';
 import '../../../../core/widgets/brand_wordmark.dart';
 
 class SettingsHomeScreen extends ConsumerWidget {
@@ -130,7 +131,7 @@ class SettingsHomeScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           Card(
             child: ListTile(
-              leading: const Icon(Icons.info_outline_rounded),
+              leading: const AppIconMark(size: 28),
               title: const BrandWordmark(fontSize: 16),
               subtitle: const Text('v0.1.0 — personal build'),
             ),
