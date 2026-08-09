@@ -207,9 +207,28 @@ Built feature by feature. So far:
   surfaces what's in progress and recently completed. The dashboard's
   "Currently playing" tile shows the most recently touched in-progress
   item's title.
-- 🚧 Every other module (Journal, Calendar, Gamification) has a
-  placeholder screen wired into navigation, ready for its own feature
-  pass — see `lib/features/<module>/presentation/screens/*_home_screen.dart`.
+- ✅ **Journal**: one `JournalEntry` entity covers the morning journal,
+  night reflection, gratitude and free-writing prompts — a
+  `JournalEntryType` tag (label, icon and its own accent color, the same
+  three-field-enum shape as `TransactionType`) on an otherwise-identical
+  text entry, rather than four separate tables. Unlike the Fitness
+  trackers, a day can have any number of entries — writing a morning
+  entry doesn't stop you from adding a night reflection the same day —
+  so entries are plain CRUD (ordered by date, then by creation time)
+  instead of the one-row-per-day upsert Body Weight/Recovery use.
+  Mood tracking is a simple optional 1-5 `Mood` enum attached to any
+  entry rather than its own feature — `JournalStats.averageMood` folds
+  it into the home hub. `JournalStats.currentStreak` counts consecutive
+  days with at least one entry, giving today a pass if nothing's
+  written yet, the same "current period never breaks a streak before
+  it's actually missed" idea as `HabitStats.currentStreak`. Quick-add
+  chips on the home hub jump straight to a prefilled entry type via
+  `go_router`'s `extra` (the app's first use of it, since every earlier
+  form screen only ever needed a path parameter). The dashboard's
+  "Today's journal" tile shows whether anything's been written today.
+- 🚧 Every other module (Calendar, Gamification) has a placeholder
+  screen wired into navigation, ready for its own feature pass — see
+  `lib/features/<module>/presentation/screens/*_home_screen.dart`.
 
 ## Architecture
 
@@ -287,9 +306,10 @@ Covers: use-case validation across Finance (`CreateAccount`/
 Goals (`CreateGoal`/`AddMilestone`), Creator Studio
 (`CreateContentProject`/`CreateClip`/`UpdateContentGoal`/
 `MoveProjectToStage`, including the first-publish-only `publishedDate`
-stamping) and Entertainment (`CreateMediaItem`/`UpdateMediaStatus`,
+stamping), Entertainment (`CreateMediaItem`/`UpdateMediaStatus`,
 including the first-arrival-only `startedDate`/`completedDate`
-stamping, and `LogMediaProgress`); `RecurrenceFrequency`'s date math
+stamping, and `LogMediaProgress`) and Journal (`CreateJournalEntry`/
+`UpdateJournalEntry`/`DeleteJournalEntry`); `RecurrenceFrequency`'s date math
 (leap years, month-length clamping) and `MarkRecurringPaymentPaid`'s
 orchestration; `WorkoutStats`'s volume and progression-suggestion math,
 `StrengthProgressStats`'s Epley 1RM estimate and same-day-best
@@ -304,8 +324,10 @@ empty-month buckets), `ContentPipelineStats`'s stage counts/
 published-since filtering/view-like-comment totals/average views and
 `MediaLibraryStats`'s status/type counts, completed-since filtering,
 progress-fraction clamping (including the no-total-set and zero-total
-null cases) and average-rating-of-the-rated-only math; DAO behaviour
-against an in-memory SQLite
+null cases) and average-rating-of-the-rated-only math, and
+`JournalStats`'s current-streak math (today's pass-if-unwritten rule,
+multiple same-day entries counting once, breaking on the first prior
+gap) and mood/type aggregation; DAO behaviour against an in-memory SQLite
 database for `AccountsDao`/`TransactionsDao`/`CreditCardsDao`/
 `CardEmisDao`/`LoansDao` (balance and payment math, including
 edit/delete reverting the right effect), `InvestmentsDao`/`AssetsDao`
@@ -321,10 +343,11 @@ filtering), `NutritionDao` (the food-item join query, seeded starter
 library, cascading deletes), `ContentStudioDao` (sort-ordered/
 captured-at-ordered streams, deleting a linked project setting a clip's
 `linkedProjectId` to null rather than cascading, and the singleton goal
-row's upsert never crashing on a re-save) and `MediaLibraryDao`
+row's upsert never crashing on a re-save), `MediaLibraryDao`
 (alphabetical ordering, and `adjustProgress`'s accumulate-delta math —
-floored at zero, capped at `totalProgress`, a no-op for a missing id);
-and `AccountCard` widget rendering.
+floored at zero, capped at `totalProgress`, a no-op for a missing id)
+and `JournalDao` (date-then-creation-time ordering, a null mood
+round-tripping as null); and `AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -344,7 +367,6 @@ Suggested order for the next feature passes (say which one you want and
 it'll get the same full treatment — models → repository → use cases →
 providers → UI → widgets → validation → tests):
 
-1. Journal
-2. Calendar & Tasks
-3. Gamification (ranks, XP, attributes, achievements, Life Score) —
+1. Calendar & Tasks
+2. Gamification (ranks, XP, attributes, achievements, Life Score) —
    wiring dashboard stats to real data from the modules above as they land

@@ -69,6 +69,9 @@ import '../../features/goals/presentation/screens/goals_list_screen.dart';
 import '../../features/habits/presentation/screens/habit_detail_screen.dart';
 import '../../features/habits/presentation/screens/habit_form_screen.dart';
 import '../../features/habits/presentation/screens/habits_list_screen.dart';
+import '../../features/journal/domain/entities/journal_entry_type.dart';
+import '../../features/journal/presentation/screens/journal_entry_form_screen.dart';
+import '../../features/journal/presentation/screens/journal_history_screen.dart';
 import '../../features/journal/presentation/screens/journal_home_screen.dart';
 import '../../features/more/presentation/screens/more_home_screen.dart';
 import '../../features/settings/presentation/screens/settings_home_screen.dart';
@@ -539,6 +542,24 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/journal',
       builder: (context, state) => const JournalHomeScreen(),
+      routes: [
+        GoRoute(
+          path: 'history',
+          builder: (context, state) => const JournalHistoryScreen(),
+        ),
+        GoRoute(
+          path: 'entries/new',
+          builder: (context, state) => JournalEntryFormScreen(
+            initialType: state.extra as JournalEntryType?,
+          ),
+        ),
+        GoRoute(
+          path: 'entries/:id/edit',
+          builder: (context, state) => JournalEntryFormScreen(
+            entryId: state.pathParameters['id'],
+          ),
+        ),
+      ],
     ),
     GoRoute(
       path: '/calendar',

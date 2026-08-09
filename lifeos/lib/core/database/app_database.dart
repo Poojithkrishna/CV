@@ -66,6 +66,8 @@ import '../../features/goals/data/tables/milestones_table.dart';
 import '../../features/habits/data/daos/habits_dao.dart';
 import '../../features/habits/data/tables/habit_entries_table.dart';
 import '../../features/habits/data/tables/habits_table.dart';
+import '../../features/journal/data/daos/journal_dao.dart';
+import '../../features/journal/data/tables/journal_entries_table.dart';
 import 'default_categories.dart';
 import 'default_exercises.dart';
 import 'default_foods.dart';
@@ -118,6 +120,7 @@ part 'app_database.g.dart';
     Clips,
     ContentGoals,
     MediaItems,
+    JournalEntries,
   ],
   daos: [
     AccountsDao,
@@ -144,6 +147,7 @@ part 'app_database.g.dart';
     RecoveryDao,
     ContentStudioDao,
     MediaLibraryDao,
+    JournalDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -154,7 +158,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 15;
+  int get schemaVersion => 16;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -235,6 +239,9 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 15) {
             await m.createTable(mediaItems);
+          }
+          if (from < 16) {
+            await m.createTable(journalEntries);
           }
         },
       );

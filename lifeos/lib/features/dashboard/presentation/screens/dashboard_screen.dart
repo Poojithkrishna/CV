@@ -18,14 +18,17 @@ import '../../../fitness/presentation/providers/workout_plan_providers.dart';
 import '../../../goals/domain/entities/goal.dart';
 import '../../../goals/presentation/providers/goal_providers.dart';
 import '../../../habits/presentation/providers/habit_providers.dart';
+import '../../../journal/domain/entities/journal_entry.dart';
+import '../../../journal/presentation/providers/journal_providers.dart';
 import '../widgets/module_summary_card.dart';
 
 /// The LifeOS home screen: a single glance at every module. Finance's net
 /// worth, Fitness's active plan, Habits' weekly completion, Goals' active
-/// count, Creator Studio's weekly-upload and Entertainment's
-/// currently-playing tiles are wired to real data; every other tile is a
-/// placeholder until that module's own feature pass lands, but they're
-/// already tappable so the whole app is navigable end to end.
+/// count, Creator Studio's weekly-upload, Entertainment's
+/// currently-playing and Journal's written-today tiles are wired to real
+/// data; every other tile is a placeholder until that module's own
+/// feature pass lands, but they're already tappable so the whole app is
+/// navigable end to end.
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -81,6 +84,22 @@ class DashboardScreen extends ConsumerWidget {
             items.where((item) => item.status == MediaStatus.inProgress).toList()
               ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
         return inProgress.isEmpty ? 'Nothing yet' : inProgress.first.title;
+      },
+      loading: () => '—',
+      error: (_, __) => '—',
+    );
+
+    final AsyncValue<List<JournalEntry>> journalEntries = ref.watch(allJournalEntriesProvider);
+    final String journalValue = journalEntries.when(
+      data: (entries) {
+        final DateTime now = DateTime.now();
+        final bool writtenToday = entries.any(
+          (entry) =>
+              entry.date.year == now.year &&
+              entry.date.month == now.month &&
+              entry.date.day == now.day,
+        );
+        return writtenToday ? 'Written' : 'Not written';
       },
       loading: () => '—',
       error: (_, __) => '—',
@@ -205,7 +224,7 @@ class DashboardScreen extends ConsumerWidget {
               ),
               ModuleSummaryCard(
                 label: 'Today\'s journal',
-                value: 'Not written',
+                value: journalValue,
                 subtitle: 'Journal',
                 icon: Icons.menu_book_rounded,
                 gradient: LinearGradient(
