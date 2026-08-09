@@ -12,9 +12,12 @@ class Clips extends Table {
 
   /// Optional — which content project this clip ended up being used in.
   /// Set null (not cascaded) if that project is deleted, so the clip
-  /// itself survives.
+  /// itself survives. Uses `.customConstraint()` rather than
+  /// `.references()` — see milestones_table.dart in the goals feature
+  /// for why (the latter's generated constraint was silently dropped by
+  /// drift_dev in this schema).
   TextColumn get linkedProjectId =>
-      text().nullable().references(ContentProjects, #id, onDelete: KeyAction.setNull)();
+      text().customConstraint('REFERENCES content_projects (id) ON DELETE SET NULL')();
 
   DateTimeColumn get capturedAt => dateTime()();
   DateTimeColumn get createdAt => dateTime()();

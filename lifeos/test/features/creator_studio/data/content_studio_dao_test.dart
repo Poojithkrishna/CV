@@ -100,8 +100,13 @@ void main() {
     expect(clips.map((row) => row.id), ['c2', 'c1']);
   });
 
-  test('watchGoal is null until a goal row is seeded', () async {
-    expect(await database.contentStudioDao.watchGoal().first, isNull);
+  test('watchGoal already has the seeded default row right after database creation', () async {
+    // AppDatabase._seedDefaultContentGoal runs unconditionally in onCreate,
+    // so there's never a window where this is null — unlike a value the
+    // app itself might not have written yet.
+    final ContentGoalRow? goal = await database.contentStudioDao.watchGoal().first;
+    expect(goal, isNotNull);
+    expect(goal!.weeklyUploadTarget, 1);
   });
 
   test('updateGoal upserts the singleton goal row without a duplicate-key crash', () async {

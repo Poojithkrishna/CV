@@ -7,10 +7,15 @@ import 'workout_days_table.dart';
 class PlanExercises extends Table {
   TextColumn get id => text()();
 
-  TextColumn get dayId => text().references(WorkoutDays, #id, onDelete: KeyAction.cascade)();
+  // See milestones_table.dart in the goals feature for why these use
+  // .customConstraint() instead of .references() — the latter's
+  // generated constraint was silently dropped by drift_dev in this
+  // schema.
+  TextColumn get dayId =>
+      text().customConstraint('NOT NULL REFERENCES workout_days (id) ON DELETE CASCADE')();
 
   TextColumn get exerciseId =>
-      text().references(Exercises, #id, onDelete: KeyAction.cascade)();
+      text().customConstraint('NOT NULL REFERENCES exercises (id) ON DELETE CASCADE')();
 
   IntColumn get targetSets => integer()();
 

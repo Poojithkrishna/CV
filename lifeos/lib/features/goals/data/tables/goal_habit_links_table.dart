@@ -9,10 +9,13 @@ import 'goals_table.dart';
 /// progress, it's just surfaced together on the goal's detail screen.
 @DataClassName('GoalHabitLinkRow')
 class GoalHabitLinks extends Table {
+  // See milestones_table.dart for why these use .customConstraint()
+  // instead of .references() — the latter's generated constraint was
+  // silently dropped by drift_dev in this schema.
   TextColumn get goalId =>
-      text().references(Goals, #id, onDelete: KeyAction.cascade)();
+      text().customConstraint('NOT NULL REFERENCES goals (id) ON DELETE CASCADE')();
   TextColumn get habitId =>
-      text().references(Habits, #id, onDelete: KeyAction.cascade)();
+      text().customConstraint('NOT NULL REFERENCES habits (id) ON DELETE CASCADE')();
   DateTimeColumn get createdAt => dateTime()();
 
   @override

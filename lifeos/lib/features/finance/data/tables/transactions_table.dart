@@ -16,11 +16,15 @@ import 'categories_table.dart';
 class Transactions extends Table {
   TextColumn get id => text()();
 
+  // See milestones_table.dart in the goals feature for why these use
+  // .customConstraint() instead of .references() — the latter's
+  // generated constraint was silently dropped by drift_dev in this
+  // schema.
   TextColumn get accountId =>
-      text().references(Accounts, #id, onDelete: KeyAction.cascade)();
+      text().customConstraint('NOT NULL REFERENCES accounts (id) ON DELETE CASCADE')();
 
   TextColumn get categoryId =>
-      text().nullable().references(Categories, #id, onDelete: KeyAction.setNull)();
+      text().customConstraint('REFERENCES categories (id) ON DELETE SET NULL')();
 
   /// Stored as [TransactionType.name] (`"income"` / `"expense"` / `"transfer"`).
   TextColumn get type => text()();
@@ -34,7 +38,7 @@ class Transactions extends Table {
 
   /// Destination account for a transfer; null for income/expense.
   TextColumn get transferAccountId =>
-      text().nullable().references(Accounts, #id, onDelete: KeyAction.cascade)();
+      text().customConstraint('REFERENCES accounts (id) ON DELETE CASCADE')();
 
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();

@@ -6,8 +6,12 @@ import 'credit_cards_table.dart';
 class CardEmis extends Table {
   TextColumn get id => text()();
 
+  // See milestones_table.dart in the goals feature for why this uses
+  // .customConstraint() instead of .references() — the latter's
+  // generated constraint was silently dropped by drift_dev in this
+  // schema.
   TextColumn get cardId =>
-      text().references(CreditCards, #id, onDelete: KeyAction.cascade)();
+      text().customConstraint('NOT NULL REFERENCES credit_cards (id) ON DELETE CASCADE')();
 
   TextColumn get description => text().withLength(min: 1, max: 120)();
   RealColumn get totalAmount => real()();

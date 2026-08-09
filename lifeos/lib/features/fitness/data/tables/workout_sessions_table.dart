@@ -9,11 +9,14 @@ class WorkoutSessions extends Table {
 
   /// Null for an ad-hoc workout not tied to any plan. Set null (rather
   /// than cascading) if the plan/day is later deleted — session history
-  /// is worth keeping on its own.
+  /// is worth keeping on its own. Uses `.customConstraint()` rather than
+  /// `.references()` — see milestones_table.dart in the goals feature
+  /// for why (the latter's generated constraint was silently dropped by
+  /// drift_dev in this schema).
   TextColumn get planId =>
-      text().nullable().references(WorkoutPlans, #id, onDelete: KeyAction.setNull)();
+      text().customConstraint('REFERENCES workout_plans (id) ON DELETE SET NULL')();
   TextColumn get dayId =>
-      text().nullable().references(WorkoutDays, #id, onDelete: KeyAction.setNull)();
+      text().customConstraint('REFERENCES workout_days (id) ON DELETE SET NULL')();
 
   DateTimeColumn get date => dateTime()();
   DateTimeColumn get startTime => dateTime()();

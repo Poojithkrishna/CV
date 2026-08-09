@@ -7,11 +7,15 @@ import 'workout_sessions_table.dart';
 class LoggedSets extends Table {
   TextColumn get id => text()();
 
+  // See milestones_table.dart in the goals feature for why these use
+  // .customConstraint() instead of .references() — the latter's
+  // generated constraint was silently dropped by drift_dev in this
+  // schema.
   TextColumn get sessionId =>
-      text().references(WorkoutSessions, #id, onDelete: KeyAction.cascade)();
+      text().customConstraint('NOT NULL REFERENCES workout_sessions (id) ON DELETE CASCADE')();
 
   TextColumn get exerciseId =>
-      text().references(Exercises, #id, onDelete: KeyAction.cascade)();
+      text().customConstraint('NOT NULL REFERENCES exercises (id) ON DELETE CASCADE')();
 
   IntColumn get setNumber => integer()();
   IntColumn get reps => integer()();

@@ -88,11 +88,19 @@ void main() {
         .logSet(buildSet(id: 's1', reps: 10, weight: 100, isWarmup: true).toCompanion());
     expect(warmupIsPr, isFalse);
 
-    // A working set lighter than the warmup should still be a PR, since
-    // warmups don't establish a working-weight baseline.
-    final bool workingIsPr = await database.workoutSessionsDao
+    // The warmup doesn't establish a working-weight baseline, so this is
+    // still effectively the first working set ever logged — same rule
+    // as the no-history case above, so it's not a PR either.
+    final bool firstWorkingIsPr = await database.workoutSessionsDao
         .logSet(buildSet(id: 's2', reps: 8, weight: 60).toCompanion());
-    expect(workingIsPr, isTrue);
+    expect(firstWorkingIsPr, isFalse);
+
+    // Heavier than the true baseline (60) but lighter than the excluded
+    // warmup (100) — only a PR if the warmup was truly ignored rather
+    // than silently counted as the max.
+    final bool secondWorkingIsPr = await database.workoutSessionsDao
+        .logSet(buildSet(id: 's3', reps: 8, weight: 90).toCompanion());
+    expect(secondWorkingIsPr, isTrue);
   });
 
   test('watchSessionCount reflects every session ever started', () async {

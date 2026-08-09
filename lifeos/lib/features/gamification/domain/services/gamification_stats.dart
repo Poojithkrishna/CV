@@ -178,7 +178,12 @@ class GamificationStats {
       if (completedMediaCount >= 25) 'completionist_ii',
       if (journalStreak >= 30) 'deep_thinker_ii',
       if (doneTaskCount >= 75) 'organized_mind_ii',
-      if (attributes.values.every((value) => value >= 50)) 'renaissance',
+      // Checked against Attribute.values rather than attributes.values —
+      // Iterable.every is vacuously true on an empty collection, so an
+      // incomplete (or, as in one test, entirely empty) attributes map
+      // would otherwise satisfy "every attribute" without a single one
+      // actually being computed.
+      if (Attribute.values.every((a) => (attributes[a] ?? 0) >= 50)) 'renaissance',
       if (attributes.values.any((value) => value >= 100)) 'peak_of_a_path',
       if (lifeScore >= 90) 'true_sovereign',
     };

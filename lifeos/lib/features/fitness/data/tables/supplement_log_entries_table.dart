@@ -7,8 +7,12 @@ import 'supplements_table.dart';
 @DataClassName('SupplementLogEntryRow')
 class SupplementLogEntries extends Table {
   TextColumn get id => text()();
+  // See milestones_table.dart in the goals feature for why this uses
+  // .customConstraint() instead of .references() — the latter's
+  // generated constraint was silently dropped by drift_dev in this
+  // schema.
   TextColumn get supplementId =>
-      text().references(Supplements, #id, onDelete: KeyAction.cascade)();
+      text().customConstraint('NOT NULL REFERENCES supplements (id) ON DELETE CASCADE')();
   DateTimeColumn get date => dateTime()();
   BoolColumn get taken => boolean().withDefault(const Constant(true))();
   DateTimeColumn get createdAt => dateTime()();

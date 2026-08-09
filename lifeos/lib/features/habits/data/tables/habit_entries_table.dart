@@ -6,7 +6,12 @@ import 'habits_table.dart';
 class HabitEntries extends Table {
   TextColumn get id => text()();
 
-  TextColumn get habitId => text().references(Habits, #id, onDelete: KeyAction.cascade)();
+  // See milestones_table.dart in the goals feature for why this uses
+  // .customConstraint() instead of .references() — the latter's
+  // generated constraint was silently dropped by drift_dev in this
+  // schema.
+  TextColumn get habitId =>
+      text().customConstraint('NOT NULL REFERENCES habits (id) ON DELETE CASCADE')();
 
   DateTimeColumn get periodStart => dateTime()();
   RealColumn get progressValue => real().withDefault(const Constant(0))();

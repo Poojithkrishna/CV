@@ -6,7 +6,12 @@ import 'loans_table.dart';
 class LoanPayments extends Table {
   TextColumn get id => text()();
 
-  TextColumn get loanId => text().references(Loans, #id, onDelete: KeyAction.cascade)();
+  // See milestones_table.dart in the goals feature for why this uses
+  // .customConstraint() instead of .references() — the latter's
+  // generated constraint was silently dropped by drift_dev in this
+  // schema.
+  TextColumn get loanId =>
+      text().customConstraint('NOT NULL REFERENCES loans (id) ON DELETE CASCADE')();
 
   RealColumn get amount => real()();
   DateTimeColumn get date => dateTime()();
