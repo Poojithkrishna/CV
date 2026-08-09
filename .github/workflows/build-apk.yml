@@ -1,0 +1,79 @@
+name: Build Demon Origin APK
+
+# GitHub-hosted runners have full internet access (unlike the sandbox this
+# was developed in, which blocks dl.google.com and so can never install an
+# Android SDK) — so this is where the Flutter app actually gets built into
+# an installable APK.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/lifeos-android-app-9blxub
+    paths:
+      - "lifeos/**"
+      - ".github/workflows/build-apk.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lifeos
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.9"
+          channel: "stable"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Drift's generated *.g.dart part files are gitignored (like every
+      # other generated-code artifact in this project), so they're
+      # rebuilt fresh on every CI run rather than checked in.
+      - name: Generate Drift code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Test
+        run: flutter test
+
+      # `--release` here is still debug-signed — see the TODO in
+      # android/app/build.gradle — which is exactly right for sideloading
+      # onto your own device; it's just not eligible for Play Store
+      # distribution without a real signing config.
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: demon-origin-apk
+          path: lifeos/build/app/outputs/flutter-apk/app-release.apk
+
+      # Keeps one stable, always-current download link rather than a new
+      # release per commit.
+      - name: Publish to the latest-apk release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-apk
+          name: Demon Origin (latest build)
+          body: >
+            Automatically rebuilt from the latest commit on
+            claude/lifeos-android-app-9blxub. Debug-signed — fine to
+            sideload onto your own device, not for Play Store
+            distribution.
+          prerelease: true
+          files: lifeos/build/app/outputs/flutter-apk/app-release.apk
