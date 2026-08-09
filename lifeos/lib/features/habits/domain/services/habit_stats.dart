@@ -1,6 +1,5 @@
 import '../entities/habit.dart';
 import '../entities/habit_entry.dart';
-import '../entities/habit_frequency.dart';
 
 /// Pure, DB-free streak/completion calculations shared by the habit list
 /// and detail screens. Everything here takes already-loaded entries so it

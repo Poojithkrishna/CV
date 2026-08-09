@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
 
 /// Reusable gradients for the "premium glassmorphism" look used across
 /// dashboard tiles, account cards and module headers.

@@ -39,7 +39,13 @@ class Achievement {
 /// `GamificationStats.evaluateAchievementKeys` against live stats — once
 /// a key is unlocked and persisted, it stays unlocked even if the
 /// triggering stat later changes (e.g. net worth drops back down).
-const List<Achievement> achievementCatalog = [
+///
+/// Not `const` — several rank-tier entries read `Rank.x.label` etc.,
+/// and Dart doesn't allow arbitrary enum property access in a constant
+/// expression, only its built-in `.index`/`.name`. Still a single,
+/// never-mutated list built once at first access, so this loses
+/// nothing in practice.
+final List<Achievement> achievementCatalog = [
   // --- Milestones: the first taste of each module's core loop. ---
   Achievement(
     key: 'rich_cultivator',

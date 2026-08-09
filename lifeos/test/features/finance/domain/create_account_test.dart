@@ -24,7 +24,7 @@ class _FakeAccountRepository implements AccountRepository {
 
   @override
   Future<NetWorthSummary> getNetWorthSummary() async =>
-      (assets: 0, liabilities: 0, netWorth: 0);
+      (assets: 0.0, liabilities: 0.0, netWorth: 0.0);
 
   @override
   Future<Result<Account>> updateAccount(Account account) async => Result.ok(account);

@@ -17,7 +17,6 @@ class WorkoutPlanTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color color = Color(plan.colorValue);
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),

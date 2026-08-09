@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 enum ContentStage {
   idea('Idea', Icons.lightbulb_outline_rounded),
   recording('Recording', Icons.videocam_outlined),
-  editing('Editing', Icons.movie_edit_outlined),
+  editing('Editing', Icons.movie_creation_outlined),
   thumbnail('Thumbnail', Icons.image_outlined),
   upload('Upload', Icons.cloud_upload_outlined),
   published('Published', Icons.check_circle_outline_rounded);

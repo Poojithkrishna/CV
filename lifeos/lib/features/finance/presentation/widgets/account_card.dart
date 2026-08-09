@@ -19,9 +19,14 @@ class AccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final IconData icon = account.iconCodePoint != null
-        ? IconData(account.iconCodePoint!, fontFamily: 'MaterialIcons')
-        : account.type.defaultIcon;
+    // `account.iconCodePoint` has no picker UI setting it yet — every
+    // account today falls back to its type's default icon. Flutter's
+    // IconData now requires a compile-time-constant codePoint (for icon
+    // tree-shaking), which a value loaded from the database can never
+    // be, so a per-account custom icon isn't reconstructible this way
+    // even once a picker exists — that'll need a fixed, curated set of
+    // const IconData choices indexed by id instead.
+    final IconData icon = account.type.defaultIcon;
 
     final Color baseColor = Color(account.colorValue);
     final bool isNegative = account.currentBalance < 0;

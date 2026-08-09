@@ -116,6 +116,11 @@ class NotificationService {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      // Android-only app — this only affects the iOS code path — but the
+      // plugin's cross-platform API requires it regardless. `absoluteTime`
+      // is correct for a fixed wall-clock `dateTime`, as opposed to
+      // `wallClockTime`'s "the same clock time every day" semantics.
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
     );
   }

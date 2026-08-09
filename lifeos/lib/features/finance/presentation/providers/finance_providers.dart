@@ -4,7 +4,6 @@ import '../../../../core/providers/database_provider.dart';
 import '../../data/daos/accounts_dao.dart';
 import '../../data/repositories/account_repository_impl.dart';
 import '../../domain/entities/account.dart';
-import '../../domain/entities/account_type.dart';
 import '../../domain/repositories/account_repository.dart';
 import '../../domain/usecases/create_account.dart';
 import '../../domain/usecases/delete_account.dart';

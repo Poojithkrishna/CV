@@ -1,4 +1,3 @@
-import '../../../../core/error/failures.dart';
 import '../../../../core/utils/result.dart';
 import '../entities/account.dart';
 
