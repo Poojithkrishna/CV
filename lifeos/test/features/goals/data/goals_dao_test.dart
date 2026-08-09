@@ -50,7 +50,9 @@ void main() {
   late AppDatabase database;
 
   setUp(() async {
-    database = AppDatabase.forTesting(NativeDatabase.memory());
+    database = AppDatabase.forTesting(
+      NativeDatabase.memory(setup: (db) => db.execute('PRAGMA foreign_keys = ON;')),
+    );
   });
 
   tearDown(() async {

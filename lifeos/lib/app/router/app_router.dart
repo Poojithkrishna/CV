@@ -22,12 +22,20 @@ import '../../features/finance/presentation/screens/recurring_payment_form_scree
 import '../../features/finance/presentation/screens/recurring_payments_list_screen.dart';
 import '../../features/finance/presentation/screens/transaction_form_screen.dart';
 import '../../features/finance/presentation/screens/transactions_list_screen.dart';
+import '../../features/fitness/domain/entities/measurement_type.dart';
 import '../../features/fitness/domain/entities/plan_exercise.dart';
+import '../../features/fitness/presentation/screens/body_weight_screen.dart';
 import '../../features/fitness/presentation/screens/exercise_form_screen.dart';
 import '../../features/fitness/presentation/screens/exercise_library_screen.dart';
 import '../../features/fitness/presentation/screens/fitness_home_screen.dart';
+import '../../features/fitness/presentation/screens/food_item_form_screen.dart';
+import '../../features/fitness/presentation/screens/food_library_screen.dart';
+import '../../features/fitness/presentation/screens/measurement_detail_screen.dart';
+import '../../features/fitness/presentation/screens/measurements_list_screen.dart';
+import '../../features/fitness/presentation/screens/nutrition_screen.dart';
 import '../../features/fitness/presentation/screens/plan_exercise_form_screen.dart';
 import '../../features/fitness/presentation/screens/start_workout_screen.dart';
+import '../../features/fitness/presentation/screens/water_screen.dart';
 import '../../features/fitness/presentation/screens/workout_history_screen.dart';
 import '../../features/fitness/presentation/screens/workout_plan_detail_screen.dart';
 import '../../features/fitness/presentation/screens/workout_plan_form_screen.dart';
@@ -288,6 +296,46 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => WorkoutSessionScreen(
                     sessionId: state.pathParameters['sessionId']!,
                   ),
+                ),
+                GoRoute(
+                  path: 'body-weight',
+                  builder: (context, state) => const BodyWeightScreen(),
+                ),
+                GoRoute(
+                  path: 'water',
+                  builder: (context, state) => const WaterScreen(),
+                ),
+                GoRoute(
+                  path: 'measurements',
+                  builder: (context, state) => const MeasurementsListScreen(),
+                  routes: [
+                    GoRoute(
+                      path: ':type',
+                      builder: (context, state) => MeasurementDetailScreen(
+                        type: MeasurementType.values.byName(state.pathParameters['type']!),
+                      ),
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  path: 'nutrition',
+                  builder: (context, state) => const NutritionScreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'foods',
+                      builder: (context, state) => const FoodLibraryScreen(),
+                    ),
+                    GoRoute(
+                      path: 'foods/new',
+                      builder: (context, state) => const FoodItemFormScreen(),
+                    ),
+                    GoRoute(
+                      path: 'foods/:id/edit',
+                      builder: (context, state) => FoodItemFormScreen(
+                        foodItemId: state.pathParameters['id'],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -20,12 +20,23 @@ import '../../features/finance/data/tables/loan_payments_table.dart';
 import '../../features/finance/data/tables/loans_table.dart';
 import '../../features/finance/data/tables/recurring_payments_table.dart';
 import '../../features/finance/data/tables/transactions_table.dart';
+import '../../features/fitness/data/daos/body_weight_dao.dart';
 import '../../features/fitness/data/daos/exercises_dao.dart';
+import '../../features/fitness/data/daos/measurements_dao.dart';
+import '../../features/fitness/data/daos/nutrition_dao.dart';
+import '../../features/fitness/data/daos/water_dao.dart';
 import '../../features/fitness/data/daos/workout_plans_dao.dart';
 import '../../features/fitness/data/daos/workout_sessions_dao.dart';
+import '../../features/fitness/data/tables/body_weight_entries_table.dart';
 import '../../features/fitness/data/tables/exercises_table.dart';
+import '../../features/fitness/data/tables/food_items_table.dart';
+import '../../features/fitness/data/tables/food_log_entries_table.dart';
 import '../../features/fitness/data/tables/logged_sets_table.dart';
+import '../../features/fitness/data/tables/measurement_entries_table.dart';
+import '../../features/fitness/data/tables/nutrition_goal_table.dart';
 import '../../features/fitness/data/tables/plan_exercises_table.dart';
+import '../../features/fitness/data/tables/water_entries_table.dart';
+import '../../features/fitness/data/tables/water_goal_table.dart';
 import '../../features/fitness/data/tables/workout_days_table.dart';
 import '../../features/fitness/data/tables/workout_plans_table.dart';
 import '../../features/fitness/data/tables/workout_sessions_table.dart';
@@ -38,6 +49,7 @@ import '../../features/habits/data/tables/habit_entries_table.dart';
 import '../../features/habits/data/tables/habits_table.dart';
 import 'default_categories.dart';
 import 'default_exercises.dart';
+import 'default_foods.dart';
 
 part 'app_database.g.dart';
 
@@ -69,6 +81,13 @@ part 'app_database.g.dart';
     Goals,
     Milestones,
     GoalHabitLinks,
+    BodyWeightEntries,
+    WaterEntries,
+    WaterGoals,
+    MeasurementEntries,
+    FoodItems,
+    FoodLogEntries,
+    NutritionGoals,
   ],
   daos: [
     AccountsDao,
@@ -83,6 +102,10 @@ part 'app_database.g.dart';
     WorkoutSessionsDao,
     HabitsDao,
     GoalsDao,
+    BodyWeightDao,
+    WaterDao,
+    MeasurementsDao,
+    NutritionDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -93,7 +116,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -101,6 +124,8 @@ class AppDatabase extends _$AppDatabase {
           await m.createAll();
           await _seedDefaultCategories();
           await _seedDefaultExercises();
+          await _seedDefaultFoods();
+          await _seedDefaultGoalRows();
         },
         onUpgrade: (Migrator m, int from, int to) async {
           if (from < 2) {
@@ -141,6 +166,17 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(milestones);
             await m.createTable(goalHabitLinks);
           }
+          if (from < 11) {
+            await m.createTable(bodyWeightEntries);
+            await m.createTable(waterEntries);
+            await m.createTable(waterGoals);
+            await m.createTable(measurementEntries);
+            await m.createTable(foodItems);
+            await m.createTable(foodLogEntries);
+            await m.createTable(nutritionGoals);
+            await _seedDefaultFoods();
+            await _seedDefaultGoalRows();
+          }
         },
       );
 
@@ -154,6 +190,24 @@ class AppDatabase extends _$AppDatabase {
     await batch((b) {
       b.insertAll(exercises, buildDefaultExerciseSeed(DateTime.now()));
     });
+  }
+
+  Future<void> _seedDefaultFoods() async {
+    await batch((b) {
+      b.insertAll(foodItems, buildDefaultFoodSeed(DateTime.now()));
+    });
+  }
+
+  /// Seeds the single-row Water and Nutrition goal settings tables so the
+  /// app has a sensible default target from the very first launch.
+  Future<void> _seedDefaultGoalRows() async {
+    final DateTime now = DateTime.now();
+    await into(waterGoals).insert(
+      WaterGoalsCompanion.insert(id: kDefaultWaterGoalId, updatedAt: now),
+    );
+    await into(nutritionGoals).insert(
+      NutritionGoalsCompanion.insert(id: kDefaultNutritionGoalId, updatedAt: now),
+    );
   }
 }
 
