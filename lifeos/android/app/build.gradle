@@ -23,6 +23,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+        // flutter_local_notifications' AAR declares a minSdk requirement
+        // that needs this enabled, regardless of our own minSdk 23.
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
@@ -51,4 +54,9 @@ android {
 
 flutter {
     source "../.."
+}
+
+dependencies {
+    // Required by compileOptions.coreLibraryDesugaringEnabled above.
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.4"
 }
