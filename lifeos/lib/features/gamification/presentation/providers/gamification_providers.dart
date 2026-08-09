@@ -120,6 +120,8 @@ final Provider<AsyncValue<GamificationSnapshot>> gamificationSnapshotProvider =
         journalEntries: journalEntries,
         calendarTasks: calendarTasks,
         rank: rank,
+        attributes: attributes,
+        lifeScore: GamificationStats.lifeScore(attributes),
       ),
     ),
   );

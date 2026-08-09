@@ -386,6 +386,34 @@ Built feature by feature. So far:
   provider and XML resources aren't — there's no Dart test harness for
   native Android widget code, the same boundary every other
   platform-plugin integration in this app draws.
+- ✅ **Richer Gamification content**: the achievement catalog grew from
+  9 to 25, now grouped into three sections (`AchievementCategory`:
+  Milestones, Rank Ascension, Mastery) so the grid stays scannable
+  instead of one long undifferentiated wall of cards. Rank Ascension
+  adds one achievement per rung of the ladder (Qi Refining through
+  Immortal Ascension, plus the existing Demon God "Ascended") —
+  evaluated with a plain `rank.index >= milestone.index` comparison,
+  since reaching a higher rank always implies every lower XP threshold
+  was already crossed, so all the lower tiers unlock simultaneously
+  with the highest one reached rather than needing their own
+  historical tracking. Mastery adds a tier-2 milestone for each of the
+  six per-module achievements (e.g. Iron Body II at 50 workout
+  sessions, vs. the original 10) plus three whole-life balance
+  achievements — Renaissance (every attribute ≥ 50), Peak of a Path
+  (any attribute maxed at 100) and True Sovereign (Life Score ≥ 90) —
+  which needed `evaluateAchievementKeys` to accept the attribute map
+  and Life Score the caller had already computed, rather than
+  re-deriving them redundantly inside the method. Unlocking now gives
+  actual feedback instead of silently writing a row: a `SnackBar`
+  ("Achievement unlocked: …") for each newly-satisfied key, queued
+  automatically if several unlock at once, plus a one-time celebration
+  dialog the first time each rank is reached. That last part needed one
+  small new piece of persisted state, `LastSeenRankController` (mirrors
+  `ThemeModeController`'s async-self-load pattern — a wrong value for
+  one frame here is cosmetic, not security-critical, unlike App Lock's
+  `AppLockEnabledController`), living in the Gamification feature's own
+  `presentation/providers/` rather than `core/providers/` since it's
+  UI state specific to this module, not cross-cutting infrastructure.
 
 ## Architecture
 
@@ -566,11 +594,17 @@ Settings has a real App Lock toggle, Settings → Backup & Restore can
 export everything to a file (shared however the user likes) or replace
 everything from a previously exported one, and a widget can be added to
 the home screen showing cultivation rank/XP, net worth, habit
-completion and today's schedule without opening the app (see the four
+completion and today's schedule without opening the app (see the five
 sections above).
+
+Gamification itself has also had a second, deeper pass: 25 achievements
+across three grouped categories, one achievement per rank, tier-2
+module milestones and whole-life balance achievements, plus actual
+unlock/rank-up celebration instead of silent state changes (see the
+"Richer Gamification content" section above).
 
 There's no outstanding polish item left from the original spec or from
 any pass since. Future work is open-ended from here: say what you'd
-like next (richer Gamification content, deep-linking the widget to a
-specific screen, or anything else) and it'll get the same full
+like next (a Life Score history/trend chart, deep-linking the widget to
+a specific screen, or anything else) and it'll get the same full
 treatment.

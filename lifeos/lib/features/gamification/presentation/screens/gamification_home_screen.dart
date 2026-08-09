@@ -7,8 +7,10 @@ import '../../../../core/widgets/labeled_progress_bar.dart';
 import '../../domain/entities/achievement.dart';
 import '../../domain/entities/attribute.dart';
 import '../../domain/entities/gamification_snapshot.dart';
+import '../../domain/entities/rank.dart';
 import '../../domain/entities/unlocked_achievement.dart';
 import '../providers/gamification_providers.dart';
+import '../providers/last_seen_rank_provider.dart';
 import '../widgets/achievement_badge.dart';
 
 /// The Gamification home screen: current rank and XP progress, the
@@ -19,13 +21,57 @@ import '../widgets/achievement_badge.dart';
 class GamificationHomeScreen extends ConsumerWidget {
   const GamificationHomeScreen({super.key});
 
-  void _unlockNewlySatisfied(WidgetRef ref, Set<String> satisfiedKeys, Set<String> alreadyUnlockedKeys) {
+  void _celebrateNewlyUnlocked(
+    BuildContext context,
+    WidgetRef ref,
+    Set<String> satisfiedKeys,
+    Set<String> alreadyUnlockedKeys,
+  ) {
     final Set<String> newlyUnlocked = satisfiedKeys.difference(alreadyUnlockedKeys);
     if (newlyUnlocked.isEmpty) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       for (final String key in newlyUnlocked) {
         ref.read(unlockAchievementUseCaseProvider).call(key);
+        final Achievement achievement = achievementCatalog.firstWhere((a) => a.key == key);
+        if (!context.mounted) continue;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(achievement.icon, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
+                Expanded(child: Text('Achievement unlocked: ${achievement.title}')),
+              ],
+            ),
+          ),
+        );
       }
+    });
+  }
+
+  /// Shows a one-time celebration dialog the first time each rank is
+  /// reached. [lastSeenRankIndex] is `null` until loaded from disk, in
+  /// which case nothing fires yet — the next rebuild after loading will
+  /// catch up correctly.
+  void _checkRankUp(BuildContext context, WidgetRef ref, Rank rank, int? lastSeenRankIndex) {
+    if (lastSeenRankIndex == null || rank.index <= lastSeenRankIndex) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(lastSeenRankProvider.notifier).markSeen(rank.index);
+      if (!context.mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          icon: Icon(rank.icon, size: 40),
+          title: Text('Ascended to ${rank.label}'),
+          content: Text(rank.flavorTitle),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Continue'),
+            ),
+          ],
+        ),
+      );
     });
   }
 
@@ -33,6 +79,7 @@ class GamificationHomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<GamificationSnapshot> snapshotAsync = ref.watch(gamificationSnapshotProvider);
     final AsyncValue<List<UnlockedAchievement>> unlockedAsync = ref.watch(unlockedAchievementsProvider);
+    final int? lastSeenRankIndex = ref.watch(lastSeenRankProvider);
 
     final GamificationSnapshot? snapshot = snapshotAsync.valueOrNull;
     final List<UnlockedAchievement>? unlocked = unlockedAsync.valueOrNull;
@@ -43,7 +90,7 @@ class GamificationHomeScreen extends ConsumerWidget {
           ? (snapshotAsync.hasError
               ? Center(child: Text('Something went wrong: ${snapshotAsync.error}'))
               : const Center(child: CircularProgressIndicator()))
-          : _buildBody(context, ref, snapshot, unlocked),
+          : _buildBody(context, ref, snapshot, unlocked, lastSeenRankIndex),
     );
   }
 
@@ -52,9 +99,11 @@ class GamificationHomeScreen extends ConsumerWidget {
     WidgetRef ref,
     GamificationSnapshot snapshot,
     List<UnlockedAchievement> unlocked,
+    int? lastSeenRankIndex,
   ) {
     final Set<String> unlockedKeys = unlocked.map((u) => u.key).toSet();
-    _unlockNewlySatisfied(ref, snapshot.satisfiedAchievementKeys, unlockedKeys);
+    _celebrateNewlyUnlocked(context, ref, snapshot.satisfiedAchievementKeys, unlockedKeys);
+    _checkRankUp(context, ref, snapshot.rank, lastSeenRankIndex);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -142,23 +191,73 @@ class GamificationHomeScreen extends ConsumerWidget {
           'Achievements',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
         ),
-        const SizedBox(height: 12),
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 1.3,
-          children: [
-            for (final Achievement achievement in achievementCatalog)
-              AchievementBadge(
-                achievement: achievement,
-                isUnlocked: unlockedKeys.contains(achievement.key),
-              ),
-          ],
-        ),
+        for (final AchievementCategory category in AchievementCategory.values)
+          _AchievementCategorySection(
+            category: category,
+            achievements: achievementCatalog.where((a) => a.category == category).toList(),
+            unlockedKeys: unlockedKeys,
+          ),
       ],
+    );
+  }
+}
+
+/// One section of the achievement grid — a category header followed by
+/// every achievement belonging to it.
+class _AchievementCategorySection extends StatelessWidget {
+  const _AchievementCategorySection({
+    required this.category,
+    required this.achievements,
+    required this.unlockedKeys,
+  });
+
+  final AchievementCategory category;
+  final List<Achievement> achievements;
+  final Set<String> unlockedKeys;
+
+  @override
+  Widget build(BuildContext context) {
+    if (achievements.isEmpty) return const SizedBox.shrink();
+    final int unlockedCount = achievements.where((a) => unlockedKeys.contains(a.key)).length;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                category.label,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+              ),
+              const Spacer(),
+              Text(
+                '$unlockedCount / ${achievements.length}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 1.3,
+            children: [
+              for (final Achievement achievement in achievements)
+                AchievementBadge(
+                  achievement: achievement,
+                  isUnlocked: unlockedKeys.contains(achievement.key),
+                ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

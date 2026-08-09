@@ -130,9 +130,12 @@ class GamificationStats {
     required List<JournalEntry> journalEntries,
     required List<CalendarTask> calendarTasks,
     required Rank rank,
+    required Map<Attribute, double> attributes,
+    required double lifeScore,
   }) {
     const double goalCrusherProgressThreshold = 0.5;
     const int goalCrusherCount = 5;
+    const int goalCrusherIiCount = 15;
 
     final int meaningfulGoals = activeGoals
         .where(
@@ -141,17 +144,43 @@ class GamificationStats {
               (goal.progressValue / goal.targetValue) >= goalCrusherProgressThreshold,
         )
         .length;
+    final int publishedCount = contentProjects.where((p) => p.isPublished).length;
+    final int completedMediaCount = mediaItems.where((m) => m.status == MediaStatus.completed).length;
+    final int journalStreak = JournalStats.currentStreak(journalEntries);
+    final int doneTaskCount = calendarTasks.where((task) => task.isDone).length;
 
     return {
+      // Milestones
       if (netWorth >= _wealthReferenceNetWorth) 'rich_cultivator',
       if (totalWorkoutSessions >= 10) 'iron_body',
       if (habitWeeklyCompletionRate >= 1.0) 'unbreakable',
       if (meaningfulGoals >= goalCrusherCount) 'goal_crusher',
-      if (contentProjects.where((p) => p.isPublished).length >= 5) 'content_creator',
-      if (mediaItems.where((m) => m.status == MediaStatus.completed).length >= 10) 'completionist',
-      if (JournalStats.currentStreak(journalEntries) >= 14) 'deep_thinker',
-      if (calendarTasks.where((task) => task.isDone).length >= 20) 'organized_mind',
+      if (publishedCount >= 5) 'content_creator',
+      if (completedMediaCount >= 10) 'completionist',
+      if (journalStreak >= 14) 'deep_thinker',
+      if (doneTaskCount >= 20) 'organized_mind',
+
+      // Rank ascension — reaching a rank implies every lower rank was
+      // already passed through, so these all unlock together.
+      if (rank.index >= Rank.qiRefining.index) 'rank_qi_refining',
+      if (rank.index >= Rank.foundationEstablishment.index) 'rank_foundation_establishment',
+      if (rank.index >= Rank.coreFormation.index) 'rank_core_formation',
+      if (rank.index >= Rank.nascentSoul.index) 'rank_nascent_soul',
+      if (rank.index >= Rank.soulTransformation.index) 'rank_soul_transformation',
+      if (rank.index >= Rank.voidTribulation.index) 'rank_void_tribulation',
+      if (rank.index >= Rank.immortalAscension.index) 'rank_immortal_ascension',
       if (rank == Rank.demonGod) 'ascended',
+
+      // Mastery — tier-2 module milestones and whole-life balance.
+      if (totalWorkoutSessions >= 50) 'iron_body_ii',
+      if (meaningfulGoals >= goalCrusherIiCount) 'goal_crusher_ii',
+      if (publishedCount >= 15) 'content_creator_ii',
+      if (completedMediaCount >= 25) 'completionist_ii',
+      if (journalStreak >= 30) 'deep_thinker_ii',
+      if (doneTaskCount >= 75) 'organized_mind_ii',
+      if (attributes.values.every((value) => value >= 50)) 'renaissance',
+      if (attributes.values.any((value) => value >= 100)) 'peak_of_a_path',
+      if (lifeScore >= 90) 'true_sovereign',
     };
   }
 }
