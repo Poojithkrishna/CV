@@ -34,6 +34,7 @@ Future<void> syncRecurringPaymentReminder(NotificationService service, Recurring
     body: '${payment.name} — ${AppFormatters.currency(payment.amount)} '
         'due ${AppFormatters.shortDate(payment.nextDueDate)}.',
     dateTime: reminderTime,
+    payload: 'lifeos://notification/recurring-payment/${payment.id}',
   );
 }
 

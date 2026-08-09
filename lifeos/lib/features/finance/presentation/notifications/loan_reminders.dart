@@ -33,6 +33,7 @@ Future<void> syncLoanReminder(NotificationService service, Loan loan) async {
     body: '${loan.personName} — ${AppFormatters.currency(loan.remainingAmount)} '
         'due ${AppFormatters.shortDate(loan.dueDate!)}.',
     dateTime: reminderTime,
+    payload: 'lifeos://notification/loan/${loan.id}',
   );
 }
 

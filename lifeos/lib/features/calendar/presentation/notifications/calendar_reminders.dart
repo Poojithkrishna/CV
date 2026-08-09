@@ -27,7 +27,13 @@ Future<void> syncTaskReminder(NotificationService service, CalendarTask task) as
     return;
   }
 
-  await service.scheduleAt(id: id, title: 'Task due', body: task.title, dateTime: reminderTime);
+  await service.scheduleAt(
+    id: id,
+    title: 'Task due',
+    body: task.title,
+    dateTime: reminderTime,
+    payload: 'lifeos://notification/task/${task.id}',
+  );
 }
 
 /// Cancels [taskId]'s reminder outright — used on delete, where there's
@@ -66,6 +72,7 @@ Future<void> syncEventReminder(NotificationService service, CalendarEvent event)
         ? '${event.title} — today'
         : '${event.title} at ${AppFormatters.time(event.startTime)}',
     dateTime: reminderTime,
+    payload: 'lifeos://notification/event/${event.id}',
   );
 }
 

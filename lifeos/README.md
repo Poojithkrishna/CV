@@ -486,6 +486,27 @@ Built feature by feature. So far:
   the target screen instead of flashing the dashboard first) for when
   the tap launches the process fresh, and `listenForWidgetTaps`
   (`HomeWidget.widgetClicked`) for when the app was already alive.
+- ✅ **Notification deep-linking**: the same idea, for the four
+  reminder types (Loan due, Bill due, Task due, Upcoming event) — tapping
+  one now opens the specific loan, recurring payment, task or event it's
+  about instead of just opening the app to whatever screen was last
+  showing. Each `syncXReminder` function now passes `NotificationService
+  .scheduleAt` a `lifeos://notification/<type>/<id>` payload alongside
+  the existing title/body, which `flutter_local_notifications` hands
+  back untouched when the notification is tapped. `routeForNotificationPayload`
+  (`core/notifications/notification_deep_link.dart`) is the pure
+  payload-to-route mapping — loan → `/finance/loans/:id`, recurring
+  payment → `/finance/recurring-payments/:id`, task/event → their
+  respective edit screens (Calendar has no separate detail screens,
+  just forms) — kept separate from the plugin/router calls in
+  `notification_deep_link_service.dart`, mirroring the widget's own
+  split. `NotificationService` grew the same two entry points as the
+  widget: `onNotificationTapped` (a broadcast stream fed by
+  `onDidReceiveNotificationResponse`, registered during `initialize()`)
+  for a tap while the app's alive, and `initialLaunchPayload()`
+  (`getNotificationAppLaunchDetails()`) for a tap that launches the
+  process fresh, awaited in `main()` before `runApp` for the same
+  no-flash reason.
 
 ## Architecture
 
@@ -633,7 +654,9 @@ and that it always emits exactly its five widget keys); `GamificationDao`'s
 rather than duplicating, distinct dates are kept and ordered ascending);
 `routeForWidgetTap`'s URI-to-route mapping (every known section, a null
 uri, an unrecognized section, a path with no segments, and a mismatched
-scheme/host); and `AccountCard` widget rendering.
+scheme/host); `routeForNotificationPayload`'s equivalent for the four
+reminder types (plus a payload that isn't a valid uri at all and one
+missing its id segment); and `AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -692,6 +715,11 @@ is opened (see "Life Score history/trend chart" above).
 The home screen widget's four sections each deep-link to their own
 screen now, instead of every tap opening the dashboard regardless of
 what was tapped (see "Widget deep-linking" above).
+
+Reminder notifications got the same treatment: tapping a Loan due,
+Bill due, Task due or Upcoming event notification now opens that exact
+loan/bill/task/event instead of just opening the app (see "Notification
+deep-linking" above).
 
 There's no outstanding polish item left from the original spec or from
 any pass since. Future work is open-ended from here — say what you'd
