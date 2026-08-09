@@ -32,7 +32,7 @@ dependencies:
   # zonedSchedule (the only scheduling API flutter_local_notifications
   # 16+ exposes) needs an IANA timezone, hence both packages below.
   timezone: ^0.9.4
-  flutter_timezone: ^2.1.0
+  flutter_timezone: ^5.1.0
   local_auth: ^2.3.0
 
   # Formatting & utility
