@@ -8,6 +8,11 @@
     <!-- App-lock via fingerprint/face for the biometric-lock requirement. -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
+    <!-- Taking Fitness progress photos with the camera (gallery picking
+         uses the system Photo Picker on modern Android, which needs no
+         storage permission). -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:label="LifeOS"
         android:name="${applicationName}"

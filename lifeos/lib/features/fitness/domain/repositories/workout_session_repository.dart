@@ -12,6 +12,7 @@ abstract interface class WorkoutSessionRepository {
   Future<Result<void>> deleteSession(String id);
 
   Stream<List<LoggedSet>> watchSetsForSession(String sessionId);
+  Stream<List<LoggedSet>> watchAllSetsForExercise(String exerciseId);
   Future<List<LoggedSet>> getRecentSetsForExercise(String exerciseId, {int limit});
   Future<double?> getMaxWeightForExercise(String exerciseId);
 

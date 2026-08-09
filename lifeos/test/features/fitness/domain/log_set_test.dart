@@ -43,6 +43,9 @@ class _FakeWorkoutSessionRepository implements WorkoutSessionRepository {
 
   @override
   Stream<List<LoggedSet>> watchSetsForSession(String sessionId) => const Stream.empty();
+
+  @override
+  Stream<List<LoggedSet>> watchAllSetsForExercise(String exerciseId) => const Stream.empty();
 }
 
 LoggedSet _buildSet({int reps = 8, double weight = 60}) {

@@ -38,6 +38,9 @@ dependencies:
   # Charts (finance & habit analytics)
   fl_chart: ^0.69.2
 
+  # Camera/gallery photo capture (Fitness progress photos)
+  image_picker: ^1.1.2
+
   # Fonts / visuals
   google_fonts: ^6.2.1
 

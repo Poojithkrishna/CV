@@ -25,13 +25,18 @@ import '../../features/finance/data/tables/loans_table.dart';
 import '../../features/finance/data/tables/recurring_payments_table.dart';
 import '../../features/finance/data/tables/transactions_table.dart';
 import '../../features/fitness/data/daos/body_weight_dao.dart';
+import '../../features/fitness/data/daos/cardio_sessions_dao.dart';
 import '../../features/fitness/data/daos/exercises_dao.dart';
 import '../../features/fitness/data/daos/measurements_dao.dart';
 import '../../features/fitness/data/daos/nutrition_dao.dart';
+import '../../features/fitness/data/daos/progress_photos_dao.dart';
+import '../../features/fitness/data/daos/recovery_dao.dart';
+import '../../features/fitness/data/daos/supplements_dao.dart';
 import '../../features/fitness/data/daos/water_dao.dart';
 import '../../features/fitness/data/daos/workout_plans_dao.dart';
 import '../../features/fitness/data/daos/workout_sessions_dao.dart';
 import '../../features/fitness/data/tables/body_weight_entries_table.dart';
+import '../../features/fitness/data/tables/cardio_sessions_table.dart';
 import '../../features/fitness/data/tables/exercises_table.dart';
 import '../../features/fitness/data/tables/food_items_table.dart';
 import '../../features/fitness/data/tables/food_log_entries_table.dart';
@@ -39,6 +44,10 @@ import '../../features/fitness/data/tables/logged_sets_table.dart';
 import '../../features/fitness/data/tables/measurement_entries_table.dart';
 import '../../features/fitness/data/tables/nutrition_goal_table.dart';
 import '../../features/fitness/data/tables/plan_exercises_table.dart';
+import '../../features/fitness/data/tables/progress_photos_table.dart';
+import '../../features/fitness/data/tables/recovery_entries_table.dart';
+import '../../features/fitness/data/tables/supplement_log_entries_table.dart';
+import '../../features/fitness/data/tables/supplements_table.dart';
 import '../../features/fitness/data/tables/water_entries_table.dart';
 import '../../features/fitness/data/tables/water_goal_table.dart';
 import '../../features/fitness/data/tables/workout_days_table.dart';
@@ -94,6 +103,11 @@ part 'app_database.g.dart';
     NutritionGoals,
     Investments,
     Assets,
+    ProgressPhotos,
+    Supplements,
+    SupplementLogEntries,
+    CardioSessions,
+    RecoveryEntries,
   ],
   daos: [
     AccountsDao,
@@ -114,6 +128,10 @@ part 'app_database.g.dart';
     NutritionDao,
     InvestmentsDao,
     AssetsDao,
+    ProgressPhotosDao,
+    SupplementsDao,
+    CardioSessionsDao,
+    RecoveryDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -124,7 +142,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -188,6 +206,13 @@ class AppDatabase extends _$AppDatabase {
           if (from < 12) {
             await m.createTable(investments);
             await m.createTable(assets);
+          }
+          if (from < 13) {
+            await m.createTable(progressPhotos);
+            await m.createTable(supplements);
+            await m.createTable(supplementLogEntries);
+            await m.createTable(cardioSessions);
+            await m.createTable(recoveryEntries);
           }
         },
       );

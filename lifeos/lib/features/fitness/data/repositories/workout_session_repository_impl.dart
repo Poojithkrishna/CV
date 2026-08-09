@@ -70,6 +70,13 @@ class WorkoutSessionRepositoryImpl implements WorkoutSessionRepository {
   }
 
   @override
+  Stream<List<LoggedSet>> watchAllSetsForExercise(String exerciseId) {
+    return _dao
+        .watchAllSetsForExercise(exerciseId)
+        .map((rows) => rows.map((row) => row.toDomain()).toList(growable: false));
+  }
+
+  @override
   Future<List<LoggedSet>> getRecentSetsForExercise(String exerciseId, {int limit = 10}) async {
     final rows = await _dao.getRecentSetsForExercise(exerciseId, limit: limit);
     return rows.map((row) => row.toDomain()).toList(growable: false);

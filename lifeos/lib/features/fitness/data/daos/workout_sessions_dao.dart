@@ -69,6 +69,16 @@ class WorkoutSessionsDao extends DatabaseAccessor<AppDatabase> with _$WorkoutSes
         .get();
   }
 
+  /// Every set ever logged for [exerciseId] across every session, oldest
+  /// first — the raw material for `StrengthProgressStats`'s per-exercise
+  /// trend chart and PR list.
+  Stream<List<LoggedSetRow>> watchAllSetsForExercise(String exerciseId) {
+    return (select(loggedSets)
+          ..where((tbl) => tbl.exerciseId.equals(exerciseId))
+          ..orderBy([(tbl) => OrderingTerm.asc(tbl.completedAt)]))
+        .watch();
+  }
+
   /// Heaviest weight ever logged for [exerciseId] (excluding warmups).
   Future<double?> getMaxWeightForExercise(String exerciseId) async {
     final query = selectOnly(loggedSets)

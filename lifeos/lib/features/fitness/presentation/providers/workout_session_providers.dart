@@ -58,6 +58,13 @@ final StreamProviderFamily<List<LoggedSet>, String> setsForSessionProvider =
   return ref.watch(workoutSessionRepositoryProvider).watchSetsForSession(sessionId);
 });
 
+/// Every set ever logged for an exercise, oldest first — the Strength
+/// Progress analytics screen's per-exercise trend chart and PR list.
+final StreamProviderFamily<List<LoggedSet>, String> setsForExerciseProvider =
+    StreamProvider.family<List<LoggedSet>, String>((ref, exerciseId) {
+  return ref.watch(workoutSessionRepositoryProvider).watchAllSetsForExercise(exerciseId);
+});
+
 /// The single most recent set logged for an exercise (across every past
 /// session) — "previous performance" and the basis for a progression
 /// suggestion. Invalidated manually after logging a new set for the same

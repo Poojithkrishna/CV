@@ -29,7 +29,10 @@ import '../../features/finance/presentation/screens/transaction_form_screen.dart
 import '../../features/finance/presentation/screens/transactions_list_screen.dart';
 import '../../features/fitness/domain/entities/measurement_type.dart';
 import '../../features/fitness/domain/entities/plan_exercise.dart';
+import '../../features/fitness/domain/entities/progress_photo.dart';
 import '../../features/fitness/presentation/screens/body_weight_screen.dart';
+import '../../features/fitness/presentation/screens/cardio_form_screen.dart';
+import '../../features/fitness/presentation/screens/cardio_list_screen.dart';
 import '../../features/fitness/presentation/screens/exercise_form_screen.dart';
 import '../../features/fitness/presentation/screens/exercise_library_screen.dart';
 import '../../features/fitness/presentation/screens/fitness_home_screen.dart';
@@ -38,8 +41,14 @@ import '../../features/fitness/presentation/screens/food_library_screen.dart';
 import '../../features/fitness/presentation/screens/measurement_detail_screen.dart';
 import '../../features/fitness/presentation/screens/measurements_list_screen.dart';
 import '../../features/fitness/presentation/screens/nutrition_screen.dart';
+import '../../features/fitness/presentation/screens/photo_viewer_screen.dart';
 import '../../features/fitness/presentation/screens/plan_exercise_form_screen.dart';
+import '../../features/fitness/presentation/screens/progress_photos_screen.dart';
+import '../../features/fitness/presentation/screens/recovery_screen.dart';
 import '../../features/fitness/presentation/screens/start_workout_screen.dart';
+import '../../features/fitness/presentation/screens/strength_progress_screen.dart';
+import '../../features/fitness/presentation/screens/supplement_form_screen.dart';
+import '../../features/fitness/presentation/screens/supplements_screen.dart';
 import '../../features/fitness/presentation/screens/water_screen.dart';
 import '../../features/fitness/presentation/screens/workout_history_screen.dart';
 import '../../features/fitness/presentation/screens/workout_plan_detail_screen.dart';
@@ -373,6 +382,58 @@ final GoRouter appRouter = GoRouter(
                       ),
                     ),
                   ],
+                ),
+                GoRoute(
+                  path: 'progress-photos',
+                  builder: (context, state) => const ProgressPhotosScreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'view',
+                      builder: (context, state) => PhotoViewerScreen(
+                        photo: state.extra as ProgressPhoto,
+                      ),
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  path: 'supplements',
+                  builder: (context, state) => const SupplementsScreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'new',
+                      builder: (context, state) => const SupplementFormScreen(),
+                    ),
+                    GoRoute(
+                      path: ':id/edit',
+                      builder: (context, state) => SupplementFormScreen(
+                        supplementId: state.pathParameters['id'],
+                      ),
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  path: 'cardio',
+                  builder: (context, state) => const CardioListScreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'new',
+                      builder: (context, state) => const CardioFormScreen(),
+                    ),
+                    GoRoute(
+                      path: ':id/edit',
+                      builder: (context, state) => CardioFormScreen(
+                        sessionId: state.pathParameters['id'],
+                      ),
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  path: 'recovery',
+                  builder: (context, state) => const RecoveryScreen(),
+                ),
+                GoRoute(
+                  path: 'strength-progress',
+                  builder: (context, state) => const StrengthProgressScreen(),
                 ),
               ],
             ),

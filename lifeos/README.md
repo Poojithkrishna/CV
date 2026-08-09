@@ -112,6 +112,30 @@ Built feature by feature. So far:
     `NutritionStats.totalsFor` sums a day's calories/protein/carbs/fat
     without a second round-trip. A single-row `NutritionGoals` table
     holds an editable daily calorie target shown as a progress bar.
+- ✅ **Fitness → Progress Photos, Supplements, Cardio, Recovery &
+  Strength Progress**: the last Fitness pass, rounding out the module.
+  - **Progress Photos**: a visual timeline (front/side/back/other),
+    stored as files copied into the app's own documents directory
+    (`core/utils/photo_storage.dart`) rather than referencing wherever
+    the camera/gallery originally put them, via the new `image_picker`
+    dependency — a grid gallery with category filter chips and a
+    full-screen viewer.
+  - **Supplements**: modeled as a boolean daily habit in miniature — a
+    reusable `Supplement` (name + dosage label) with a per-day
+    `SupplementLogEntry` toggled by `SupplementsDao.toggleTaken`, the
+    exact same read-then-write upsert as `HabitsDao.toggleChecklistItem`.
+  - **Cardio**: `CardioSession` (running/cycling/swimming/walking/
+    rowing/elliptical/other) with duration, optional distance and
+    calories; `CardioStats` computes a this-week summary.
+  - **Recovery**: one entry per day (sleep hours, soreness 1-5, stress
+    1-5), upserted by date like `BodyWeightEntries`. `RecoveryStats`
+    averages whichever of the three were actually logged that day into
+    a 0-100 score, rather than requiring all three.
+  - **Strength Progress**: no new table — a new
+    `WorkoutSessionsDao.watchAllSetsForExercise` query feeds
+    `StrengthProgressStats`, which collapses same-day sets to that day's
+    best estimated 1RM (Epley formula) for a per-exercise trend chart,
+    plus a PR list drawn from the existing `LoggedSet.isPr` flag.
 - ✅ **Habits**: six habit types (Yes/No, Counter, Timer, Duration,
   Checklist, Collection) share one storage model — every type except
   Checklist is a numeric `progressValue` against a `targetValue` (Yes/No
@@ -210,16 +234,20 @@ Covers: use-case validation across Finance (`CreateAccount`/
 `CreateTransaction`/`CreateCategory`/`CreateCreditCard`/`CreateLoan`/
 `RecordLoanPayment`/`CreateRecurringPayment`/`CreateInvestment`/
 `CreateAsset`), Fitness (`LogSet`/`CreateWorkoutPlan`/
-`AddExerciseToDay`/`LogBodyWeight`/`CreateFoodItem`/`LogFood`), Habits
-(`CreateHabit`) and Goals (`CreateGoal`/`AddMilestone`);
-`RecurrenceFrequency`'s date math (leap years, month-length clamping)
-and `MarkRecurringPaymentPaid`'s orchestration; `WorkoutStats`'s volume
-and progression-suggestion math; `HabitStats`'s streak/completion-rate/
-heatmap math (including custom weekday schedules), `GoalStats`'s
-milestone-vs-numeric progress fallback, `BodyWeightStats`/
-`MeasurementStats`'s N-day trend deltas, `NutritionStats`'s macro
-totaling/meal grouping and `FinanceAnalytics`'s category totals/
-monthly income-vs-expense bucketing (including transfer exclusion and
+`AddExerciseToDay`/`LogBodyWeight`/`CreateFoodItem`/`LogFood`/
+`LogCardioSession`/`LogRecovery`/`CreateSupplement`/
+`ToggleSupplementTaken`/`AddProgressPhoto`), Habits (`CreateHabit`) and
+Goals (`CreateGoal`/`AddMilestone`); `RecurrenceFrequency`'s date math
+(leap years, month-length clamping) and `MarkRecurringPaymentPaid`'s
+orchestration; `WorkoutStats`'s volume and progression-suggestion math,
+`StrengthProgressStats`'s Epley 1RM estimate and same-day-best
+collapsing; `HabitStats`'s streak/completion-rate/heatmap math
+(including custom weekday schedules), `GoalStats`'s milestone-vs-numeric
+progress fallback, `BodyWeightStats`/`MeasurementStats`'s N-day trend
+deltas, `CardioStats`'s weekly totals, `RecoveryStats`'s
+logged-components-only score average, `NutritionStats`'s macro
+totaling/meal grouping and `FinanceAnalytics`'s category totals/monthly
+income-vs-expense bucketing (including transfer exclusion and
 empty-month buckets); DAO behaviour against an in-memory SQLite
 database for `AccountsDao`/`TransactionsDao`/`CreditCardsDao`/
 `CardEmisDao`/`LoansDao` (balance and payment math, including
@@ -227,11 +255,13 @@ edit/delete reverting the right effect), `InvestmentsDao`/`AssetsDao`
 (archived-filtering CRUD), `WorkoutSessionsDao`/`WorkoutPlansDao` (PR
 detection, active-plan switching), `HabitsDao` (atomic period upserts,
 floored at zero, checklist toggling), `GoalsDao` (milestone toggling,
-habit linking, cascading deletes), `BodyWeightDao`/`MeasurementsDao`
-(upsert-by-date/type overwrites same-day re-logs), `WaterDao`
-(accumulating daily total floored at zero, goal upsert) and
-`NutritionDao` (the food-item join query, seeded starter library,
-cascading deletes); and `AccountCard` widget rendering.
+habit linking, cascading deletes), `BodyWeightDao`/`MeasurementsDao`/
+`RecoveryDao` (upsert-by-date/type overwrites same-day re-logs),
+`WaterDao` (accumulating daily total floored at zero, goal upsert),
+`SupplementsDao` (the same toggle-upsert as habit checklist items),
+`CardioSessionsDao`/`ProgressPhotosDao` (straightforward CRUD, category
+filtering) and `NutritionDao` (the food-item join query, seeded starter
+library, cascading deletes); and `AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -251,11 +281,9 @@ Suggested order for the next feature passes (say which one you want and
 it'll get the same full treatment — models → repository → use cases →
 providers → UI → widgets → validation → tests):
 
-1. Fitness: Progress Photos, Supplements, Cardio, Recovery & Strength
-   Progress analytics
-2. Gaming Creator Studio pipeline
-3. Entertainment Library
-4. Journal
-5. Calendar & Tasks
-6. Gamification (ranks, XP, attributes, achievements, Life Score) —
+1. Gaming Creator Studio pipeline
+2. Entertainment Library
+3. Journal
+4. Calendar & Tasks
+5. Gamification (ranks, XP, attributes, achievements, Life Score) —
    wiring dashboard stats to real data from the modules above as they land
