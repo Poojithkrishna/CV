@@ -2,5 +2,5 @@
 <resources>
     <!-- Sampled from the app icon's own backdrop, so the adaptive icon's
          background layer matches the emblem art exactly. -->
-    <color name="ic_launcher_background">#120A1C</color>
+    <color name="ic_launcher_background">#1A1A1A</color>
 </resources>
