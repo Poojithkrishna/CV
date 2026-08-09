@@ -14,7 +14,7 @@ class LifeOsApp extends ConsumerWidget {
     final ThemeMode themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp.router(
-      title: 'LifeOS',
+      title: 'Demon Origin',
       debugShowCheckedModeBanner: false,
       themeMode: themeMode,
       theme: AppTheme.light(),

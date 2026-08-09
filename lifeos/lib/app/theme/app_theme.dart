@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
-/// Builds the light and dark Material 3 themes for LifeOS.
+/// Builds the light and dark Material 3 themes for Demon Origin.
 ///
 /// The app is dark-mode-first (it's a personal, always-on-phone tool used
 /// day and night) but a light theme is fully supported for daytime use.

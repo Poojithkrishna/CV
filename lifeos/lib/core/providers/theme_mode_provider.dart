@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const String _prefsKey = 'lifeos.theme_mode';
 
-/// Persisted light/dark/system theme preference. LifeOS defaults to dark
+/// Persisted light/dark/system theme preference. Demon Origin defaults to dark
 /// mode since it's a personal, always-on-phone tool used day and night,
 /// but a full light theme is supported too.
 class ThemeModeController extends Notifier<ThemeMode> {

@@ -45,7 +45,7 @@ class BackupService {
 
   /// Whether [file]'s first 16 bytes match the SQLite3 file header —
   /// the one check standing between a real backup and silently
-  /// clobbering everything in LifeOS with an arbitrary file.
+  /// clobbering everything in Demon Origin with an arbitrary file.
   Future<bool> isValidSqliteFile(File file) async {
     if (!await file.exists()) return false;
     final RandomAccessFile handle = await file.open();

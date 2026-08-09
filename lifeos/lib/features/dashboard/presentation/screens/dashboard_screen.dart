@@ -30,7 +30,7 @@ import '../../../journal/domain/entities/journal_entry.dart';
 import '../../../journal/presentation/providers/journal_providers.dart';
 import '../widgets/module_summary_card.dart';
 
-/// The LifeOS home screen: a single glance at every module. Every module
+/// The Demon Origin home screen: a single glance at every module. Every module
 /// summary tile, and the cultivation card's rank/XP/progress, are wired
 /// to real data derived live from what's actually been logged — nothing
 /// on this screen is a placeholder anymore.
@@ -137,7 +137,7 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('LifeOS'),
+        title: const Text('Demon Origin'),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),

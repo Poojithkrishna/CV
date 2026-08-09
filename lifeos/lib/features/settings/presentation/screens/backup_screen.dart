@@ -27,7 +27,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
       final backupService = ref.read(backupServiceProvider);
       final String exportPath = await backupService.resolveDefaultExportPath();
       await backupService.exportTo(ref.read(appDatabaseProvider), exportPath);
-      await Share.shareXFiles([XFile(exportPath)], subject: 'LifeOS backup');
+      await Share.shareXFiles([XFile(exportPath)], subject: 'Demon Origin backup');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -43,8 +43,8 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
     final bool confirmed = await showConfirmDialog(
       context,
       title: 'Restore from backup?',
-      message: 'This replaces everything currently in LifeOS with the contents of the '
-          'backup file. This cannot be undone. LifeOS will close afterward — reopen it '
+      message: 'This replaces everything currently in Demon Origin with the contents of the '
+          'backup file. This cannot be undone. Demon Origin will close afterward — reopen it '
           'to see the restored data.',
       confirmLabel: 'Choose backup file',
       isDestructive: true,
@@ -63,14 +63,14 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
       if (mounted) {
         setState(() => _restoring = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('That doesn\'t look like a valid LifeOS backup file.')),
+          const SnackBar(content: Text('That doesn\'t look like a valid Demon Origin backup file.')),
         );
       }
       return;
     }
 
     // Close the live connection before touching its file — restoring
-    // hot-swaps nothing; LifeOS closes afterward and the next launch
+    // hot-swaps nothing; Demon Origin closes afterward and the next launch
     // opens the restored file fresh, the same way any launch does.
     await ref.read(appDatabaseProvider).close();
     final String databaseFilePath = await backupService.resolveDatabaseFilePath();
@@ -83,11 +83,11 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text('Restore complete'),
-        content: const Text('LifeOS will now close. Reopen it to see your restored data.'),
+        content: const Text('Demon Origin will now close. Reopen it to see your restored data.'),
         actions: [
           FilledButton(
             onPressed: () => SystemNavigator.pop(),
-            child: const Text('Close LifeOS'),
+            child: const Text('Close Demon Origin'),
           ),
         ],
       ),
@@ -106,7 +106,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
               leading: const Icon(Icons.upload_outlined),
               title: const Text('Export backup'),
               subtitle: const Text(
-                'Save everything in LifeOS to a file you can share or store elsewhere.',
+                'Save everything in Demon Origin to a file you can share or store elsewhere.',
               ),
               trailing: _exporting
                   ? const SizedBox(
@@ -124,7 +124,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
               leading: const Icon(Icons.download_outlined),
               title: const Text('Restore from backup'),
               subtitle: const Text(
-                'Replace everything in LifeOS with a previously exported backup file.',
+                'Replace everything in Demon Origin with a previously exported backup file.',
               ),
               trailing: _restoring
                   ? const SizedBox(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// The kinds of accounts LifeOS's Finance module can track. Credit cards
+/// The kinds of accounts Demon Origin's Finance module can track. Credit cards
 /// and loans get their own richer modules later; a credit card can still
 /// be represented here as a lightweight account so it rolls up into net
 /// worth before the dedicated Credit Cards feature lands.

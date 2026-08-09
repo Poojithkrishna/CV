@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Central brand palette for LifeOS. All screens should pull colors from
+/// Central brand palette for Demon Origin. All screens should pull colors from
 /// [ColorScheme] (via `Theme.of(context).colorScheme`) for anything that
 /// must adapt to light/dark mode; this file exists for the handful of
 /// brand-fixed accents (module colors, gradients) that stay constant

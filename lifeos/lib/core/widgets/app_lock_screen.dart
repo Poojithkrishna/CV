@@ -28,7 +28,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen> {
     setState(() => _authenticating = true);
     final bool success = await ref
         .read(appLockServiceProvider)
-        .authenticate(reason: 'Unlock LifeOS');
+        .authenticate(reason: 'Unlock Demon Origin');
     if (!mounted) return;
     setState(() => _authenticating = false);
     if (success) {
@@ -52,7 +52,7 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen> {
                 Icon(Icons.lock_outline_rounded, size: 64, color: colorScheme.primary),
                 const SizedBox(height: 24),
                 Text(
-                  'LifeOS is locked',
+                  'Demon Origin is locked',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 8),

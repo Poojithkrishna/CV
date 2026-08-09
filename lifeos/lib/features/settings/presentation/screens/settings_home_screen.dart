@@ -96,7 +96,7 @@ class SettingsHomeScreen extends ConsumerWidget {
                   SwitchListTile(
                     secondary: const Icon(Icons.fingerprint_rounded),
                     title: const Text('App Lock'),
-                    subtitle: const Text('Require biometrics or device unlock to open LifeOS'),
+                    subtitle: const Text('Require biometrics or device unlock to open Demon Origin'),
                     value: appLockEnabled,
                     onChanged: (value) => _setAppLockEnabled(context, ref, value),
                   ),
@@ -130,7 +130,7 @@ class SettingsHomeScreen extends ConsumerWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.info_outline_rounded),
-              title: const Text('LifeOS'),
+              title: const Text('Demon Origin'),
               subtitle: const Text('v0.1.0 — personal build'),
             ),
           ),
