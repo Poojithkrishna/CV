@@ -10,6 +10,9 @@ import '../../../creator_studio/domain/entities/content_goal.dart';
 import '../../../creator_studio/domain/entities/content_project.dart';
 import '../../../creator_studio/domain/services/content_pipeline_stats.dart';
 import '../../../creator_studio/presentation/providers/content_studio_providers.dart';
+import '../../../entertainment/domain/entities/media_item.dart';
+import '../../../entertainment/domain/entities/media_status.dart';
+import '../../../entertainment/presentation/providers/media_library_providers.dart';
 import '../../../finance/presentation/providers/net_worth_provider.dart';
 import '../../../fitness/presentation/providers/workout_plan_providers.dart';
 import '../../../goals/domain/entities/goal.dart';
@@ -19,10 +22,10 @@ import '../widgets/module_summary_card.dart';
 
 /// The LifeOS home screen: a single glance at every module. Finance's net
 /// worth, Fitness's active plan, Habits' weekly completion, Goals' active
-/// count and Creator Studio's weekly-upload tiles are wired to real data;
-/// every other tile is a placeholder until that module's own feature pass
-/// lands, but they're already tappable so the whole app is navigable end
-/// to end.
+/// count, Creator Studio's weekly-upload and Entertainment's
+/// currently-playing tiles are wired to real data; every other tile is a
+/// placeholder until that module's own feature pass lands, but they're
+/// already tappable so the whole app is navigable end to end.
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -66,6 +69,18 @@ class DashboardScreen extends ConsumerWidget {
         final int uploads = ContentPipelineStats.publishedSince(projects, weekAgo).length;
         final int target = contentGoal.valueOrNull?.weeklyUploadTarget ?? 1;
         return '$uploads / $target';
+      },
+      loading: () => '—',
+      error: (_, __) => '—',
+    );
+
+    final AsyncValue<List<MediaItem>> mediaItems = ref.watch(allMediaItemsProvider);
+    final String currentlyPlayingValue = mediaItems.when(
+      data: (items) {
+        final List<MediaItem> inProgress =
+            items.where((item) => item.status == MediaStatus.inProgress).toList()
+              ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+        return inProgress.isEmpty ? 'Nothing yet' : inProgress.first.title;
       },
       loading: () => '—',
       error: (_, __) => '—',
@@ -180,7 +195,7 @@ class DashboardScreen extends ConsumerWidget {
               ),
               ModuleSummaryCard(
                 label: 'Currently playing',
-                value: 'Nothing yet',
+                value: currentlyPlayingValue,
                 subtitle: 'Entertainment',
                 icon: Icons.movie_filter_rounded,
                 gradient: LinearGradient(

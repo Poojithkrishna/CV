@@ -186,10 +186,30 @@ Built feature by feature. So far:
     `progress_photos` helper into a shared `saveImageFile(..., subdirectory:
     ...)`/`deleteImageFile(...)` utility, now reused by both Fitness
     progress photos and Creator Studio thumbnails.
-- 🚧 Every other module (Entertainment, Journal, Calendar, Gamification)
-  has a placeholder screen wired into navigation, ready for its own
-  feature pass — see
-  `lib/features/<module>/presentation/screens/*_home_screen.dart`.
+- ✅ **Entertainment Library**: one `MediaItem` entity covers games,
+  movies, series, anime, books, manga and courses — a `MediaType` tag on
+  an otherwise-identical shape, same idea as Habits' one storage model
+  for six habit types. Tracks a wishlist → in-progress → completed (or
+  dropped) `MediaStatus`, a generic `currentProgress`/`totalProgress`
+  pair (episode/chapter/page/whatever fits the type — null total means
+  "not tracked", not zero), an optional 0-10 rating, and a cover image
+  via the same `saveImageFile` utility Creator Studio uses.
+  `UpdateMediaStatus` stamps `startedDate`/`completedDate` the first
+  time (and only the first time) an item reaches In Progress/Completed —
+  the same first-arrival-only pattern as `MoveProjectToStage`'s
+  `publishedDate`, so dropping something and picking it back up never
+  loses the original dates. A quick "+1" button on each library card
+  calls `LogMediaProgress`, which nudges `currentProgress` via
+  `MediaLibraryDao.adjustProgress` — an accumulate-delta transaction
+  floored at zero like `WaterDao.logWater`, but also capped at
+  `totalProgress` if one is set, since progress can't outrun a known
+  total. The Library screen filters by status and type; the home hub
+  surfaces what's in progress and recently completed. The dashboard's
+  "Currently playing" tile shows the most recently touched in-progress
+  item's title.
+- 🚧 Every other module (Journal, Calendar, Gamification) has a
+  placeholder screen wired into navigation, ready for its own feature
+  pass — see `lib/features/<module>/presentation/screens/*_home_screen.dart`.
 
 ## Architecture
 
@@ -264,10 +284,12 @@ Covers: use-case validation across Finance (`CreateAccount`/
 `AddExerciseToDay`/`LogBodyWeight`/`CreateFoodItem`/`LogFood`/
 `LogCardioSession`/`LogRecovery`/`CreateSupplement`/
 `ToggleSupplementTaken`/`AddProgressPhoto`), Habits (`CreateHabit`),
-Goals (`CreateGoal`/`AddMilestone`) and Creator Studio
+Goals (`CreateGoal`/`AddMilestone`), Creator Studio
 (`CreateContentProject`/`CreateClip`/`UpdateContentGoal`/
 `MoveProjectToStage`, including the first-publish-only `publishedDate`
-stamping); `RecurrenceFrequency`'s date math
+stamping) and Entertainment (`CreateMediaItem`/`UpdateMediaStatus`,
+including the first-arrival-only `startedDate`/`completedDate`
+stamping, and `LogMediaProgress`); `RecurrenceFrequency`'s date math
 (leap years, month-length clamping) and `MarkRecurringPaymentPaid`'s
 orchestration; `WorkoutStats`'s volume and progression-suggestion math,
 `StrengthProgressStats`'s Epley 1RM estimate and same-day-best
@@ -278,9 +300,12 @@ deltas, `CardioStats`'s weekly totals, `RecoveryStats`'s
 logged-components-only score average, `NutritionStats`'s macro
 totaling/meal grouping, `FinanceAnalytics`'s category totals/monthly
 income-vs-expense bucketing (including transfer exclusion and
-empty-month buckets) and `ContentPipelineStats`'s stage counts/
-published-since filtering/view-like-comment totals/average views; DAO
-behaviour against an in-memory SQLite
+empty-month buckets), `ContentPipelineStats`'s stage counts/
+published-since filtering/view-like-comment totals/average views and
+`MediaLibraryStats`'s status/type counts, completed-since filtering,
+progress-fraction clamping (including the no-total-set and zero-total
+null cases) and average-rating-of-the-rated-only math; DAO behaviour
+against an in-memory SQLite
 database for `AccountsDao`/`TransactionsDao`/`CreditCardsDao`/
 `CardEmisDao`/`LoansDao` (balance and payment math, including
 edit/delete reverting the right effect), `InvestmentsDao`/`AssetsDao`
@@ -293,11 +318,13 @@ habit linking, cascading deletes), `BodyWeightDao`/`MeasurementsDao`/
 `SupplementsDao` (the same toggle-upsert as habit checklist items),
 `CardioSessionsDao`/`ProgressPhotosDao` (straightforward CRUD, category
 filtering), `NutritionDao` (the food-item join query, seeded starter
-library, cascading deletes) and `ContentStudioDao` (sort-ordered/
+library, cascading deletes), `ContentStudioDao` (sort-ordered/
 captured-at-ordered streams, deleting a linked project setting a clip's
 `linkedProjectId` to null rather than cascading, and the singleton goal
-row's upsert never crashing on a re-save); and `AccountCard` widget
-rendering.
+row's upsert never crashing on a re-save) and `MediaLibraryDao`
+(alphabetical ordering, and `adjustProgress`'s accumulate-delta math —
+floored at zero, capped at `totalProgress`, a no-op for a missing id);
+and `AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -317,8 +344,7 @@ Suggested order for the next feature passes (say which one you want and
 it'll get the same full treatment — models → repository → use cases →
 providers → UI → widgets → validation → tests):
 
-1. Entertainment Library
-2. Journal
-3. Calendar & Tasks
-4. Gamification (ranks, XP, attributes, achievements, Life Score) —
+1. Journal
+2. Calendar & Tasks
+3. Gamification (ranks, XP, attributes, achievements, Life Score) —
    wiring dashboard stats to real data from the modules above as they land

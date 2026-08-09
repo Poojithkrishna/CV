@@ -9,6 +9,8 @@ import '../../features/creator_studio/data/daos/content_studio_dao.dart';
 import '../../features/creator_studio/data/tables/clips_table.dart';
 import '../../features/creator_studio/data/tables/content_goal_table.dart';
 import '../../features/creator_studio/data/tables/content_projects_table.dart';
+import '../../features/entertainment/data/daos/media_library_dao.dart';
+import '../../features/entertainment/data/tables/media_items_table.dart';
 import '../../features/finance/data/daos/accounts_dao.dart';
 import '../../features/finance/data/daos/assets_dao.dart';
 import '../../features/finance/data/daos/card_emis_dao.dart';
@@ -115,6 +117,7 @@ part 'app_database.g.dart';
     ContentProjects,
     Clips,
     ContentGoals,
+    MediaItems,
   ],
   daos: [
     AccountsDao,
@@ -140,6 +143,7 @@ part 'app_database.g.dart';
     CardioSessionsDao,
     RecoveryDao,
     ContentStudioDao,
+    MediaLibraryDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -150,7 +154,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 15;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -228,6 +232,9 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(clips);
             await m.createTable(contentGoals);
             await _seedDefaultContentGoal();
+          }
+          if (from < 15) {
+            await m.createTable(mediaItems);
           }
         },
       );

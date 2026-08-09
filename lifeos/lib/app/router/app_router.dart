@@ -10,6 +10,8 @@ import '../../features/creator_studio/presentation/screens/content_project_form_
 import '../../features/creator_studio/presentation/screens/creator_studio_home_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/entertainment/presentation/screens/entertainment_home_screen.dart';
+import '../../features/entertainment/presentation/screens/entertainment_library_screen.dart';
+import '../../features/entertainment/presentation/screens/media_item_form_screen.dart';
 import '../../features/finance/presentation/screens/account_detail_screen.dart';
 import '../../features/finance/presentation/screens/account_form_screen.dart';
 import '../../features/finance/presentation/screens/asset_form_screen.dart';
@@ -517,6 +519,22 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/entertainment',
       builder: (context, state) => const EntertainmentHomeScreen(),
+      routes: [
+        GoRoute(
+          path: 'library',
+          builder: (context, state) => const EntertainmentLibraryScreen(),
+        ),
+        GoRoute(
+          path: 'items/new',
+          builder: (context, state) => const MediaItemFormScreen(),
+        ),
+        GoRoute(
+          path: 'items/:id/edit',
+          builder: (context, state) => MediaItemFormScreen(
+            itemId: state.pathParameters['id'],
+          ),
+        ),
+      ],
     ),
     GoRoute(
       path: '/journal',
