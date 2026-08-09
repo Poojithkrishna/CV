@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_gradients.dart';
 import '../../../../core/widgets/gradient_card.dart';
 import '../../../../core/widgets/labeled_progress_bar.dart';
+import '../../../../core/widgets/trend_line_chart.dart';
 import '../../domain/entities/achievement.dart';
 import '../../domain/entities/attribute.dart';
 import '../../domain/entities/gamification_snapshot.dart';
+import '../../domain/entities/life_score_snapshot.dart';
 import '../../domain/entities/rank.dart';
 import '../../domain/entities/unlocked_achievement.dart';
 import '../providers/gamification_providers.dart';
@@ -75,14 +77,29 @@ class GamificationHomeScreen extends ConsumerWidget {
     });
   }
 
+  /// Records today's Life Score/XP/rank so the history chart has
+  /// something to plot. Idempotent within a day — see
+  /// `GamificationDao.upsertTodaysSnapshot`.
+  void _recordTodaysSnapshot(WidgetRef ref, GamificationSnapshot snapshot) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(recordLifeScoreSnapshotUseCaseProvider).call(
+            lifeScore: snapshot.lifeScore,
+            xp: snapshot.xp,
+            rank: snapshot.rank,
+          );
+    });
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<GamificationSnapshot> snapshotAsync = ref.watch(gamificationSnapshotProvider);
     final AsyncValue<List<UnlockedAchievement>> unlockedAsync = ref.watch(unlockedAchievementsProvider);
+    final AsyncValue<List<LifeScoreSnapshot>> historyAsync = ref.watch(lifeScoreSnapshotsProvider);
     final int? lastSeenRankIndex = ref.watch(lastSeenRankProvider);
 
     final GamificationSnapshot? snapshot = snapshotAsync.valueOrNull;
     final List<UnlockedAchievement>? unlocked = unlockedAsync.valueOrNull;
+    final List<LifeScoreSnapshot> history = historyAsync.valueOrNull ?? const [];
 
     return Scaffold(
       appBar: AppBar(title: const Text('Demon God Cultivation')),
@@ -90,7 +107,7 @@ class GamificationHomeScreen extends ConsumerWidget {
           ? (snapshotAsync.hasError
               ? Center(child: Text('Something went wrong: ${snapshotAsync.error}'))
               : const Center(child: CircularProgressIndicator()))
-          : _buildBody(context, ref, snapshot, unlocked, lastSeenRankIndex),
+          : _buildBody(context, ref, snapshot, unlocked, history, lastSeenRankIndex),
     );
   }
 
@@ -99,11 +116,13 @@ class GamificationHomeScreen extends ConsumerWidget {
     WidgetRef ref,
     GamificationSnapshot snapshot,
     List<UnlockedAchievement> unlocked,
+    List<LifeScoreSnapshot> history,
     int? lastSeenRankIndex,
   ) {
     final Set<String> unlockedKeys = unlocked.map((u) => u.key).toSet();
     _celebrateNewlyUnlocked(context, ref, snapshot.satisfiedAchievementKeys, unlockedKeys);
     _checkRankUp(context, ref, snapshot.rank, lastSeenRankIndex);
+    _recordTodaysSnapshot(ref, snapshot);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -170,6 +189,8 @@ class GamificationHomeScreen extends ConsumerWidget {
             ),
           ),
         ),
+        const SizedBox(height: 16),
+        _LifeScoreHistoryCard(history: history),
         const SizedBox(height: 24),
         Text(
           'Attributes',
@@ -198,6 +219,54 @@ class GamificationHomeScreen extends ConsumerWidget {
             unlockedKeys: unlockedKeys,
           ),
       ],
+    );
+  }
+}
+
+/// A day-by-day trend of Life Score, built from whatever was recorded
+/// each time the app was open (see `_recordTodaysSnapshot`) — there's no
+/// background recomputation, so a sparse history just means the app
+/// wasn't opened those days, the same honesty as the home screen
+/// widget's freshness.
+class _LifeScoreHistoryCard extends StatelessWidget {
+  const _LifeScoreHistoryCard({required this.history});
+
+  final List<LifeScoreSnapshot> history;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.show_chart_rounded),
+                const SizedBox(width: 12),
+                Text('Life Score History', style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    )),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (history.length < 2)
+              Text(
+                'Open the app on a few different days to start seeing your '
+                'Life Score trend here.',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              )
+            else
+              TrendLineChart(
+                valuesAscending: [for (final LifeScoreSnapshot s in history) s.lifeScore],
+                color: Theme.of(context).colorScheme.primary,
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -444,6 +444,26 @@ Built feature by feature. So far:
   of the adaptive canvas so no launcher mask shape (circle, squircle,
   rounded square) clips the spike tips, which the source art uses right
   out to its own edges.
+- ✅ **Life Score history/trend chart**: the one piece of Gamification
+  state that isn't purely a live computation. Life Score itself has no
+  history to chart — it's derived fresh every time from other modules'
+  current data, and those modules don't keep their own historical
+  snapshots either (net worth, workout counts, etc. are all "as of
+  right now"). So this needed a new table, `LifeScoreSnapshots`
+  (schema bump 18→19), recording whatever Life Score/XP/rank were live
+  the last time the app was opened that calendar day — opening the app
+  again later the same day updates that day's row instead of adding a
+  second one, the exact same "upsert by date" shape as
+  `BodyWeightDao.upsertForDate`. There's deliberately no background job
+  filling in days the app wasn't opened, the same on-device-only
+  honesty as the home screen widget's freshness — a sparse chart
+  legitimately means sparse app usage, not a bug. The Gamification home
+  screen now has a "Life Score History" card right below the existing
+  Life Score summary, reusing the same `TrendLineChart` widget Body
+  Weight and Measurements already use rather than writing a new chart
+  from scratch, with a plain-language nudge ("open the app on a few
+  different days...") in place of the chart until there are at least
+  two points to draw a line between.
 
 ## Architecture
 
@@ -586,8 +606,10 @@ SQLite-header validation (a real file, plain text, a too-short file, a
 missing file) and its `VACUUM INTO` export round-tripping back through
 a fresh `AppDatabase` with the exported data intact; `buildHomeWidgetData`'s
 mapping (both the loaded and not-yet-loaded gamification-snapshot cases,
-and that it always emits exactly its five widget keys); and `AccountCard`
-widget rendering.
+and that it always emits exactly its five widget keys); `GamificationDao`'s
+`upsertTodaysSnapshot` (a new date inserts, the same date updates in place
+rather than duplicating, distinct dates are kept and ordered ascending);
+and `AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -638,8 +660,12 @@ real launcher icon generated from a supplied emblem — both the legacy
 full-bleed icon and a proper Android 12+ adaptive icon with a safe-zone-
 scaled foreground (see "Rebrand" above).
 
+Gamification also now tracks its own history: a "Life Score History"
+card on the Gamification home screen charts Life Score day by day,
+backed by a new `LifeScoreSnapshots` table recorded each time the app
+is opened (see "Life Score history/trend chart" above).
+
 There's no outstanding polish item left from the original spec or from
 any pass since. Future work is open-ended from here: say what you'd
-like next (a Life Score history/trend chart, deep-linking the widget to
-a specific screen, or anything else) and it'll get the same full
-treatment.
+like next (deep-linking the widget to a specific screen, or anything
+else) and it'll get the same full treatment.

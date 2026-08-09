@@ -64,6 +64,7 @@ import '../../features/fitness/data/tables/workout_plans_table.dart';
 import '../../features/fitness/data/tables/workout_sessions_table.dart';
 import '../../features/gamification/data/daos/gamification_dao.dart';
 import '../../features/gamification/data/tables/gamification_achievements_table.dart';
+import '../../features/gamification/data/tables/life_score_snapshots_table.dart';
 import '../../features/goals/data/daos/goals_dao.dart';
 import '../../features/goals/data/tables/goal_habit_links_table.dart';
 import '../../features/goals/data/tables/goals_table.dart';
@@ -129,6 +130,7 @@ part 'app_database.g.dart';
     CalendarTasks,
     CalendarEvents,
     GamificationAchievements,
+    LifeScoreSnapshots,
   ],
   daos: [
     AccountsDao,
@@ -168,7 +170,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 18;
+  int get schemaVersion => 19;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -259,6 +261,9 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 18) {
             await m.createTable(gamificationAchievements);
+          }
+          if (from < 19) {
+            await m.createTable(lifeScoreSnapshots);
           }
         },
       );

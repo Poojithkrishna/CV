@@ -18,9 +18,11 @@ import '../../../journal/presentation/providers/journal_providers.dart';
 import '../../data/daos/gamification_dao.dart';
 import '../../data/repositories/gamification_repository_impl.dart';
 import '../../domain/entities/gamification_snapshot.dart';
+import '../../domain/entities/life_score_snapshot.dart';
 import '../../domain/entities/unlocked_achievement.dart';
 import '../../domain/repositories/gamification_repository.dart';
 import '../../domain/services/gamification_stats.dart';
+import '../../domain/usecases/record_life_score_snapshot.dart';
 import '../../domain/usecases/unlock_achievement.dart';
 
 final Provider<GamificationDao> gamificationDaoProvider = Provider<GamificationDao>((ref) {
@@ -39,6 +41,15 @@ final Provider<UnlockAchievement> unlockAchievementUseCaseProvider = Provider(
 final StreamProvider<List<UnlockedAchievement>> unlockedAchievementsProvider =
     StreamProvider<List<UnlockedAchievement>>((ref) {
   return ref.watch(gamificationRepositoryProvider).watchUnlockedAchievements();
+});
+
+final Provider<RecordLifeScoreSnapshot> recordLifeScoreSnapshotUseCaseProvider = Provider(
+  (ref) => RecordLifeScoreSnapshot(ref.watch(gamificationRepositoryProvider)),
+);
+
+final StreamProvider<List<LifeScoreSnapshot>> lifeScoreSnapshotsProvider =
+    StreamProvider<List<LifeScoreSnapshot>>((ref) {
+  return ref.watch(gamificationRepositoryProvider).watchLifeScoreSnapshots();
 });
 
 /// Combines every other module's live data into one computed
