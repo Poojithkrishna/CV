@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_gradients.dart';
+import '../../../../core/home_widget/home_widget_data.dart';
+import '../../../../core/providers/home_widget_provider.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/gradient_card.dart';
 import '../../../creator_studio/domain/entities/content_goal.dart';
@@ -116,6 +118,22 @@ class DashboardScreen extends ConsumerWidget {
 
     final AsyncValue<GamificationSnapshot> gamificationSnapshot =
         ref.watch(gamificationSnapshotProvider);
+
+    // Keeps the Android home screen widget in sync with whatever the
+    // dashboard itself is showing — there's no background refresh, so
+    // "whenever the user has the app open" is what freshness means
+    // here, the same as every other piece of this app being purely
+    // on-device with no push mechanism of its own.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(homeWidgetSyncServiceProvider).push(
+            buildHomeWidgetData(
+              gamificationSnapshot: gamificationSnapshot.valueOrNull,
+              netWorthValue: netWorthValue,
+              habitCompletionValue: habitCompletionValue,
+              scheduleSummary: todaysScheduleValue,
+            ),
+          );
+    });
 
     return Scaffold(
       appBar: AppBar(

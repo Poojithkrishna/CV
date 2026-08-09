@@ -360,6 +360,32 @@ Built feature by feature. So far:
   the same in-memory-database pattern every DAO test already uses); the
   `path_provider`-dependent path resolution isn't, consistent with how
   every other platform-plugin call in this app is left untested.
+- ✅ **Home screen widget**: a real Android App Widget (`home_widget`
+  package + a native `LifeOsWidgetProvider`), not just an in-app
+  feature — cultivation rank/XP, net worth, habit completion and
+  today's schedule at a glance without opening LifeOS at all. The
+  mapping from live app data to the five strings the widget actually
+  displays is one small pure function, `buildHomeWidgetData` — kept
+  separate from `HomeWidgetSyncService`'s actual plugin calls for the
+  same reason the notification reminder-time functions are split from
+  `NotificationService`: so the mapping is unit-testable without a
+  platform channel. `DashboardScreen` pushes a fresh set of values via
+  `WidgetsBinding.instance.addPostFrameCallback` on every rebuild — the
+  same "freshness means whenever the app's open" honesty as every other
+  on-device-only piece of this app, since there's no background refresh
+  wired up (`lifeos_widget_info.xml` sets `updatePeriodMillis="0"` for
+  exactly that reason, rather than declaring a refresh cadence nothing
+  actually honors). The native side is a `RemoteViews`-based
+  `AppWidgetProvider` subclass reading the shared preferences the
+  plugin already writes to, a gradient-background layout matching the
+  Gamification module's own color, and a tap target that launches
+  `MainActivity` via `HomeWidgetLaunchIntent` — no deep link into a
+  specific screen, just the same as tapping the app icon. `buildHomeWidgetData`
+  is unit tested (the loaded and not-yet-loaded gamification-snapshot
+  cases, and that it always emits exactly its five keys); the Kotlin
+  provider and XML resources aren't — there's no Dart test harness for
+  native Android widget code, the same boundary every other
+  platform-plugin integration in this app draws.
 
 ## Architecture
 
@@ -500,7 +526,9 @@ module's pure reminder-time function — `loanReminderTime`,
 unit-testable without mocking a platform channel; `BackupService`'s
 SQLite-header validation (a real file, plain text, a too-short file, a
 missing file) and its `VACUUM INTO` export round-tripping back through
-a fresh `AppDatabase` with the exported data intact; and `AccountCard`
+a fresh `AppDatabase` with the exported data intact; `buildHomeWidgetData`'s
+mapping (both the loaded and not-yet-loaded gamification-snapshot cases,
+and that it always emits exactly its five widget keys); and `AccountCard`
 widget rendering.
 
 ## Data & privacy
@@ -518,7 +546,9 @@ installed) — LifeOS itself never uploads it anywhere; restoring reads
 only the single file the user explicitly chose. Backup files are plain
 database files with no encryption of their own layered on top, so they
 carry the same sensitivity as everything else in the app and are worth
-sharing with the same care.
+sharing with the same care. The home screen widget doesn't call out
+either — its values are written to local Android shared preferences by
+the app itself and read back by the widget's own code, all on-device.
 
 ## Next up
 
@@ -528,15 +558,19 @@ Gamification — has now had its full feature pass (models → repository →
 use cases → providers → UI → widgets → validation → tests), and the
 dashboard's every tile is wired to real, live data.
 
-Local notifications, biometric App Lock and Backup & Restore are all
-wired up too — every `reminderEnabled`/`reminderDaysBefore` flag (Loans,
-Recurring Payments, Calendar tasks and events) actually schedules a
-device notification, Settings has a real App Lock toggle, and Settings
-→ Backup & Restore can export everything to a file (shared however the
-user likes) or replace everything from a previously exported one (see
-the three sections above).
+Local notifications, biometric App Lock, Backup & Restore and a real
+Android home screen widget are all wired up too — every
+`reminderEnabled`/`reminderDaysBefore` flag (Loans, Recurring Payments,
+Calendar tasks and events) actually schedules a device notification,
+Settings has a real App Lock toggle, Settings → Backup & Restore can
+export everything to a file (shared however the user likes) or replace
+everything from a previously exported one, and a widget can be added to
+the home screen showing cultivation rank/XP, net worth, habit
+completion and today's schedule without opening the app (see the four
+sections above).
 
 There's no outstanding polish item left from the original spec or from
 any pass since. Future work is open-ended from here: say what you'd
-like next (Home screen widgets, richer Gamification content, or
-anything else) and it'll get the same full treatment.
+like next (richer Gamification content, deep-linking the widget to a
+specific screen, or anything else) and it'll get the same full
+treatment.
