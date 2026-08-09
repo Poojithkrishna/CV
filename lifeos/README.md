@@ -52,6 +52,20 @@ Built feature by feature. So far:
   worth (an upcoming bill is a forecast, not a balance-sheet liability —
   counting it would double-count against the cash sitting in the account
   that'll pay it). The list screen surfaces overdue items first.
+- ✅ **Finance → Investments, Assets & Analytics**: `Investment` (stocks/
+  mutual funds/crypto/bonds/retirement/gold/other) tracks an invested
+  amount against a manually-updated current value, so gain/loss is just
+  `currentValue - investedAmount` — no live price feed, since this is an
+  offline app. `Asset` (real estate/vehicle/jewelry/electronics/
+  collectible/other) is simpler still: just a current value, with an
+  optional purchase price kept for reference only. Both fold straight
+  into net worth as pure assets alongside accounts/cards/loans.
+  Analytics is a read-only view with no table of its own —
+  `FinanceAnalytics` (pure, DB-free) aggregates the existing Transactions
+  + Categories streams into a 6-month income-vs-expense trend and a
+  this-month spending-by-category breakdown, rendered as a grouped bar
+  chart and a donut chart (`fl_chart`, same charting dependency as the
+  Fitness trend charts).
 - ✅ **Fitness → Exercise Library, Workout Plans & Workout Tracker**: the
   spec's core Fitness loop, built as one pass since each part depends on
   the last.
@@ -194,27 +208,30 @@ flutter test
 
 Covers: use-case validation across Finance (`CreateAccount`/
 `CreateTransaction`/`CreateCategory`/`CreateCreditCard`/`CreateLoan`/
-`RecordLoanPayment`/`CreateRecurringPayment`), Fitness (`LogSet`/
-`CreateWorkoutPlan`/`AddExerciseToDay`/`LogBodyWeight`/`CreateFoodItem`/
-`LogFood`), Habits (`CreateHabit`) and Goals (`CreateGoal`/
-`AddMilestone`); `RecurrenceFrequency`'s date math (leap years,
-month-length clamping) and `MarkRecurringPaymentPaid`'s orchestration;
-`WorkoutStats`'s volume and progression-suggestion math; `HabitStats`'s
-streak/completion-rate/heatmap math (including custom weekday
-schedules), `GoalStats`'s milestone-vs-numeric progress fallback,
-`BodyWeightStats`/`MeasurementStats`'s N-day trend deltas and
-`NutritionStats`'s macro totaling/meal grouping; DAO behaviour against
-an in-memory SQLite database for `AccountsDao`/`TransactionsDao`/
-`CreditCardsDao`/`CardEmisDao`/`LoansDao` (balance and payment math,
-including edit/delete reverting the right effect),
-`WorkoutSessionsDao`/`WorkoutPlansDao` (PR detection, active-plan
-switching), `HabitsDao` (atomic period upserts, floored at zero,
-checklist toggling), `GoalsDao` (milestone toggling, habit linking,
-cascading deletes), `BodyWeightDao`/`MeasurementsDao` (upsert-by-date/
-type overwrites same-day re-logs), `WaterDao` (accumulating daily
-total floored at zero, goal upsert) and `NutritionDao` (the food-item
-join query, seeded starter library, cascading deletes); and
-`AccountCard` widget rendering.
+`RecordLoanPayment`/`CreateRecurringPayment`/`CreateInvestment`/
+`CreateAsset`), Fitness (`LogSet`/`CreateWorkoutPlan`/
+`AddExerciseToDay`/`LogBodyWeight`/`CreateFoodItem`/`LogFood`), Habits
+(`CreateHabit`) and Goals (`CreateGoal`/`AddMilestone`);
+`RecurrenceFrequency`'s date math (leap years, month-length clamping)
+and `MarkRecurringPaymentPaid`'s orchestration; `WorkoutStats`'s volume
+and progression-suggestion math; `HabitStats`'s streak/completion-rate/
+heatmap math (including custom weekday schedules), `GoalStats`'s
+milestone-vs-numeric progress fallback, `BodyWeightStats`/
+`MeasurementStats`'s N-day trend deltas, `NutritionStats`'s macro
+totaling/meal grouping and `FinanceAnalytics`'s category totals/
+monthly income-vs-expense bucketing (including transfer exclusion and
+empty-month buckets); DAO behaviour against an in-memory SQLite
+database for `AccountsDao`/`TransactionsDao`/`CreditCardsDao`/
+`CardEmisDao`/`LoansDao` (balance and payment math, including
+edit/delete reverting the right effect), `InvestmentsDao`/`AssetsDao`
+(archived-filtering CRUD), `WorkoutSessionsDao`/`WorkoutPlansDao` (PR
+detection, active-plan switching), `HabitsDao` (atomic period upserts,
+floored at zero, checklist toggling), `GoalsDao` (milestone toggling,
+habit linking, cascading deletes), `BodyWeightDao`/`MeasurementsDao`
+(upsert-by-date/type overwrites same-day re-logs), `WaterDao`
+(accumulating daily total floored at zero, goal upsert) and
+`NutritionDao` (the food-item join query, seeded starter library,
+cascading deletes); and `AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -234,12 +251,11 @@ Suggested order for the next feature passes (say which one you want and
 it'll get the same full treatment — models → repository → use cases →
 providers → UI → widgets → validation → tests):
 
-1. Finance: Investments & Assets, Analytics
-2. Fitness: Progress Photos, Supplements, Cardio, Recovery & Strength
+1. Fitness: Progress Photos, Supplements, Cardio, Recovery & Strength
    Progress analytics
-3. Gaming Creator Studio pipeline
-4. Entertainment Library
-5. Journal
-6. Calendar & Tasks
-7. Gamification (ranks, XP, attributes, achievements, Life Score) —
+2. Gaming Creator Studio pipeline
+3. Entertainment Library
+4. Journal
+5. Calendar & Tasks
+6. Gamification (ranks, XP, attributes, achievements, Life Score) —
    wiring dashboard stats to real data from the modules above as they land

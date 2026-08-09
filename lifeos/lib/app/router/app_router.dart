@@ -7,13 +7,18 @@ import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/entertainment/presentation/screens/entertainment_home_screen.dart';
 import '../../features/finance/presentation/screens/account_detail_screen.dart';
 import '../../features/finance/presentation/screens/account_form_screen.dart';
+import '../../features/finance/presentation/screens/asset_form_screen.dart';
+import '../../features/finance/presentation/screens/assets_list_screen.dart';
 import '../../features/finance/presentation/screens/card_emi_form_screen.dart';
 import '../../features/finance/presentation/screens/categories_screen.dart';
 import '../../features/finance/presentation/screens/category_form_screen.dart';
 import '../../features/finance/presentation/screens/credit_card_detail_screen.dart';
 import '../../features/finance/presentation/screens/credit_card_form_screen.dart';
 import '../../features/finance/presentation/screens/credit_cards_list_screen.dart';
+import '../../features/finance/presentation/screens/finance_analytics_screen.dart';
 import '../../features/finance/presentation/screens/finance_home_screen.dart';
+import '../../features/finance/presentation/screens/investment_form_screen.dart';
+import '../../features/finance/presentation/screens/investments_list_screen.dart';
 import '../../features/finance/presentation/screens/loan_detail_screen.dart';
 import '../../features/finance/presentation/screens/loan_form_screen.dart';
 import '../../features/finance/presentation/screens/loans_list_screen.dart';
@@ -196,6 +201,38 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => RecurringPaymentFormScreen(
                     paymentId: state.pathParameters['id'],
                   ),
+                ),
+                GoRoute(
+                  path: 'investments',
+                  builder: (context, state) => const InvestmentsListScreen(),
+                ),
+                GoRoute(
+                  path: 'investments/new',
+                  builder: (context, state) => const InvestmentFormScreen(),
+                ),
+                GoRoute(
+                  path: 'investments/:id/edit',
+                  builder: (context, state) => InvestmentFormScreen(
+                    investmentId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'assets',
+                  builder: (context, state) => const AssetsListScreen(),
+                ),
+                GoRoute(
+                  path: 'assets/new',
+                  builder: (context, state) => const AssetFormScreen(),
+                ),
+                GoRoute(
+                  path: 'assets/:id/edit',
+                  builder: (context, state) => AssetFormScreen(
+                    assetId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'analytics',
+                  builder: (context, state) => const FinanceAnalyticsScreen(),
                 ),
               ],
             ),

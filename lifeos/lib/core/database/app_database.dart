@@ -6,16 +6,20 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import '../../features/finance/data/daos/accounts_dao.dart';
+import '../../features/finance/data/daos/assets_dao.dart';
 import '../../features/finance/data/daos/card_emis_dao.dart';
 import '../../features/finance/data/daos/categories_dao.dart';
 import '../../features/finance/data/daos/credit_cards_dao.dart';
+import '../../features/finance/data/daos/investments_dao.dart';
 import '../../features/finance/data/daos/loans_dao.dart';
 import '../../features/finance/data/daos/recurring_payments_dao.dart';
 import '../../features/finance/data/daos/transactions_dao.dart';
 import '../../features/finance/data/tables/accounts_table.dart';
+import '../../features/finance/data/tables/assets_table.dart';
 import '../../features/finance/data/tables/card_emis_table.dart';
 import '../../features/finance/data/tables/categories_table.dart';
 import '../../features/finance/data/tables/credit_cards_table.dart';
+import '../../features/finance/data/tables/investments_table.dart';
 import '../../features/finance/data/tables/loan_payments_table.dart';
 import '../../features/finance/data/tables/loans_table.dart';
 import '../../features/finance/data/tables/recurring_payments_table.dart';
@@ -88,6 +92,8 @@ part 'app_database.g.dart';
     FoodItems,
     FoodLogEntries,
     NutritionGoals,
+    Investments,
+    Assets,
   ],
   daos: [
     AccountsDao,
@@ -106,6 +112,8 @@ part 'app_database.g.dart';
     WaterDao,
     MeasurementsDao,
     NutritionDao,
+    InvestmentsDao,
+    AssetsDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -116,7 +124,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -176,6 +184,10 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(nutritionGoals);
             await _seedDefaultFoods();
             await _seedDefaultGoalRows();
+          }
+          if (from < 12) {
+            await m.createTable(investments);
+            await m.createTable(assets);
           }
         },
       );

@@ -46,3 +46,13 @@ final StreamProviderFamily<TransactionEntry?, String> transactionByIdProvider =
     StreamProvider.family<TransactionEntry?, String>((ref, id) {
   return ref.watch(transactionRepositoryProvider).watchTransaction(id);
 });
+
+typedef DateRange = ({DateTime from, DateTime to});
+
+/// Every transaction (any account, including transfers) within a date
+/// range — used by Analytics, which needs the full history rather than
+/// a fixed-size "recent" window.
+final StreamProviderFamily<List<TransactionEntry>, DateRange> transactionsInRangeProvider =
+    StreamProvider.family<List<TransactionEntry>, DateRange>((ref, range) {
+  return ref.watch(transactionRepositoryProvider).watchTransactionsBetween(range.from, range.to);
+});

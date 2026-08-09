@@ -33,6 +33,10 @@ class _FakeTransactionRepository implements TransactionRepository {
       const Stream.empty();
 
   @override
+  Stream<List<TransactionEntry>> watchTransactionsBetween(DateTime from, DateTime to) =>
+      const Stream.empty();
+
+  @override
   Stream<List<TransactionEntry>> watchRecentTransactions({int limit = 20}) =>
       const Stream.empty();
 }

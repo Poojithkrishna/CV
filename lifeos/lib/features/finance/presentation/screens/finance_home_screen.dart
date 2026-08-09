@@ -15,9 +15,8 @@ import '../widgets/transaction_tile.dart';
 const int _recentTransactionsLimit = 5;
 
 /// Entry point for the Finance module: net worth summary, quick links to
-/// Credit Cards/Loans/Categories, accounts, and a peek at recent
-/// transactions. Bills, investments and analytics land here as their own
-/// sections in later passes.
+/// every Finance sub-feature, accounts, and a peek at recent
+/// transactions.
 class FinanceHomeScreen extends ConsumerWidget {
   const FinanceHomeScreen({super.key});
 
@@ -103,6 +102,24 @@ class FinanceHomeScreen extends ConsumerWidget {
                             icon: Icons.category_outlined,
                             label: 'Categories',
                             onTap: () => context.push('/finance/categories'),
+                          ),
+                          const SizedBox(width: 8),
+                          _ToolChip(
+                            icon: Icons.trending_up_rounded,
+                            label: 'Investments',
+                            onTap: () => context.push('/finance/investments'),
+                          ),
+                          const SizedBox(width: 8),
+                          _ToolChip(
+                            icon: Icons.inventory_2_outlined,
+                            label: 'Assets',
+                            onTap: () => context.push('/finance/assets'),
+                          ),
+                          const SizedBox(width: 8),
+                          _ToolChip(
+                            icon: Icons.insights_outlined,
+                            label: 'Analytics',
+                            onTap: () => context.push('/finance/analytics'),
                           ),
                         ],
                       ),

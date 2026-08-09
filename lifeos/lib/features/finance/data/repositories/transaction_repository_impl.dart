@@ -25,6 +25,13 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
+  Stream<List<TransactionEntry>> watchTransactionsBetween(DateTime from, DateTime to) {
+    return _dao
+        .watchTransactionsBetween(from, to)
+        .map((rows) => rows.map((row) => row.toDomain()).toList(growable: false));
+  }
+
+  @override
   Stream<TransactionEntry?> watchTransaction(String id) {
     return _dao.watchTransaction(id).map((row) => row?.toDomain());
   }

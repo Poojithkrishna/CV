@@ -22,6 +22,16 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase> with _$TransactionsD
         .watch();
   }
 
+  /// Every transaction (including transfers) with a date in `[from, to]`,
+  /// oldest first — used for Analytics, which buckets by calendar month
+  /// rather than needing a specific account.
+  Stream<List<TransactionRow>> watchTransactionsBetween(DateTime from, DateTime to) {
+    return (select(transactions)
+          ..where((t) => t.date.isBiggerOrEqualValue(from) & t.date.isSmallerOrEqualValue(to))
+          ..orderBy([(t) => OrderingTerm.asc(t.date)]))
+        .watch();
+  }
+
   Stream<List<TransactionRow>> watchTransactionsForAccount(String accountId) {
     return (select(transactions)
           ..where((t) => t.accountId.equals(accountId) | t.transferAccountId.equals(accountId))
