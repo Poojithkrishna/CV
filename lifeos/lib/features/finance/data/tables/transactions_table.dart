@@ -24,7 +24,7 @@ class Transactions extends Table {
       text().customConstraint('NOT NULL REFERENCES accounts (id) ON DELETE CASCADE')();
 
   TextColumn get categoryId =>
-      text().customConstraint('REFERENCES categories (id) ON DELETE SET NULL')();
+      text().nullable().customConstraint('REFERENCES categories (id) ON DELETE SET NULL')();
 
   /// Stored as [TransactionType.name] (`"income"` / `"expense"` / `"transfer"`).
   TextColumn get type => text()();
@@ -38,7 +38,7 @@ class Transactions extends Table {
 
   /// Destination account for a transfer; null for income/expense.
   TextColumn get transferAccountId =>
-      text().customConstraint('REFERENCES accounts (id) ON DELETE CASCADE')();
+      text().nullable().customConstraint('REFERENCES accounts (id) ON DELETE CASCADE')();
 
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();

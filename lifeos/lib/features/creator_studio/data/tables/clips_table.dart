@@ -17,7 +17,7 @@ class Clips extends Table {
   /// for why (the latter's generated constraint was silently dropped by
   /// drift_dev in this schema).
   TextColumn get linkedProjectId =>
-      text().customConstraint('REFERENCES content_projects (id) ON DELETE SET NULL')();
+      text().nullable().customConstraint('REFERENCES content_projects (id) ON DELETE SET NULL')();
 
   DateTimeColumn get capturedAt => dateTime()();
   DateTimeColumn get createdAt => dateTime()();

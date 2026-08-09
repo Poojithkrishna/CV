@@ -14,9 +14,9 @@ class WorkoutSessions extends Table {
   /// for why (the latter's generated constraint was silently dropped by
   /// drift_dev in this schema).
   TextColumn get planId =>
-      text().customConstraint('REFERENCES workout_plans (id) ON DELETE SET NULL')();
+      text().nullable().customConstraint('REFERENCES workout_plans (id) ON DELETE SET NULL')();
   TextColumn get dayId =>
-      text().customConstraint('REFERENCES workout_days (id) ON DELETE SET NULL')();
+      text().nullable().customConstraint('REFERENCES workout_days (id) ON DELETE SET NULL')();
 
   DateTimeColumn get date => dateTime()();
   DateTimeColumn get startTime => dateTime()();

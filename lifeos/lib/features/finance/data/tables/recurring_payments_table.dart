@@ -18,13 +18,13 @@ class RecurringPayments extends Table {
   // generated constraint was silently dropped by drift_dev in this
   // schema.
   TextColumn get categoryId =>
-      text().customConstraint('REFERENCES categories (id) ON DELETE SET NULL')();
+      text().nullable().customConstraint('REFERENCES categories (id) ON DELETE SET NULL')();
 
   /// Left null if this bill isn't tracked against a specific account
   /// (e.g. paid in cash) — "mark as paid" then just advances the
   /// schedule instead of logging a transaction.
   TextColumn get accountId =>
-      text().customConstraint('REFERENCES accounts (id) ON DELETE SET NULL')();
+      text().nullable().customConstraint('REFERENCES accounts (id) ON DELETE SET NULL')();
 
   IntColumn get reminderDaysBefore => integer().nullable()();
   BoolColumn get isAutoPay => boolean().withDefault(const Constant(false))();
