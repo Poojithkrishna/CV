@@ -306,6 +306,32 @@ Built feature by feature. So far:
   and from the Calendar home screen's done-checkbox toggle (a completed
   task's reminder cancels) — every place these four entities actually
   get created, changed or removed in the app.
+- ✅ **Biometric App Lock**: an opt-in `AppLockService` wrapping
+  `local_auth`'s biometric/device-credential prompt (fingerprint, face,
+  or whatever PIN/pattern the phone already falls back to — never
+  biometric-only, so a bad fingerprint-sensor day can't lock anyone out
+  for good). Whether it's on is the one preference in the app that
+  can't use `ThemeModeController`'s async-load-after-a-default pattern,
+  since a security toggle showing the app unlocked for even one frame
+  while the real value loads would defeat the feature — so
+  `AppLockEnabledController` starts `null` and `loadInitial()` is
+  awaited in `main()` before `runApp`, same timing discipline as the
+  notification service's own pre-`runApp` init. `AppLockGate` wraps
+  `MaterialApp.router`'s `builder`, showing a lock screen instead of the
+  app whenever enabled and the current session hasn't unlocked yet, and
+  a `WidgetsBindingObserver` re-locks the moment the app is backgrounded
+  — switching away and back always re-prompts. The Settings toggle
+  requires a successful authentication to flip in *either* direction:
+  to enable, so no one can turn it on and lock the real owner out of
+  their own phone, and to disable, so grabbing an already-unlocked phone
+  isn't enough to permanently switch the lock off. `MainActivity` had to
+  change from `FlutterActivity` to `FlutterFragmentActivity` —
+  `local_auth`'s biometric prompt requires a `FragmentActivity` host and
+  won't work on the stock template's default. No unit tests for this
+  one (consistent with `ThemeModeController`, which has none either) —
+  there's no pure logic to extract here, just a persisted bool and a
+  platform plugin call, and this project's tests are for domain/data
+  logic, not for mocking platform channels.
 
 ## Architecture
 
@@ -452,10 +478,10 @@ Everything is stored locally in a single SQLite database
 (`<app documents dir>/lifeos.sqlite`) via Drift — there is no backend and
 no network calls beyond what a future backup feature adds explicitly.
 Local notifications are on-device only (`flutter_local_notifications`,
-no push service, no server round-trip). Biometric app-lock is declared
-as a dependency already (`local_auth`) so wiring it up doesn't require
-another platform-config pass, but isn't wired into app startup or
-Settings yet.
+no push service, no server round-trip). App Lock authenticates entirely
+on-device too (`local_auth` — biometrics or the phone's own device
+credential), so there's nothing to configure server-side and no
+account/password of ours to manage.
 
 ## Next up
 
@@ -465,13 +491,14 @@ Gamification — has now had its full feature pass (models → repository →
 use cases → providers → UI → widgets → validation → tests), and the
 dashboard's every tile is wired to real, live data.
 
-Local notifications are now wired up too — every `reminderEnabled`/
-`reminderDaysBefore` flag (Loans, Recurring Payments, Calendar tasks and
-events) actually schedules a device notification (see the
-Notifications section above).
+Local notifications and biometric App Lock are now wired up too — every
+`reminderEnabled`/`reminderDaysBefore` flag (Loans, Recurring Payments,
+Calendar tasks and events) actually schedules a device notification,
+and Settings has a real App Lock toggle (see the two sections above).
 
-What's left is polish rather than new modules — say which one you want
-and it'll get the same full treatment:
-
-1. Biometric app-lock: `local_auth` is already a dependency but isn't
-   wired into app startup or Settings yet.
+Both dependencies called out in earlier passes as "declared but not
+wired" are now fully wired — there's no outstanding polish item left
+from the original spec. Future passes are open-ended from here: say
+what you'd like next (a backup/export feature, widgets, richer
+Gamification content, or anything else) and it'll get the same full
+treatment.

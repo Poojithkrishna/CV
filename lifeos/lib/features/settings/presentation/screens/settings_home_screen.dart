@@ -1,14 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/app_lock_provider.dart';
 import '../../../../core/providers/theme_mode_provider.dart';
 
 class SettingsHomeScreen extends ConsumerWidget {
   const SettingsHomeScreen({super.key});
 
+  Future<void> _setAppLockEnabled(BuildContext context, WidgetRef ref, bool value) async {
+    final bool supported = await ref.read(appLockServiceProvider).isSupported();
+    if (!context.mounted) return;
+    if (!supported) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No biometrics or device lock is set up on this device.'),
+        ),
+      );
+      return;
+    }
+
+    // Re-authentication is required in both directions: to enable, so
+    // no one can turn it on and lock the actual owner out, and to
+    // disable, so grabbing an already-unlocked phone isn't enough to
+    // permanently switch the lock off.
+    final bool authenticated = await ref.read(appLockServiceProvider).authenticate(
+          reason: value ? 'Verify it\'s you to enable App Lock' : 'Verify it\'s you to disable App Lock',
+        );
+    if (!authenticated) return;
+
+    await ref.read(appLockEnabledProvider.notifier).setEnabled(value);
+    if (value) {
+      // Already proven who they are just now — don't immediately
+      // re-lock the screen they're looking at.
+      ref.read(appLockSessionProvider.notifier).unlock();
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeMode themeMode = ref.watch(themeModeProvider);
+    final bool appLockEnabled = ref.watch(appLockEnabledProvider) ?? false;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -45,6 +76,28 @@ class SettingsHomeScreen extends ConsumerWidget {
                     groupValue: themeMode,
                     onChanged: (mode) =>
                         ref.read(themeModeProvider.notifier).setThemeMode(mode!),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+                    child: Text('Security', style: Theme.of(context).textTheme.labelLarge),
+                  ),
+                  SwitchListTile(
+                    secondary: const Icon(Icons.fingerprint_rounded),
+                    title: const Text('App Lock'),
+                    subtitle: const Text('Require biometrics or device unlock to open LifeOS'),
+                    value: appLockEnabled,
+                    onChanged: (value) => _setAppLockEnabled(context, ref, value),
                   ),
                 ],
               ),
