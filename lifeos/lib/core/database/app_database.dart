@@ -62,6 +62,8 @@ import '../../features/fitness/data/tables/water_goal_table.dart';
 import '../../features/fitness/data/tables/workout_days_table.dart';
 import '../../features/fitness/data/tables/workout_plans_table.dart';
 import '../../features/fitness/data/tables/workout_sessions_table.dart';
+import '../../features/gamification/data/daos/gamification_dao.dart';
+import '../../features/gamification/data/tables/gamification_achievements_table.dart';
 import '../../features/goals/data/daos/goals_dao.dart';
 import '../../features/goals/data/tables/goal_habit_links_table.dart';
 import '../../features/goals/data/tables/goals_table.dart';
@@ -126,6 +128,7 @@ part 'app_database.g.dart';
     JournalEntries,
     CalendarTasks,
     CalendarEvents,
+    GamificationAchievements,
   ],
   daos: [
     AccountsDao,
@@ -154,6 +157,7 @@ part 'app_database.g.dart';
     MediaLibraryDao,
     JournalDao,
     CalendarDao,
+    GamificationDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -164,7 +168,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 17;
+  int get schemaVersion => 18;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -252,6 +256,9 @@ class AppDatabase extends _$AppDatabase {
           if (from < 17) {
             await m.createTable(calendarTasks);
             await m.createTable(calendarEvents);
+          }
+          if (from < 18) {
+            await m.createTable(gamificationAchievements);
           }
         },
       );

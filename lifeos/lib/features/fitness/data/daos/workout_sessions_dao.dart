@@ -27,6 +27,13 @@ class WorkoutSessionsDao extends DatabaseAccessor<AppDatabase> with _$WorkoutSes
     return (select(workoutSessions)..where((tbl) => tbl.id.equals(id))).watchSingleOrNull();
   }
 
+  /// Total number of sessions ever logged — the Gamification module's
+  /// Vitality attribute input.
+  Stream<int> watchSessionCount() {
+    final query = selectOnly(workoutSessions)..addColumns([workoutSessions.id.count()]);
+    return query.watchSingle().map((row) => row.read(workoutSessions.id.count()) ?? 0);
+  }
+
   /// The most recent session still missing an end time, if any — used so
   /// re-opening the app can resume an in-progress workout.
   Stream<WorkoutSessionRow?> watchInProgressSession() {

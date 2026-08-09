@@ -36,6 +36,9 @@ class _FakeWorkoutSessionRepository implements WorkoutSessionRepository {
   Stream<WorkoutSession?> watchInProgressSession() => const Stream.empty();
 
   @override
+  Stream<int> watchSessionCount() => const Stream.empty();
+
+  @override
   Stream<List<WorkoutSession>> watchRecentSessions({int limit = 20}) => const Stream.empty();
 
   @override

@@ -30,6 +30,9 @@ class WorkoutSessionRepositoryImpl implements WorkoutSessionRepository {
   }
 
   @override
+  Stream<int> watchSessionCount() => _dao.watchSessionCount();
+
+  @override
   Future<Result<WorkoutSession>> startSession(WorkoutSession session) async {
     try {
       await _dao.startSession(session.toCompanion());

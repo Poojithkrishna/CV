@@ -53,6 +53,12 @@ final StreamProvider<WorkoutSession?> inProgressSessionProvider = StreamProvider
   return ref.watch(workoutSessionRepositoryProvider).watchInProgressSession();
 });
 
+/// Total workout sessions ever logged — the Gamification module's
+/// Vitality attribute input.
+final StreamProvider<int> workoutSessionCountProvider = StreamProvider<int>((ref) {
+  return ref.watch(workoutSessionRepositoryProvider).watchSessionCount();
+});
+
 final StreamProviderFamily<List<LoggedSet>, String> setsForSessionProvider =
     StreamProvider.family<List<LoggedSet>, String>((ref, sessionId) {
   return ref.watch(workoutSessionRepositoryProvider).watchSetsForSession(sessionId);

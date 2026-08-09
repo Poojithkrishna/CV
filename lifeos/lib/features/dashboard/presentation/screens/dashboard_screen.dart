@@ -19,6 +19,8 @@ import '../../../entertainment/domain/entities/media_status.dart';
 import '../../../entertainment/presentation/providers/media_library_providers.dart';
 import '../../../finance/presentation/providers/net_worth_provider.dart';
 import '../../../fitness/presentation/providers/workout_plan_providers.dart';
+import '../../../gamification/domain/entities/gamification_snapshot.dart';
+import '../../../gamification/presentation/providers/gamification_providers.dart';
 import '../../../goals/domain/entities/goal.dart';
 import '../../../goals/presentation/providers/goal_providers.dart';
 import '../../../habits/presentation/providers/habit_providers.dart';
@@ -26,13 +28,10 @@ import '../../../journal/domain/entities/journal_entry.dart';
 import '../../../journal/presentation/providers/journal_providers.dart';
 import '../widgets/module_summary_card.dart';
 
-/// The LifeOS home screen: a single glance at every module. Finance's net
-/// worth, Fitness's active plan, Habits' weekly completion, Goals' active
-/// count, Creator Studio's weekly-upload, Entertainment's
-/// currently-playing, Journal's written-today and Calendar's
-/// today's-schedule tiles are wired to real data; every other tile is a
-/// placeholder until that module's own feature pass lands, but they're
-/// already tappable so the whole app is navigable end to end.
+/// The LifeOS home screen: a single glance at every module. Every module
+/// summary tile, and the cultivation card's rank/XP/progress, are wired
+/// to real data derived live from what's actually been logged — nothing
+/// on this screen is a placeholder anymore.
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -115,6 +114,9 @@ class DashboardScreen extends ConsumerWidget {
         ? '${CalendarStats.tasksOnDate(calendarTasks.value!, DateTime.now()).length + CalendarStats.eventsOnDate(calendarEvents.value!, DateTime.now()).length} today'
         : '—';
 
+    final AsyncValue<GamificationSnapshot> gamificationSnapshot =
+        ref.watch(gamificationSnapshotProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('LifeOS'),
@@ -131,37 +133,53 @@ class DashboardScreen extends ConsumerWidget {
           GradientCard(
             gradient: AppGradients.gamification,
             onTap: () => context.push('/gamification'),
-            child: Row(
-              children: [
-                const Icon(Icons.local_fire_department_rounded, size: 36),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Mortal',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-                      ),
-                      const SizedBox(height: 2),
-                      const Text(
-                        '0 XP · Cultivation begins',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                      const SizedBox(height: 10),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: const LinearProgressIndicator(
-                          value: 0.02,
-                          minHeight: 6,
-                          backgroundColor: Colors.white24,
-                          valueColor: AlwaysStoppedAnimation(Colors.white),
+            child: gamificationSnapshot.when(
+              data: (snapshot) => Row(
+                children: [
+                  Icon(snapshot.rank.icon, size: 36),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          snapshot.rank.label,
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 2),
+                        Text(
+                          '${snapshot.xp} XP · ${snapshot.rank.flavorTitle}',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        const SizedBox(height: 10),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: LinearProgressIndicator(
+                            value: snapshot.progressToNextRank,
+                            minHeight: 6,
+                            backgroundColor: Colors.white24,
+                            valueColor: const AlwaysStoppedAnimation(Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
+              loading: () => const Row(
+                children: [
+                  Icon(Icons.local_fire_department_rounded, size: 36),
+                  SizedBox(width: 16),
+                  Expanded(child: Text('Loading cultivation progress…')),
+                ],
+              ),
+              error: (_, __) => const Row(
+                children: [
+                  Icon(Icons.local_fire_department_rounded, size: 36),
+                  SizedBox(width: 16),
+                  Expanded(child: Text('Cultivation progress unavailable')),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 20),

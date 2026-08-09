@@ -247,9 +247,36 @@ Built feature by feature. So far:
   package needed since a week strip plus day agenda covers the spec's
   "daily/weekly planner" without one. The dashboard's "Today's schedule"
   tile shows the combined count of today's tasks and events.
-- 🚧 Gamification has a placeholder screen wired into navigation, ready
-  for its own feature pass — see
-  `lib/features/gamification/presentation/screens/gamification_home_screen.dart`.
+- ✅ **Gamification — Demon God Cultivation**: the capstone module,
+  read-only and cross-cutting — it has no forms of its own, just a pure
+  aggregation over every other module's already-loaded data, the same
+  "compute over already-loaded lists" shape as every other Stats
+  service, just spanning all eight of them at once
+  (`gamificationSnapshotProvider` watches all eight and waits for every
+  one to load before computing, mirroring `netWorthSummaryProvider`'s
+  watch-and-wait pattern). Eight attributes map 1:1 to the eight built
+  modules — Wealth (net worth, ₹1,00,000 = 100 points), Vitality (workout
+  sessions logged), Discipline (habit weekly completion rate), Willpower
+  (average active-goal progress), Creativity (published content),
+  Culture (completed media), Wisdom (journal streak) and Order (task
+  completion rate) — each scaled and clamped to 0-100. Total XP is the
+  attribute sum ×10 (max 8000), mapped to nine ranks from Mortal to
+  Demon God (`Rank.minXp` thresholds), each with a flavor title so there
+  was no need for a separate user-selectable "titles" feature. Life
+  Score is the plain average of the eight attributes — "how balanced is
+  your life right now," distinct from XP's cumulative "how far you've
+  progressed." Achievements are a static in-code catalog (like the
+  seeded default categories/exercises, but as a catalog rather than
+  seeded rows) whose unlock status is the one thing this module actually
+  persists — a single `GamificationAchievements` table recording which
+  keys have been earned, since achievements must never un-unlock even if
+  the triggering stat later regresses (e.g. net worth dropping back
+  down). Getting a true "total workout sessions" count required one
+  small additive method on Fitness's already-shipped
+  `WorkoutSessionsDao` (`watchSessionCount`) — the only other module
+  touched this round, and only with a new, non-breaking method. The
+  dashboard's cultivation card (previously a hardcoded "Mortal / 0 XP")
+  now shows the real rank, XP and progress bar to the next rank.
 
 ## Architecture
 
@@ -330,9 +357,9 @@ Goals (`CreateGoal`/`AddMilestone`), Creator Studio
 stamping), Entertainment (`CreateMediaItem`/`UpdateMediaStatus`,
 including the first-arrival-only `startedDate`/`completedDate`
 stamping, and `LogMediaProgress`), Journal (`CreateJournalEntry`/
-`UpdateJournalEntry`/`DeleteJournalEntry`) and Calendar (`CreateTask`/
-`ToggleTaskDone`, and `CreateEvent`'s end-before-start rejection);
-`RecurrenceFrequency`'s date math
+`UpdateJournalEntry`/`DeleteJournalEntry`), Calendar (`CreateTask`/
+`ToggleTaskDone`, and `CreateEvent`'s end-before-start rejection) and
+Gamification (`UnlockAchievement`); `RecurrenceFrequency`'s date math
 (leap years, month-length clamping) and `MarkRecurringPaymentPaid`'s
 orchestration; `WorkoutStats`'s volume and progression-suggestion math,
 `StrengthProgressStats`'s Epley 1RM estimate and same-day-best
@@ -350,9 +377,14 @@ progress-fraction clamping (including the no-total-set and zero-total
 null cases) and average-rating-of-the-rated-only math, and
 `JournalStats`'s current-streak math (today's pass-if-unwritten rule,
 multiple same-day entries counting once, breaking on the first prior
-gap) and mood/type aggregation, and `CalendarStats`'s same-day task/
+gap) and mood/type aggregation, `CalendarStats`'s same-day task/
 event filtering, pending count and overdue-excludes-done-and-dateless
-filtering; DAO behaviour against an in-memory SQLite
+filtering, and `GamificationStats`'s eight attribute formulas (scaling
+and clamping, including the zero-goals/zero-tasks empty cases), XP
+totaling, rank lookup at and around every threshold (including the
+above-max-XP case), next-rank progress fractions and every achievement
+criterion (including the exact-threshold and just-below-threshold
+boundary for a perfect habit week); DAO behaviour against an in-memory SQLite
 database for `AccountsDao`/`TransactionsDao`/`CreditCardsDao`/
 `CardEmisDao`/`LoansDao` (balance and payment math, including
 edit/delete reverting the right effect), `InvestmentsDao`/`AssetsDao`
@@ -370,11 +402,13 @@ captured-at-ordered streams, deleting a linked project setting a clip's
 `linkedProjectId` to null rather than cascading, and the singleton goal
 row's upsert never crashing on a re-save), `MediaLibraryDao`
 (alphabetical ordering, and `adjustProgress`'s accumulate-delta math —
-floored at zero, capped at `totalProgress`, a no-op for a missing id)
+floored at zero, capped at `totalProgress`, a no-op for a missing id),
 `JournalDao` (date-then-creation-time ordering, a null mood
-round-tripping as null) and `CalendarDao` (due-date/start-time ordering
+round-tripping as null), `CalendarDao` (due-date/start-time ordering
 across its two tables, `toggleTaskDone`'s flip-and-idempotent behavior
-including a no-op for a missing id); and `AccountCard` widget rendering.
+including a no-op for a missing id) and `GamificationDao`
+(`unlockAchievement` never re-unlocking or overwriting an already-earned
+achievement's timestamp); and `AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -390,9 +424,19 @@ it is part of that future notifications pass, not a half-built feature here.
 
 ## Next up
 
-Suggested order for the next feature passes (say which one you want and
-it'll get the same full treatment — models → repository → use cases →
-providers → UI → widgets → validation → tests):
+Every module from the original spec — Finance, Fitness, Habits, Goals,
+Creator Studio, Entertainment, Journal, Calendar & Tasks and
+Gamification — has now had its full feature pass (models → repository →
+use cases → providers → UI → widgets → validation → tests), and the
+dashboard's every tile is wired to real, live data.
 
-1. Gamification (ranks, XP, attributes, achievements, Life Score) —
-   wiring dashboard stats to real data from the modules above as they land
+What's left is polish rather than new modules — say which one you want
+and it'll get the same full treatment:
+
+1. Local notifications: `flutter_local_notifications` is already a
+   dependency, and several entities already carry a `reminderEnabled`/
+   `reminderDaysBefore` flag (Loans, Recurring Payments, Calendar tasks
+   and events), but nothing actually schedules or fires a notification
+   yet.
+2. Biometric app-lock: `local_auth` is already a dependency but isn't
+   wired into app startup or Settings yet.

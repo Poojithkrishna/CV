@@ -95,6 +95,22 @@ void main() {
     expect(workingIsPr, isTrue);
   });
 
+  test('watchSessionCount reflects every session ever started', () async {
+    expect(await database.workoutSessionsDao.watchSessionCount().first, 1);
+
+    await database.workoutSessionsDao.startSession(
+      WorkoutSession(
+        id: 'session-2',
+        date: DateTime(2026, 1, 2),
+        startTime: DateTime(2026, 1, 2),
+        createdAt: DateTime(2026, 1, 2),
+        updatedAt: DateTime(2026, 1, 2),
+      ).toCompanion(),
+    );
+
+    expect(await database.workoutSessionsDao.watchSessionCount().first, 2);
+  });
+
   test('getRecentSetsForExercise returns the most recent set first', () async {
     await database.workoutSessionsDao.logSet(
       buildSet(id: 's1', reps: 8, weight: 60).toCompanion(),

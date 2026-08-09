@@ -7,6 +7,9 @@ abstract interface class WorkoutSessionRepository {
   Stream<WorkoutSession?> watchSession(String id);
   Stream<WorkoutSession?> watchInProgressSession();
 
+  /// Total number of sessions ever logged.
+  Stream<int> watchSessionCount();
+
   Future<Result<WorkoutSession>> startSession(WorkoutSession session);
   Future<Result<WorkoutSession>> endSession(WorkoutSession session);
   Future<Result<void>> deleteSession(String id);
