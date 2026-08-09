@@ -5,6 +5,9 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import '../../features/calendar/data/daos/calendar_dao.dart';
+import '../../features/calendar/data/tables/calendar_events_table.dart';
+import '../../features/calendar/data/tables/calendar_tasks_table.dart';
 import '../../features/creator_studio/data/daos/content_studio_dao.dart';
 import '../../features/creator_studio/data/tables/clips_table.dart';
 import '../../features/creator_studio/data/tables/content_goal_table.dart';
@@ -121,6 +124,8 @@ part 'app_database.g.dart';
     ContentGoals,
     MediaItems,
     JournalEntries,
+    CalendarTasks,
+    CalendarEvents,
   ],
   daos: [
     AccountsDao,
@@ -148,6 +153,7 @@ part 'app_database.g.dart';
     ContentStudioDao,
     MediaLibraryDao,
     JournalDao,
+    CalendarDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -158,7 +164,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 16;
+  int get schemaVersion => 17;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -242,6 +248,10 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 16) {
             await m.createTable(journalEntries);
+          }
+          if (from < 17) {
+            await m.createTable(calendarTasks);
+            await m.createTable(calendarEvents);
           }
         },
       );

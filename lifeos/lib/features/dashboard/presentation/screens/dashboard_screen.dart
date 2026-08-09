@@ -9,6 +9,10 @@ import '../../../../core/widgets/gradient_card.dart';
 import '../../../creator_studio/domain/entities/content_goal.dart';
 import '../../../creator_studio/domain/entities/content_project.dart';
 import '../../../creator_studio/domain/services/content_pipeline_stats.dart';
+import '../../../calendar/domain/entities/calendar_event.dart';
+import '../../../calendar/domain/entities/calendar_task.dart';
+import '../../../calendar/domain/services/calendar_stats.dart';
+import '../../../calendar/presentation/providers/calendar_providers.dart';
 import '../../../creator_studio/presentation/providers/content_studio_providers.dart';
 import '../../../entertainment/domain/entities/media_item.dart';
 import '../../../entertainment/domain/entities/media_status.dart';
@@ -25,10 +29,10 @@ import '../widgets/module_summary_card.dart';
 /// The LifeOS home screen: a single glance at every module. Finance's net
 /// worth, Fitness's active plan, Habits' weekly completion, Goals' active
 /// count, Creator Studio's weekly-upload, Entertainment's
-/// currently-playing and Journal's written-today tiles are wired to real
-/// data; every other tile is a placeholder until that module's own
-/// feature pass lands, but they're already tappable so the whole app is
-/// navigable end to end.
+/// currently-playing, Journal's written-today and Calendar's
+/// today's-schedule tiles are wired to real data; every other tile is a
+/// placeholder until that module's own feature pass lands, but they're
+/// already tappable so the whole app is navigable end to end.
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -104,6 +108,12 @@ class DashboardScreen extends ConsumerWidget {
       loading: () => '—',
       error: (_, __) => '—',
     );
+
+    final AsyncValue<List<CalendarTask>> calendarTasks = ref.watch(allTasksProvider);
+    final AsyncValue<List<CalendarEvent>> calendarEvents = ref.watch(allEventsProvider);
+    final String todaysScheduleValue = calendarTasks.hasValue && calendarEvents.hasValue
+        ? '${CalendarStats.tasksOnDate(calendarTasks.value!, DateTime.now()).length + CalendarStats.eventsOnDate(calendarEvents.value!, DateTime.now()).length} today'
+        : '—';
 
     return Scaffold(
       appBar: AppBar(
@@ -234,7 +244,7 @@ class DashboardScreen extends ConsumerWidget {
               ),
               ModuleSummaryCard(
                 label: 'Today\'s schedule',
-                value: '0 tasks',
+                value: todaysScheduleValue,
                 subtitle: 'Calendar',
                 icon: Icons.calendar_month_rounded,
                 gradient: LinearGradient(

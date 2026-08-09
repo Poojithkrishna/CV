@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/calendar/presentation/screens/calendar_home_screen.dart';
+import '../../features/calendar/presentation/screens/event_form_screen.dart';
+import '../../features/calendar/presentation/screens/task_form_screen.dart';
 import '../../features/creator_studio/presentation/screens/clip_form_screen.dart';
 import '../../features/creator_studio/presentation/screens/clip_library_screen.dart';
 import '../../features/creator_studio/presentation/screens/content_analytics_screen.dart';
@@ -564,6 +566,28 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/calendar',
       builder: (context, state) => const CalendarHomeScreen(),
+      routes: [
+        GoRoute(
+          path: 'tasks/new',
+          builder: (context, state) => const TaskFormScreen(),
+        ),
+        GoRoute(
+          path: 'tasks/:id/edit',
+          builder: (context, state) => TaskFormScreen(
+            taskId: state.pathParameters['id'],
+          ),
+        ),
+        GoRoute(
+          path: 'events/new',
+          builder: (context, state) => const EventFormScreen(),
+        ),
+        GoRoute(
+          path: 'events/:id/edit',
+          builder: (context, state) => EventFormScreen(
+            eventId: state.pathParameters['id'],
+          ),
+        ),
+      ],
     ),
     GoRoute(
       path: '/gamification',

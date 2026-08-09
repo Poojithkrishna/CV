@@ -19,6 +19,7 @@ class AppFormatters {
 
   static final DateFormat _shortDate = DateFormat('d MMM yyyy');
   static final DateFormat _monthYear = DateFormat('MMMM yyyy');
+  static final DateFormat _time = DateFormat('h:mm a');
 
   static String currency(num amount) => _currency.format(amount);
 
@@ -27,6 +28,8 @@ class AppFormatters {
   static String shortDate(DateTime date) => _shortDate.format(date);
 
   static String monthYear(DateTime date) => _monthYear.format(date);
+
+  static String time(DateTime date) => _time.format(date);
 
   static String relativeDay(DateTime date) {
     final DateTime now = DateTime.now();

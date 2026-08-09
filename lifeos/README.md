@@ -226,9 +226,30 @@ Built feature by feature. So far:
   `go_router`'s `extra` (the app's first use of it, since every earlier
   form screen only ever needed a path parameter). The dashboard's
   "Today's journal" tile shows whether anything's been written today.
-- 🚧 Every other module (Calendar, Gamification) has a placeholder
-  screen wired into navigation, ready for its own feature pass — see
-  `lib/features/<module>/presentation/screens/*_home_screen.dart`.
+- ✅ **Calendar & Tasks**: two related entities, one shared `CalendarDao`
+  covering both tables — the same one-DAO-per-feature-group shape as
+  `ContentStudioDao` covering Content Projects + Clips. `CalendarTask` is
+  due-date-driven (an optional `dueDate`, plus an `isTimeBlocked` flag
+  that makes the date's time-of-day meaningful for "time blocking" a
+  task onto an hour rather than inventing a second date column) with a
+  `TaskPriority` (low/medium/high, same label+icon+color enum shape as
+  `TransactionType`/`JournalEntryType`) and a done/undone toggle —
+  `CalendarDao.toggleTaskDone` is the same flip-an-existing-row
+  transaction as `GoalsDao.toggleMilestone`. `CalendarEvent` is
+  start/end-time-driven instead (with an all-day flag and optional
+  location); `CreateEvent`/`UpdateEvent` reject an end time before the
+  start. Both carry a `reminderEnabled` flag, stored but not yet wired
+  to `flutter_local_notifications` — same "declared, not yet firing"
+  state as `Loan.reminderEnabled`. The home hub is a 7-day week-strip
+  date picker over a merged events-then-tasks agenda for the selected
+  day (`CalendarStats.tasksOnDate`/`eventsOnDate`), with a bottom-sheet
+  chooser on the FAB for "New task" vs. "New event" — no calendar-grid
+  package needed since a week strip plus day agenda covers the spec's
+  "daily/weekly planner" without one. The dashboard's "Today's schedule"
+  tile shows the combined count of today's tasks and events.
+- 🚧 Gamification has a placeholder screen wired into navigation, ready
+  for its own feature pass — see
+  `lib/features/gamification/presentation/screens/gamification_home_screen.dart`.
 
 ## Architecture
 
@@ -308,8 +329,10 @@ Goals (`CreateGoal`/`AddMilestone`), Creator Studio
 `MoveProjectToStage`, including the first-publish-only `publishedDate`
 stamping), Entertainment (`CreateMediaItem`/`UpdateMediaStatus`,
 including the first-arrival-only `startedDate`/`completedDate`
-stamping, and `LogMediaProgress`) and Journal (`CreateJournalEntry`/
-`UpdateJournalEntry`/`DeleteJournalEntry`); `RecurrenceFrequency`'s date math
+stamping, and `LogMediaProgress`), Journal (`CreateJournalEntry`/
+`UpdateJournalEntry`/`DeleteJournalEntry`) and Calendar (`CreateTask`/
+`ToggleTaskDone`, and `CreateEvent`'s end-before-start rejection);
+`RecurrenceFrequency`'s date math
 (leap years, month-length clamping) and `MarkRecurringPaymentPaid`'s
 orchestration; `WorkoutStats`'s volume and progression-suggestion math,
 `StrengthProgressStats`'s Epley 1RM estimate and same-day-best
@@ -327,7 +350,9 @@ progress-fraction clamping (including the no-total-set and zero-total
 null cases) and average-rating-of-the-rated-only math, and
 `JournalStats`'s current-streak math (today's pass-if-unwritten rule,
 multiple same-day entries counting once, breaking on the first prior
-gap) and mood/type aggregation; DAO behaviour against an in-memory SQLite
+gap) and mood/type aggregation, and `CalendarStats`'s same-day task/
+event filtering, pending count and overdue-excludes-done-and-dateless
+filtering; DAO behaviour against an in-memory SQLite
 database for `AccountsDao`/`TransactionsDao`/`CreditCardsDao`/
 `CardEmisDao`/`LoansDao` (balance and payment math, including
 edit/delete reverting the right effect), `InvestmentsDao`/`AssetsDao`
@@ -346,8 +371,10 @@ captured-at-ordered streams, deleting a linked project setting a clip's
 row's upsert never crashing on a re-save), `MediaLibraryDao`
 (alphabetical ordering, and `adjustProgress`'s accumulate-delta math —
 floored at zero, capped at `totalProgress`, a no-op for a missing id)
-and `JournalDao` (date-then-creation-time ordering, a null mood
-round-tripping as null); and `AccountCard` widget rendering.
+`JournalDao` (date-then-creation-time ordering, a null mood
+round-tripping as null) and `CalendarDao` (due-date/start-time ordering
+across its two tables, `toggleTaskDone`'s flip-and-idempotent behavior
+including a no-op for a missing id); and `AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -367,6 +394,5 @@ Suggested order for the next feature passes (say which one you want and
 it'll get the same full treatment — models → repository → use cases →
 providers → UI → widgets → validation → tests):
 
-1. Calendar & Tasks
-2. Gamification (ranks, XP, attributes, achievements, Life Score) —
+1. Gamification (ranks, XP, attributes, achievements, Life Score) —
    wiring dashboard stats to real data from the modules above as they land
