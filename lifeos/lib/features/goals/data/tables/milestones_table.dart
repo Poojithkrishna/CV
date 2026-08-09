@@ -1,7 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'goals_table.dart';
-
 @DataClassName('MilestoneRow')
 class Milestones extends Table {
   TextColumn get id => text()();

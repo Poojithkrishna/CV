@@ -1,8 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'exercises_table.dart';
-import 'workout_days_table.dart';
-
 @DataClassName('PlanExerciseRow')
 class PlanExercises extends Table {
   TextColumn get id => text()();

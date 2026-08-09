@@ -1,8 +1,5 @@
 import 'package:drift/drift.dart';
 
-import '../../../habits/data/tables/habits_table.dart';
-import 'goals_table.dart';
-
 /// Join table linking a goal to habits that contribute to it (e.g. a
 /// "Run a marathon" goal linked to a daily "Go for a run" habit). Purely
 /// informational — logging the habit doesn't move the goal's own

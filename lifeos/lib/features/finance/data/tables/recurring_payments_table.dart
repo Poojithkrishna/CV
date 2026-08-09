@@ -1,8 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'accounts_table.dart';
-import 'categories_table.dart';
-
 @DataClassName('RecurringPaymentRow')
 class RecurringPayments extends Table {
   TextColumn get id => text()();

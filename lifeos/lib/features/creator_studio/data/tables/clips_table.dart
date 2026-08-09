@@ -1,7 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'content_projects_table.dart';
-
 @DataClassName('ClipRow')
 class Clips extends Table {
   TextColumn get id => text()();

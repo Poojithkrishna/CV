@@ -1,7 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'credit_cards_table.dart';
-
 @DataClassName('CardEmiRow')
 class CardEmis extends Table {
   TextColumn get id => text()();

@@ -1,8 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'accounts_table.dart';
-import 'categories_table.dart';
-
 /// SQLite schema for a single income/expense/transfer entry. A transfer
 /// uses [accountId] as the source and [transferAccountId] as the
 /// destination; [categoryId] stays null for transfers since money moving

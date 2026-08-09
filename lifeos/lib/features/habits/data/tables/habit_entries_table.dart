@@ -1,7 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'habits_table.dart';
-
 @DataClassName('HabitEntryRow')
 class HabitEntries extends Table {
   TextColumn get id => text()();

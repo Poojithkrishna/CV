@@ -1,7 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'supplements_table.dart';
-
 /// One entry per supplement per calendar day — toggled by
 /// `SupplementsDao.toggleTaken`, mirroring `HabitEntries`.
 @DataClassName('SupplementLogEntryRow')

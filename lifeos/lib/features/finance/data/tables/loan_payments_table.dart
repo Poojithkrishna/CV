@@ -1,7 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'loans_table.dart';
-
 @DataClassName('LoanPaymentRow')
 class LoanPayments extends Table {
   TextColumn get id => text()();
