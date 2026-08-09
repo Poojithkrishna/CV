@@ -501,12 +501,41 @@ Built feature by feature. So far:
   just forms) — kept separate from the plugin/router calls in
   `notification_deep_link_service.dart`, mirroring the widget's own
   split. `NotificationService` grew the same two entry points as the
-  widget: `onNotificationTapped` (a broadcast stream fed by
+  widget: `onNotificationResponse` (a broadcast stream fed by
   `onDidReceiveNotificationResponse`, registered during `initialize()`)
-  for a tap while the app's alive, and `initialLaunchPayload()`
+  for a tap while the app's alive, and `initialLaunchResponse()`
   (`getNotificationAppLaunchDetails()`) for a tap that launches the
   process fresh, awaited in `main()` before `runApp` for the same
   no-flash reason.
+- ✅ **Notification action buttons**: Task due and Bill due reminders
+  now carry a "Mark done"/"Mark paid" button alongside "Snooze"; Loan
+  due and Upcoming event only get "Snooze" — a loan can't be settled
+  without a payment amount a notification button can't collect, and an
+  event has no "done" state at all. Every reminder's payload grew from
+  a bare `lifeos://notification/<type>/<id>` to also carry its title/body
+  as query parameters (`buildNotificationPayload`/`notificationContentFromPayload`
+  in `notification_deep_link.dart`), so a Snooze can reschedule the
+  exact same notification content three hours later without re-fetching
+  the entity from the database. `notification_actions.dart` centralizes
+  the action ids, the snooze duration, and `actionsFor(type)` — the one
+  place deciding which buttons each reminder type gets, reused both when
+  a reminder is first scheduled and when Snooze re-attaches the same
+  buttons to its reschedule. Handling an action tap needs cross-feature
+  use cases (`ToggleTaskDone`, `MarkRecurringPaymentPaid`) rather than
+  just a route, so `handleNotificationActionResponse` lives at the
+  composition root (`lib/app/notification_action_handler.dart`) instead
+  of feature-agnostic `core/`, the same reasoning `app_router.dart`
+  already follows for importing every feature's screens; "Mark paid"
+  uses the payment's own scheduled amount, since there's no dialog to
+  collect a different actual amount the way the in-app button has. Every
+  action button is deliberately `showsUserInterface: true` — tapping one
+  always foregrounds (or cold-launches) the app to handle the tap through
+  the same response pipeline already wired for plain taps, rather than
+  requiring a separate background-isolate entry point that can run Dart
+  code (and reopen the database) while the app process is fully killed;
+  it's a little less instant than a true no-open quick action, but avoids
+  a second, much more complex code path for something that still
+  completes in under a second.
 
 ## Architecture
 
@@ -656,7 +685,11 @@ rather than duplicating, distinct dates are kept and ordered ascending);
 uri, an unrecognized section, a path with no segments, and a mismatched
 scheme/host); `routeForNotificationPayload`'s equivalent for the four
 reminder types (plus a payload that isn't a valid uri at all and one
-missing its id segment); and `AccountCard` widget rendering.
+missing its id segment); `buildNotificationPayload`/`notificationContentFromPayload`
+round-tripping title/body (including reserved uri characters like `&`
+and `?`) and defaulting to empty strings when absent; `actionsFor`'s
+per-type button set (and that every action shows the app UI when
+tapped); and `AccountCard` widget rendering.
 
 ## Data & privacy
 
@@ -720,6 +753,11 @@ Reminder notifications got the same treatment: tapping a Loan due,
 Bill due, Task due or Upcoming event notification now opens that exact
 loan/bill/task/event instead of just opening the app (see "Notification
 deep-linking" above).
+
+Task due and Bill due reminders also picked up quick-action buttons —
+"Mark done"/"Mark paid" and "Snooze" — so handling one doesn't always
+require opening the app to the full screen first (see "Notification
+action buttons" above).
 
 There's no outstanding polish item left from the original spec or from
 any pass since. Future work is open-ended from here — say what you'd

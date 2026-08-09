@@ -21,13 +21,17 @@ class NotificationService {
   static const String _channelDescription =
       'Due-date and event reminders for loans, bills, tasks and calendar events.';
 
-  final StreamController<String?> _tapController = StreamController<String?>.broadcast();
+  final StreamController<NotificationResponse> _responseController =
+      StreamController<NotificationResponse>.broadcast();
 
-  /// Emits a notification's payload every time one is tapped while the
-  /// app process is already alive (foreground or background) — the
-  /// "warm" counterpart to [initialLaunchPayload]'s cold-start case. See
-  /// `notification_deep_link_service.dart` for how this drives routing.
-  Stream<String?> get onNotificationTapped => _tapController.stream;
+  /// Emits every time a notification (or one of its action buttons) is
+  /// tapped while the app process is already alive (foreground or
+  /// background) — the "warm" counterpart to [initialLaunchResponse]'s
+  /// cold-start case. `response.notificationResponseType` distinguishes
+  /// a plain tap from an action button, and `response.actionId` names
+  /// which one; see `notification_deep_link_service.dart` (routing) and
+  /// `notification_action_handler.dart` (Mark done/paid, Snooze).
+  Stream<NotificationResponse> get onNotificationResponse => _responseController.stream;
 
   Future<void> initialize() async {
     if (_initialized) return;
@@ -47,7 +51,7 @@ class NotificationService {
     await _plugin.initialize(
       const InitializationSettings(android: androidSettings),
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        _tapController.add(response.payload);
+        _responseController.add(response);
       },
     );
 
@@ -67,13 +71,13 @@ class NotificationService {
     _initialized = true;
   }
 
-  /// The payload of the notification that launched the app process
+  /// The response for the notification that launched the app process
   /// fresh (cold start), or `null` if the app wasn't launched that way
-  /// — the counterpart to [onNotificationTapped]'s warm-tap stream.
-  Future<String?> initialLaunchPayload() async {
+  /// — the counterpart to [onNotificationResponse]'s warm-tap stream.
+  Future<NotificationResponse?> initialLaunchResponse() async {
     final NotificationAppLaunchDetails? details = await _plugin.getNotificationAppLaunchDetails();
     if (details == null || !details.didNotificationLaunchApp) return null;
-    return details.notificationResponse?.payload;
+    return details.notificationResponse;
   }
 
   /// Schedules a one-time reminder at [dateTime], replacing whatever was
@@ -82,12 +86,16 @@ class NotificationService {
   /// by. [payload] (a `lifeos://notification/<type>/<id>` string — see
   /// `notification_deep_link.dart`) is handed back verbatim when the
   /// notification is tapped, so the app can open the entity it's about.
+  /// [actions] attaches quick-action buttons (Mark done, Snooze — see
+  /// `notification_actions.dart`); omit for reminder types that don't
+  /// have any.
   Future<void> scheduleAt({
     required int id,
     required String title,
     required String body,
     required DateTime dateTime,
     String? payload,
+    List<AndroidNotificationAction>? actions,
   }) async {
     await cancel(id);
     if (!dateTime.isAfter(DateTime.now())) return;
@@ -97,13 +105,14 @@ class NotificationService {
       title,
       body,
       tz.TZDateTime.from(dateTime, tz.local),
-      const NotificationDetails(
+      NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,
           channelDescription: _channelDescription,
           importance: Importance.high,
           priority: Priority.high,
+          actions: actions,
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,

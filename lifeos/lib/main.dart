@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/app.dart';
+import 'app/notification_action_handler.dart';
 import 'app/router/app_router.dart';
 import 'core/home_widget/home_widget_deep_link_service.dart';
 import 'core/notifications/notification_deep_link_service.dart';
@@ -24,8 +25,17 @@ Future<void> main() async {
   listenForWidgetTaps(appRouter);
   await handleInitialWidgetLaunch(appRouter);
 
+  // Plain taps route via GoRouter; action-button taps (Mark done/paid,
+  // Snooze) perform a mutation instead — see
+  // `notification_action_handler.dart` for why that needs the full
+  // provider container rather than just a router.
   listenForNotificationTaps(notificationService, appRouter);
   await handleInitialNotificationLaunch(notificationService, appRouter);
+
+  notificationService.onNotificationResponse.listen(
+    (response) => handleNotificationActionResponse(container, response),
+  );
+  await handleNotificationActionResponse(container, await notificationService.initialLaunchResponse());
 
   runApp(UncontrolledProviderScope(container: container, child: const LifeOsApp()));
 }

@@ -43,4 +43,46 @@ void main() {
       expect(routeForNotificationPayload('lifeos://not-notification/loan/l1'), isNull);
     });
   });
+
+  group('buildNotificationPayload / notificationContentFromPayload', () {
+    test('round-trips type, id, title and body', () {
+      final Uri payload = buildNotificationPayload(
+        type: notificationTypeTask,
+        id: 't1',
+        title: 'Task due',
+        body: 'Buy groceries',
+      );
+
+      final NotificationContent? content = notificationContentFromPayload(payload.toString());
+
+      expect(content, isNotNull);
+      expect(content!.type, notificationTypeTask);
+      expect(content.id, 't1');
+      expect(content.title, 'Task due');
+      expect(content.body, 'Buy groceries');
+    });
+
+    test('round-trips a body containing reserved uri characters', () {
+      final Uri payload = buildNotificationPayload(
+        type: notificationTypeRecurringPayment,
+        id: 'p1',
+        title: 'Bill due soon',
+        body: 'Electricity — ₹500 due 12/08 & tax? included',
+      );
+
+      final NotificationContent? content = notificationContentFromPayload(payload.toString());
+
+      expect(content!.body, 'Electricity — ₹500 due 12/08 & tax? included');
+    });
+
+    test('returns empty strings for title/body when absent from the payload', () {
+      final content = notificationContentFromPayload('lifeos://notification/loan/l1');
+      expect(content!.title, '');
+      expect(content.body, '');
+    });
+
+    test('returns null for a null payload', () {
+      expect(notificationContentFromPayload(null), isNull);
+    });
+  });
 }

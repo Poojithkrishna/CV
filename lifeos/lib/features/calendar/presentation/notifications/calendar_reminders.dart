@@ -1,3 +1,5 @@
+import '../../../../core/notifications/notification_actions.dart';
+import '../../../../core/notifications/notification_deep_link.dart';
 import '../../../../core/notifications/notification_ids.dart';
 import '../../../../core/notifications/notification_service.dart';
 import '../../../../core/utils/formatters.dart';
@@ -27,12 +29,18 @@ Future<void> syncTaskReminder(NotificationService service, CalendarTask task) as
     return;
   }
 
+  const String title = 'Task due';
+  final String body = task.title;
+
   await service.scheduleAt(
     id: id,
-    title: 'Task due',
-    body: task.title,
+    title: title,
+    body: body,
     dateTime: reminderTime,
-    payload: 'lifeos://notification/task/${task.id}',
+    payload:
+        buildNotificationPayload(type: notificationTypeTask, id: task.id, title: title, body: body)
+            .toString(),
+    actions: actionsFor(notificationTypeTask),
   );
 }
 
@@ -65,14 +73,23 @@ Future<void> syncEventReminder(NotificationService service, CalendarEvent event)
     return;
   }
 
+  const String title = 'Upcoming event';
+  final String body = event.isAllDay
+      ? '${event.title} — today'
+      : '${event.title} at ${AppFormatters.time(event.startTime)}';
+
   await service.scheduleAt(
     id: id,
-    title: 'Upcoming event',
-    body: event.isAllDay
-        ? '${event.title} — today'
-        : '${event.title} at ${AppFormatters.time(event.startTime)}',
+    title: title,
+    body: body,
     dateTime: reminderTime,
-    payload: 'lifeos://notification/event/${event.id}',
+    payload: buildNotificationPayload(
+      type: notificationTypeEvent,
+      id: event.id,
+      title: title,
+      body: body,
+    ).toString(),
+    actions: actionsFor(notificationTypeEvent),
   );
 }
 

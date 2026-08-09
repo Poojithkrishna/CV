@@ -1,3 +1,5 @@
+import '../../../../core/notifications/notification_actions.dart';
+import '../../../../core/notifications/notification_deep_link.dart';
 import '../../../../core/notifications/notification_ids.dart';
 import '../../../../core/notifications/notification_service.dart';
 import '../../../../core/utils/formatters.dart';
@@ -27,13 +29,19 @@ Future<void> syncLoanReminder(NotificationService service, Loan loan) async {
     return;
   }
 
+  const String title = 'Loan due soon';
+  final String body = '${loan.personName} — ${AppFormatters.currency(loan.remainingAmount)} '
+      'due ${AppFormatters.shortDate(loan.dueDate!)}.';
+
   await service.scheduleAt(
     id: id,
-    title: 'Loan due soon',
-    body: '${loan.personName} — ${AppFormatters.currency(loan.remainingAmount)} '
-        'due ${AppFormatters.shortDate(loan.dueDate!)}.',
+    title: title,
+    body: body,
     dateTime: reminderTime,
-    payload: 'lifeos://notification/loan/${loan.id}',
+    payload:
+        buildNotificationPayload(type: notificationTypeLoan, id: loan.id, title: title, body: body)
+            .toString(),
+    actions: actionsFor(notificationTypeLoan),
   );
 }
 

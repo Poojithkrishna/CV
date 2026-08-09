@@ -1,3 +1,5 @@
+import '../../../../core/notifications/notification_actions.dart';
+import '../../../../core/notifications/notification_deep_link.dart';
 import '../../../../core/notifications/notification_ids.dart';
 import '../../../../core/notifications/notification_service.dart';
 import '../../../../core/utils/formatters.dart';
@@ -28,13 +30,22 @@ Future<void> syncRecurringPaymentReminder(NotificationService service, Recurring
     return;
   }
 
+  const String title = 'Bill due soon';
+  final String body = '${payment.name} — ${AppFormatters.currency(payment.amount)} '
+      'due ${AppFormatters.shortDate(payment.nextDueDate)}.';
+
   await service.scheduleAt(
     id: id,
-    title: 'Bill due soon',
-    body: '${payment.name} — ${AppFormatters.currency(payment.amount)} '
-        'due ${AppFormatters.shortDate(payment.nextDueDate)}.',
+    title: title,
+    body: body,
     dateTime: reminderTime,
-    payload: 'lifeos://notification/recurring-payment/${payment.id}',
+    payload: buildNotificationPayload(
+      type: notificationTypeRecurringPayment,
+      id: payment.id,
+      title: title,
+      body: body,
+    ).toString(),
+    actions: actionsFor(notificationTypeRecurringPayment),
   );
 }
 
