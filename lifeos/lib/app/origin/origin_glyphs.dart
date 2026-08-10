@@ -2,11 +2,14 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-/// The Origin Glyph family (spec §5) — one small, monoline vector mark per
-/// domain, replacing Material icons as Demon Origin's primary iconography.
-/// Every glyph is drawn on the same normalized 24×24 grid with the same
-/// stroke language (round caps/joins, no fill) so they read as one
-/// designed set rather than icons pulled from a generic library.
+/// The Origin Glyph family (spec §5) — one small vector mark per domain,
+/// replacing Material icons as Demon Origin's primary iconography.
+///
+/// Style: a solid silhouette pictogram (temple, blade-arm, seated figure,
+/// summit-and-standard, camera, popcorn, quill, gear) set inside a spiked
+/// medallion ring — echoing the app icon's own radiating-spike emblem.
+/// Colors always come from the caller (never hardcoded here) so the whole
+/// family stays inside the app's black/white/grey palette.
 enum OriginGlyphType {
   sanctuary,
   wealth,
@@ -35,8 +38,9 @@ class OriginGlyph extends StatelessWidget {
   final Color? color;
   final double strokeWidth;
 
-  /// The selected/active variant — slightly heavier stroke and a soft
-  /// interior fill, used by RuneDock's engraved capsule state.
+  /// The selected/active variant — a heavier medallion ring, used by
+  /// RuneDock's engraved capsule state. The pictogram itself is always a
+  /// solid silhouette regardless of this flag.
   final bool filled;
 
   @override
@@ -70,6 +74,8 @@ class _GlyphPainter extends CustomPainter {
   final double strokeWidth;
   final bool filled;
 
+  static const Offset _c = Offset(12, 12);
+
   @override
   void paint(Canvas canvas, Size size) {
     // Every path below is authored against a 24x24 box, then scaled to fit.
@@ -77,255 +83,274 @@ class _GlyphPainter extends CustomPainter {
     canvas.save();
     canvas.scale(scale, scale);
 
-    final Paint stroke = Paint()
+    final Paint solid = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    final Paint ring = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth / scale
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-    final Paint fill = Paint()
-      ..color = color.withOpacity(0.14)
-      ..style = PaintingStyle.fill;
+      ..strokeWidth = (filled ? strokeWidth * 0.85 : strokeWidth * 0.7) / scale
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round;
 
     switch (type) {
       case OriginGlyphType.sanctuary:
-        _paintSanctuary(canvas, stroke, fill);
+        _paintSanctuary(canvas, solid);
         break;
       case OriginGlyphType.wealth:
-        _paintWealth(canvas, stroke, fill);
+        _drawMedallion(canvas, ring);
+        _paintWealth(canvas, solid);
         break;
       case OriginGlyphType.fitness:
-        _paintFitness(canvas, stroke, fill);
+        _drawMedallion(canvas, ring);
+        _paintFitness(canvas, solid);
         break;
       case OriginGlyphType.cultivation:
-        _paintCultivation(canvas, stroke, fill);
+        _drawMedallion(canvas, ring);
+        _paintCultivation(canvas, solid);
         break;
       case OriginGlyphType.goals:
-        _paintGoals(canvas, stroke, fill);
+        _drawMedallion(canvas, ring);
+        _paintGoals(canvas, solid);
         break;
       case OriginGlyphType.creator:
-        _paintCreator(canvas, stroke, fill);
+        _drawMedallion(canvas, ring);
+        _paintCreator(canvas, solid);
         break;
       case OriginGlyphType.entertainment:
-        _paintEntertainment(canvas, stroke, fill);
+        _drawMedallion(canvas, ring);
+        _paintEntertainment(canvas, solid);
         break;
       case OriginGlyphType.chronicle:
-        _paintChronicle(canvas, stroke, fill);
+        _drawMedallion(canvas, ring);
+        _paintChronicle(canvas, solid);
         break;
       case OriginGlyphType.settings:
-        _paintSettings(canvas, stroke, fill);
+        _paintSettings(canvas, solid, ring);
         break;
       case OriginGlyphType.quickAdd:
-        _paintQuickAdd(canvas, stroke, fill);
+        _drawMedallion(canvas, ring);
+        _paintQuickAdd(canvas, solid);
         break;
     }
     canvas.restore();
   }
 
-  // Four-point Origin star/seal — a compass-rose sigil, echoing the app
-  // icon's spiked emblem without reproducing it.
-  void _paintSanctuary(Canvas canvas, Paint stroke, Paint fill) {
-    const Offset c = Offset(12, 12);
-    Path star = Path();
-    const double outer = 10, inner = 3.6;
-    for (int i = 0; i < 8; i++) {
-      final double angle = (math.pi / 4) * i - math.pi / 2;
+  // A closed star polygon alternating between an outer spike radius and an
+  // inner valley radius — used both for the Sanctuary sigil and as the
+  // shared spiked-medallion ring frame around every other pictogram.
+  static Path _spikeRing(Offset c, double outer, double inner, int spikes) {
+    final Path path = Path();
+    final int total = spikes * 2;
+    for (int i = 0; i < total; i++) {
+      final double angle = (math.pi / spikes) * i - math.pi / 2;
       final double r = i.isEven ? outer : inner;
       final Offset p = c + Offset(math.cos(angle), math.sin(angle)) * r;
       if (i == 0) {
-        star.moveTo(p.dx, p.dy);
+        path.moveTo(p.dx, p.dy);
       } else {
-        star.lineTo(p.dx, p.dy);
+        path.lineTo(p.dx, p.dy);
       }
     }
-    star.close();
-    if (filled) canvas.drawPath(star, fill);
-    canvas.drawPath(star, stroke);
-    canvas.drawCircle(c, 2, stroke);
+    path.close();
+    return path;
   }
 
-  // A treasure chest — domed lid, banded body, a lock plate. Reads
-  // instantly as "treasury" at a glance, where the previous coin+vault
-  // abstraction didn't.
-  void _paintWealth(Canvas canvas, Paint stroke, Paint fill) {
-    final Path body = Path()
-      ..moveTo(4, 12)
-      ..lineTo(4, 18)
-      ..quadraticBezierTo(4, 20, 6, 20)
-      ..lineTo(18, 20)
-      ..quadraticBezierTo(20, 20, 20, 18)
-      ..lineTo(20, 12)
+  void _drawMedallion(Canvas canvas, Paint ring) {
+    canvas.drawPath(_spikeRing(_c, 11.2, 9.5, 14), ring);
+  }
+
+  // The brand sigil — a spiked compass star with a center eye, standing on
+  // its own (no separate medallion; the star's own spikes are the frame).
+  void _paintSanctuary(Canvas canvas, Paint solid) {
+    final Path star = _spikeRing(_c, 10, 3.8, 8);
+    // Punch a small center eye out of the solid star so it doesn't read as
+    // a plain blob at a glance.
+    final Path withEye = Path.combine(
+      PathOperation.difference,
+      star,
+      Path()..addOval(Rect.fromCircle(center: _c, radius: 1.8)),
+    );
+    canvas.drawPath(withEye, solid);
+    canvas.drawCircle(_c, 0.75, solid);
+  }
+
+  // A temple facade — pediment, entablature, three columns, a stepped
+  // plinth. Reads instantly as "treasury/wealth" the way a bank does.
+  void _paintWealth(Canvas canvas, Paint solid) {
+    final Path roof = Path()
+      ..moveTo(6.3, 10)
+      ..lineTo(12, 5.6)
+      ..lineTo(17.7, 10)
       ..close();
-    if (filled) canvas.drawPath(body, fill);
-    canvas.drawPath(body, stroke);
+    canvas.drawPath(roof, solid);
 
-    final Path lid = Path()
-      ..moveTo(4, 12)
-      ..quadraticBezierTo(12, 2.5, 20, 12)
-      ..close();
-    canvas.drawPath(lid, stroke);
+    canvas.drawRect(const Rect.fromLTWH(6.3, 10, 11.4, 1.3), solid);
 
-    // Reinforcing straps, so the silhouette reads as a bound chest rather
-    // than a plain box/briefcase.
-    canvas.drawLine(const Offset(7.5, 12), const Offset(7.5, 20), stroke);
-    canvas.drawLine(const Offset(16.5, 12), const Offset(16.5, 20), stroke);
+    for (final double x in [7.9, 11.35, 14.8]) {
+      canvas.drawRect(Rect.fromLTWH(x, 11.5, 1.5, 4.7), solid);
+    }
 
+    canvas.drawRect(const Rect.fromLTWH(6, 16.2, 12, 1.1), solid);
+    canvas.drawRect(const Rect.fromLTWH(5.4, 17.3, 13.2, 1, ), solid);
+  }
+
+  // A dumbbell — two weight plates joined by a bar, unambiguous at small
+  // sizes where the previous flexed-arm silhouette read as a blob.
+  void _paintFitness(Canvas canvas, Paint solid) {
+    final RRect leftPlate = RRect.fromRectAndRadius(
+      const Rect.fromLTWH(5.6, 8.6, 3.2, 6.8),
+      const Radius.circular(1.1),
+    );
+    final RRect rightPlate = RRect.fromRectAndRadius(
+      const Rect.fromLTWH(15.2, 8.6, 3.2, 6.8),
+      const Radius.circular(1.1),
+    );
+    canvas.drawRRect(leftPlate, solid);
+    canvas.drawRRect(rightPlate, solid);
+    canvas.drawRect(const Rect.fromLTWH(6.6, 7, 1.2, 10), solid);
+    canvas.drawRect(const Rect.fromLTWH(16.2, 7, 1.2, 10), solid);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(const Rect.fromLTWH(10, 13, 4, 4), const Radius.circular(1)),
-      stroke,
+      RRect.fromRectAndRadius(const Rect.fromLTWH(8.8, 10.7, 6.4, 2.6), const Radius.circular(1)),
+      solid,
     );
   }
 
-  // A single upright relic blade — pointed blade, crossguard, grip and
-  // pommel. Reads as "training/combat" clearly, where crossed lines read
-  // as a plain cancel/close mark instead.
-  void _paintFitness(Canvas canvas, Paint stroke, Paint fill) {
-    final Path blade = Path()
-      ..moveTo(12, 3)
-      ..lineTo(13.4, 14)
-      ..lineTo(12, 16)
-      ..lineTo(10.6, 14)
-      ..close();
-    if (filled) canvas.drawPath(blade, fill);
-    canvas.drawPath(blade, stroke);
+  // A seated, robed figure in meditation — round head, small topknot, a
+  // crossed-leg base. Reads as "cultivation/practice," not a chart icon.
+  void _paintCultivation(Canvas canvas, Paint solid) {
+    canvas.drawCircle(const Offset(12, 8.1), 1.9, solid);
+    canvas.drawCircle(const Offset(12, 5.9), 0.7, solid);
 
-    canvas.drawLine(const Offset(8, 15.5), const Offset(16, 15.5), stroke);
-    canvas.drawLine(const Offset(8, 15.5), const Offset(7, 17), stroke);
-    canvas.drawLine(const Offset(16, 15.5), const Offset(17, 17), stroke);
-    canvas.drawLine(const Offset(12, 16), const Offset(12, 19.5), stroke);
-    canvas.drawCircle(const Offset(12, 20.5), 1.1, filled ? fill : stroke);
+    final Path robe = Path()
+      ..moveTo(9.4, 11)
+      ..cubicTo(9.4, 9.9, 14.6, 9.9, 14.6, 11)
+      ..lineTo(16.6, 16.3)
+      ..cubicTo(16.7, 17.4, 15, 17.8, 13.3, 17)
+      ..cubicTo(12, 17.6, 12, 17.6, 10.7, 17)
+      ..cubicTo(9, 17.8, 7.3, 17.4, 7.4, 16.3)
+      ..close();
+    canvas.drawPath(robe, solid);
   }
 
-  // A flame contained inside a shield outline.
-  void _paintCultivation(Canvas canvas, Paint stroke, Paint fill) {
-    final Path shield = Path()
-      ..moveTo(12, 3)
-      ..lineTo(19, 6)
-      ..lineTo(19, 12)
-      ..cubicTo(19, 17, 15.5, 19.5, 12, 21)
-      ..cubicTo(8.5, 19.5, 5, 17, 5, 12)
-      ..lineTo(5, 6)
+  // A twin-peak summit with a standard planted on the highest point.
+  void _paintGoals(Canvas canvas, Paint solid) {
+    final Path summit = Path()
+      ..moveTo(5.3, 18.2)
+      ..lineTo(9.8, 9.6)
+      ..lineTo(12.4, 13.2)
+      ..lineTo(15.4, 7.6)
+      ..lineTo(18.7, 18.2)
       ..close();
-    if (filled) canvas.drawPath(shield, fill);
-    canvas.drawPath(shield, stroke);
+    canvas.drawPath(summit, solid);
 
-    // A classic two-curve flame silhouette (outer lick, inner notch)
-    // rather than the busy multi-cubic version this replaced.
-    final Path flame = Path()
-      ..moveTo(12, 8)
-      ..cubicTo(15, 11, 15, 14.5, 12.5, 16.5)
-      ..cubicTo(13.3, 15, 12.4, 13.6, 11.4, 13.2)
-      ..cubicTo(11.7, 14.4, 10.9, 15.2, 10.6, 16.5)
-      ..cubicTo(8.2, 14, 8.6, 10.5, 12, 8)
-      ..close();
-    canvas.drawPath(flame, Paint()..color = color);
-  }
-
-  // Ascending standard/banner — a pole with a pennant tapering upward.
-  void _paintGoals(Canvas canvas, Paint stroke, Paint fill) {
-    canvas.drawLine(const Offset(7, 4), const Offset(7, 21), stroke);
+    canvas.drawRect(const Rect.fromLTWH(15.1, 3.4, 0.7, 4.6), solid);
     final Path pennant = Path()
-      ..moveTo(7, 5)
-      ..lineTo(18, 8)
-      ..lineTo(13.5, 11)
-      ..lineTo(18, 14)
-      ..lineTo(7, 11)
+      ..moveTo(15.8, 3.5)
+      ..lineTo(19.6, 5.1)
+      ..lineTo(15.8, 6.8)
       ..close();
-    if (filled) canvas.drawPath(pennant, fill);
-    canvas.drawPath(pennant, stroke);
+    canvas.drawPath(pennant, solid);
   }
 
-  // A clapperboard — instantly reads as "content creation," where the
-  // previous camera-aperture abstraction looked like a burst of lines.
-  void _paintCreator(Canvas canvas, Paint stroke, Paint fill) {
-    final RRect board =
-        RRect.fromRectAndRadius(const Rect.fromLTWH(4.5, 9, 15, 11), const Radius.circular(1.5));
-    if (filled) canvas.drawRRect(board, fill);
-    canvas.drawRRect(board, stroke);
-
-    final Path clapperTop = Path()
-      ..moveTo(4.5, 9)
-      ..lineTo(19.5, 9)
-      ..lineTo(18, 5)
-      ..lineTo(3, 5)
+  // A camera — body, viewfinder hump, and a lens punched out as a ring +
+  // center dot via a boolean cutout (not a stroke drawn over a fill).
+  void _paintCreator(Canvas canvas, Paint solid) {
+    final Path body = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+        const Rect.fromLTWH(6.3, 10, 11.4, 7.2),
+        const Radius.circular(1.4),
+      ));
+    final Path viewfinder = Path()
+      ..moveTo(9.4, 10)
+      ..lineTo(9.7, 8)
+      ..lineTo(13.3, 8)
+      ..lineTo(13.6, 10)
       ..close();
-    canvas.drawPath(clapperTop, stroke);
-    canvas.drawLine(const Offset(6.6, 5), const Offset(8.3, 9), stroke);
-    canvas.drawLine(const Offset(10.6, 5), const Offset(12.3, 9), stroke);
-    canvas.drawLine(const Offset(14.6, 5), const Offset(16.3, 9), stroke);
+    final Path camera = Path.combine(PathOperation.union, body, viewfinder);
+    final Path lensHole = Path()
+      ..addOval(Rect.fromCircle(center: const Offset(12, 13.7), radius: 2.5));
+    final Path cut = Path.combine(PathOperation.difference, camera, lensHole);
+    canvas.drawPath(cut, solid);
+    canvas.drawCircle(const Offset(12, 13.7), 0.9, solid);
   }
 
-  // Three-card/play sigil — overlapping card shapes with a small play mark.
-  void _paintEntertainment(Canvas canvas, Paint stroke, Paint fill) {
-    RRect card(double dx) => RRect.fromRectAndRadius(
-          Rect.fromLTWH(4.5 + dx, 5 + dx * 0.6, 12, 15),
-          const Radius.circular(2),
-        );
-    canvas.drawRRect(card(3), stroke);
-    canvas.drawRRect(card(1.5), stroke);
-    final RRect front = card(0);
-    if (filled) canvas.drawRRect(front, fill);
-    canvas.drawRRect(front, stroke);
-    final Path play = Path()
-      ..moveTo(9.5, 9.5)
-      ..lineTo(9.5, 15.5)
-      ..lineTo(14, 12.5)
+  // A popcorn bucket — striped body (via boolean-cut vertical gaps) with
+  // three kernel bumps cresting the rim.
+  void _paintEntertainment(Canvas canvas, Paint solid) {
+    final Path bucket = Path()
+      ..moveTo(8.3, 11)
+      ..lineTo(15.7, 11)
+      ..lineTo(14.6, 18.3)
+      ..lineTo(9.4, 18.3)
       ..close();
-    canvas.drawPath(play, stroke);
+    final Path stripes = Path.combine(
+      PathOperation.union,
+      Path()..addRect(const Rect.fromLTWH(10.5, 11, 1, 7.3)),
+      Path()..addRect(const Rect.fromLTWH(13, 11, 1, 7.3)),
+    );
+    canvas.drawPath(Path.combine(PathOperation.difference, bucket, stripes), solid);
+
+    canvas.drawCircle(const Offset(9.6, 9.9), 1.5, solid);
+    canvas.drawCircle(const Offset(12, 8.6), 1.7, solid);
+    canvas.drawCircle(const Offset(14.4, 9.9), 1.5, solid);
   }
 
-  // An open grimoire with a small timeline tick beneath it.
-  void _paintChronicle(Canvas canvas, Paint stroke, Paint fill) {
-    final Path book = Path()
-      ..moveTo(12, 6.5)
-      ..cubicTo(10.3, 5.2, 6.5, 5, 4.5, 5.6)
-      ..lineTo(4.5, 16.5)
-      ..cubicTo(6.5, 15.8, 10.3, 16, 12, 17.3)
-      ..cubicTo(13.7, 16, 17.5, 15.8, 19.5, 16.5)
-      ..lineTo(19.5, 5.6)
-      ..cubicTo(17.5, 5, 13.7, 5.2, 12, 6.5)
+  // A quill above an inkwell — the feather as a single tapered silhouette,
+  // the well as a small squat pot with a rim.
+  void _paintChronicle(Canvas canvas, Paint solid) {
+    canvas.drawOval(const Rect.fromLTWH(8.1, 15.1, 4.6, 1.4), solid);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(8.4, 15.9, 4, 2.3),
+        const Radius.circular(0.6),
+      ),
+      solid,
+    );
+
+    final Path quill = Path()
+      ..moveTo(17.6, 5.7)
+      ..cubicTo(14, 9, 10.6, 13, 10.3, 16.4)
+      ..lineTo(11.7, 15.1)
+      ..cubicTo(12.6, 11.4, 15.6, 7.9, 18.1, 6)
       ..close();
-    if (filled) canvas.drawPath(book, fill);
-    canvas.drawPath(book, stroke);
-    canvas.drawLine(const Offset(12, 6.5), const Offset(12, 17.3), stroke);
-    canvas.drawLine(const Offset(6, 19.5), const Offset(18, 19.5), stroke);
-    canvas.drawCircle(const Offset(9, 19.5), 0.9, Paint()..color = color);
-    canvas.drawCircle(const Offset(15, 19.5), 0.9, Paint()..color = color);
+    canvas.drawPath(quill, solid);
   }
 
-  // An arcane gear — blocky rectangular teeth around a ring, reading as an
-  // actual gear rather than a sun/clock-like radiating-line mark.
-  void _paintSettings(Canvas canvas, Paint stroke, Paint fill) {
-    const Offset c = Offset(12, 12);
-    const double ringR = 6.0;
+  // An arcane gear — blocky rectangular teeth around a ring, a compass
+  // tick at each cardinal point, reading as gear+compass together.
+  void _paintSettings(Canvas canvas, Paint solid, Paint ring) {
+    const double ringR = 6.4;
     const int teeth = 8;
-    canvas.drawCircle(c, ringR, stroke);
+    canvas.drawCircle(_c, ringR, ring);
     for (int i = 0; i < teeth; i++) {
       final double angle = (2 * math.pi / teeth) * i;
       canvas.save();
-      canvas.translate(c.dx, c.dy);
+      canvas.translate(_c.dx, _c.dy);
       canvas.rotate(angle);
-      final Rect tooth = Rect.fromLTWH(ringR - 0.6, -1.6, 2.8, 3.2);
-      if (filled) canvas.drawRect(tooth, fill);
-      canvas.drawRect(tooth, stroke);
+      canvas.drawRect(const Rect.fromLTWH(ringR - 0.5, -1.5, 2.6, 3), solid);
       canvas.restore();
     }
-    if (filled) canvas.drawCircle(c, 2.3, fill);
-    canvas.drawCircle(c, 2.3, stroke);
+    canvas.drawCircle(_c, 2.4, solid);
+    for (int i = 0; i < 4; i++) {
+      final double angle = (math.pi / 2) * i - math.pi / 2;
+      final Offset tickOuter = _c + Offset(math.cos(angle), math.sin(angle)) * (ringR - 1.4);
+      final Offset tickInner = _c + Offset(math.cos(angle), math.sin(angle)) * (ringR - 3.2);
+      canvas.drawLine(tickOuter, tickInner, ring);
+    }
   }
 
-  // A small diamond Origin mark for branded quick-add actions.
-  void _paintQuickAdd(Canvas canvas, Paint stroke, Paint fill) {
-    final Path diamond = Path()
-      ..moveTo(12, 3.5)
-      ..lineTo(20.5, 12)
-      ..lineTo(12, 20.5)
-      ..lineTo(3.5, 12)
-      ..close();
-    if (filled) canvas.drawPath(diamond, fill);
-    canvas.drawPath(diamond, stroke);
-    canvas.drawLine(const Offset(12, 8.5), const Offset(12, 15.5), stroke);
-    canvas.drawLine(const Offset(8.5, 12), const Offset(15.5, 12), stroke);
+  // A plus mark set inside the shared medallion — used for the branded
+  // quick-add action.
+  void _paintQuickAdd(Canvas canvas, Paint solid) {
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(const Rect.fromLTWH(11, 6.8, 2, 10.4), const Radius.circular(1)),
+      solid,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(const Rect.fromLTWH(6.8, 11, 10.4, 2), const Radius.circular(1)),
+      solid,
+    );
   }
 
   @override
