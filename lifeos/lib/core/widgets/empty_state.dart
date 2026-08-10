@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../app/origin/origin_glyphs.dart';
 
 /// Consistent "nothing here yet" placeholder, used across every module's
 /// empty list state and for the not-yet-built module screens.
@@ -57,7 +58,7 @@ class EmptyState extends StatelessWidget {
               const SizedBox(height: 24),
               FilledButton.icon(
                 onPressed: onAction,
-                icon: const Icon(Icons.add_rounded),
+                icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
                 label: Text(actionLabel!),
               ),
             ],

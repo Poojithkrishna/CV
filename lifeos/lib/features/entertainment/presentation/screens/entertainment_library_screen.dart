@@ -8,6 +8,7 @@ import '../../domain/entities/media_status.dart';
 import '../../domain/entities/media_type.dart';
 import '../providers/media_library_providers.dart';
 import '../widgets/media_item_card.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class EntertainmentLibraryScreen extends ConsumerStatefulWidget {
   const EntertainmentLibraryScreen({super.key});
@@ -32,7 +33,7 @@ class _EntertainmentLibraryScreenState extends ConsumerState<EntertainmentLibrar
       appBar: AppBar(title: const Text('Library')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/entertainment/items/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Add'),
       ),
       body: itemsAsync.when(

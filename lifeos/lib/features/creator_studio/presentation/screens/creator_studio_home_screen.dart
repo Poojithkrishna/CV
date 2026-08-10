@@ -9,6 +9,7 @@ import '../../domain/entities/content_goal.dart';
 import '../../domain/entities/content_project.dart';
 import '../../domain/services/content_pipeline_stats.dart';
 import '../providers/content_studio_providers.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 const int _recentLimit = 5;
 const LinearGradient _gradient = LinearGradient(
@@ -31,7 +32,7 @@ class CreatorStudioHomeScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Creator Studio')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/creator-studio/projects/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Idea'),
       ),
       body: projectsAsync.when(

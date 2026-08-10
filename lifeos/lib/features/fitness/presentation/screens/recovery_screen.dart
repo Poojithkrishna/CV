@@ -10,6 +10,7 @@ import '../../../../core/widgets/trend_line_chart.dart';
 import '../../domain/entities/recovery_entry.dart';
 import '../../domain/services/recovery_stats.dart';
 import '../providers/recovery_providers.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 final Uuid _uuid = Uuid();
 final Color _accentColor = AppGradients.fitness.colors.first;
@@ -131,7 +132,7 @@ class RecoveryScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Recovery')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _logToday(context, ref, today),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Log today'),
       ),
       body: entriesAsync.when(

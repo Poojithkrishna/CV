@@ -10,6 +10,7 @@ import '../../domain/entities/journal_entry_type.dart';
 import '../../domain/services/journal_stats.dart';
 import '../providers/journal_providers.dart';
 import '../widgets/journal_entry_card.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 const int _recentLimit = 5;
 const LinearGradient _gradient = LinearGradient(
@@ -29,7 +30,7 @@ class JournalHomeScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Journal')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/journal/entries/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Write'),
       ),
       body: const JournalHomeBody(),

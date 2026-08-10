@@ -6,6 +6,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/credit_card.dart';
 import '../providers/credit_card_providers.dart';
 import '../widgets/credit_card_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class CreditCardsListScreen extends ConsumerWidget {
   const CreditCardsListScreen({super.key});
@@ -18,7 +19,7 @@ class CreditCardsListScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Credit Cards')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/finance/credit-cards/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Card'),
       ),
       body: cardsAsync.when(

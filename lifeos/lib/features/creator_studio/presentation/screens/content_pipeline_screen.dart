@@ -6,6 +6,7 @@ import '../../domain/entities/content_project.dart';
 import '../../domain/entities/content_stage.dart';
 import '../providers/content_studio_providers.dart';
 import '../widgets/content_project_card.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 const double _columnWidth = 260;
 
@@ -25,7 +26,7 @@ class ContentPipelineScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Pipeline')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/creator-studio/projects/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Idea'),
       ),
       body: projectsAsync.when(

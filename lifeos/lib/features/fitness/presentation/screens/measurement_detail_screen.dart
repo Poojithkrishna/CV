@@ -12,6 +12,7 @@ import '../../domain/entities/measurement_entry.dart';
 import '../../domain/entities/measurement_type.dart';
 import '../../domain/services/measurement_stats.dart';
 import '../providers/measurement_providers.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 final Uuid _uuid = Uuid();
 final Color _accentColor = AppGradients.fitness.colors.first;
@@ -76,7 +77,7 @@ class MeasurementDetailScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(type.label)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _log(context, ref, entriesAsync.valueOrNull ?? const []),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Log'),
       ),
       body: entriesAsync.when(

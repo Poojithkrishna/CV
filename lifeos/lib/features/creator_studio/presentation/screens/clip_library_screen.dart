@@ -6,6 +6,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/clip.dart';
 import '../providers/content_studio_providers.dart';
 import '../widgets/clip_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class ClipLibraryScreen extends ConsumerWidget {
   const ClipLibraryScreen({super.key});
@@ -18,7 +19,7 @@ class ClipLibraryScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Clip Library')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/creator-studio/clips/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Clip'),
       ),
       body: clipsAsync.when(

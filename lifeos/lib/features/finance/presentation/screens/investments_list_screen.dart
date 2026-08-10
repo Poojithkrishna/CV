@@ -8,6 +8,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/investment.dart';
 import '../providers/investment_providers.dart';
 import '../widgets/investment_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class InvestmentsListScreen extends ConsumerWidget {
   const InvestmentsListScreen({super.key});
@@ -20,7 +21,7 @@ class InvestmentsListScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Investments')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/finance/investments/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Investment'),
       ),
       body: investmentsAsync.when(

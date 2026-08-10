@@ -7,6 +7,7 @@ import '../../domain/entities/journal_entry.dart';
 import '../../domain/entities/journal_entry_type.dart';
 import '../providers/journal_providers.dart';
 import '../widgets/journal_entry_card.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class JournalHistoryScreen extends ConsumerStatefulWidget {
   const JournalHistoryScreen({super.key});
@@ -26,7 +27,7 @@ class _JournalHistoryScreenState extends ConsumerState<JournalHistoryScreen> {
       appBar: AppBar(title: const Text('History')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/journal/entries/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Write'),
       ),
       body: entriesAsync.when(

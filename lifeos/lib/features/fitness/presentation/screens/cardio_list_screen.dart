@@ -7,6 +7,7 @@ import '../../domain/entities/cardio_session.dart';
 import '../../domain/services/cardio_stats.dart';
 import '../providers/cardio_providers.dart';
 import '../widgets/cardio_session_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class CardioListScreen extends ConsumerWidget {
   const CardioListScreen({super.key});
@@ -19,7 +20,7 @@ class CardioListScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Cardio')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/fitness/cardio/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Session'),
       ),
       body: sessionsAsync.when(

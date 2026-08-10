@@ -7,6 +7,7 @@ import '../../../../app/origin/origin_typography.dart';
 import '../../../calendar/presentation/screens/calendar_home_screen.dart';
 import '../../../entertainment/presentation/screens/entertainment_home_screen.dart';
 import '../../../journal/presentation/screens/journal_home_screen.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 enum _ChronicleSection { journal, calendar, media }
 
@@ -52,7 +53,7 @@ class _ChronicleHomeScreenState extends State<ChronicleHomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _onAddPressed,
-        child: const Icon(Icons.add_rounded),
+        child: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
       ),
       body: Column(
         children: [

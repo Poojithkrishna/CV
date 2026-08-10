@@ -6,6 +6,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/recurring_payment.dart';
 import '../providers/recurring_payment_providers.dart';
 import '../widgets/recurring_payment_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 /// Bills & recurring payments, sorted by due date (soonest first, which
 /// the DAO already guarantees) with overdue ones surfaced at the top via
@@ -22,7 +23,7 @@ class RecurringPaymentsListScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Bills & Recurring Payments')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/finance/recurring-payments/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Payment'),
       ),
       body: paymentsAsync.when(

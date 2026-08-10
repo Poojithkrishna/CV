@@ -11,6 +11,7 @@ import '../providers/transaction_providers.dart';
 import '../widgets/account_card.dart';
 import '../widgets/net_worth_summary_card.dart';
 import '../widgets/transaction_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 const int _recentTransactionsLimit = 5;
 
@@ -43,12 +44,12 @@ class FinanceHomeScreen extends ConsumerWidget {
       floatingActionButton: hasAccounts
           ? FloatingActionButton.extended(
               onPressed: () => context.push('/finance/transactions/new'),
-              icon: const Icon(Icons.add_rounded),
+              icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
               label: const Text('Transaction'),
             )
           : FloatingActionButton.extended(
               onPressed: () => context.push('/finance/accounts/new'),
-              icon: const Icon(Icons.add_rounded),
+              icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
               label: const Text('Account'),
             ),
       body: RefreshIndicator(

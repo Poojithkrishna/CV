@@ -6,6 +6,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/habit.dart';
 import '../providers/habit_providers.dart';
 import '../widgets/habit_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class HabitsListScreen extends ConsumerWidget {
   const HabitsListScreen({super.key});
@@ -18,7 +19,7 @@ class HabitsListScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Habits')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/habits/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Habit'),
       ),
       body: habitsAsync.when(

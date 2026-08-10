@@ -11,6 +11,7 @@ import '../../../../core/widgets/trend_line_chart.dart';
 import '../../domain/entities/body_weight_entry.dart';
 import '../../domain/services/body_weight_stats.dart';
 import '../providers/body_weight_providers.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 final Uuid _uuid = Uuid();
 final Color _accentColor = AppGradients.fitness.colors.first;
@@ -71,7 +72,7 @@ class BodyWeightScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Body Weight')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _logToday(context, ref, entriesAsync.valueOrNull ?? const []),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Log weight'),
       ),
       body: entriesAsync.when(

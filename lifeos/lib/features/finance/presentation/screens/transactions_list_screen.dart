@@ -6,6 +6,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/transaction_entry.dart';
 import '../providers/transaction_providers.dart';
 import '../widgets/transaction_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 /// Full transaction history. When [accountId] is provided, scoped to just
 /// that account's transactions (including transfers in or out of it);
@@ -29,7 +30,7 @@ class TransactionsListScreen extends ConsumerWidget {
               ? '/finance/transactions/new?accountId=$accountId'
               : '/finance/transactions/new',
         ),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Transaction'),
       ),
       body: transactionsAsync.when(

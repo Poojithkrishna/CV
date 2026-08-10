@@ -10,6 +10,7 @@ import '../../domain/entities/media_status.dart';
 import '../../domain/services/media_library_stats.dart';
 import '../providers/media_library_providers.dart';
 import '../widgets/media_item_card.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 const int _sectionLimit = 5;
 const LinearGradient _gradient = LinearGradient(
@@ -30,7 +31,7 @@ class EntertainmentHomeScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Entertainment')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/entertainment/items/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Add'),
       ),
       body: const EntertainmentHomeBody(),

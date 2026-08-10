@@ -6,6 +6,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/food_item.dart';
 import '../providers/nutrition_providers.dart';
 import '../widgets/food_item_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class FoodLibraryScreen extends ConsumerWidget {
   const FoodLibraryScreen({super.key});
@@ -18,7 +19,7 @@ class FoodLibraryScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Food Library')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/fitness/nutrition/foods/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Food'),
       ),
       body: itemsAsync.when(

@@ -6,6 +6,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/goal.dart';
 import '../providers/goal_providers.dart';
 import '../widgets/goal_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class GoalsListScreen extends ConsumerWidget {
   const GoalsListScreen({super.key});
@@ -18,7 +19,7 @@ class GoalsListScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Goals')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/goals/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Goal'),
       ),
       body: goalsAsync.when(

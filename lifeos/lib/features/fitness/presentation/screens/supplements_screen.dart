@@ -6,6 +6,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/supplement.dart';
 import '../providers/supplement_providers.dart';
 import '../widgets/supplement_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class SupplementsScreen extends ConsumerWidget {
   const SupplementsScreen({super.key});
@@ -20,7 +21,7 @@ class SupplementsScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Supplements')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/fitness/supplements/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Supplement'),
       ),
       body: supplementsAsync.when(

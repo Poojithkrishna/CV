@@ -6,6 +6,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/workout_plan.dart';
 import '../providers/workout_plan_providers.dart';
 import '../widgets/workout_plan_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class WorkoutPlansListScreen extends ConsumerWidget {
   const WorkoutPlansListScreen({super.key});
@@ -29,7 +30,7 @@ class WorkoutPlansListScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Workout Plans')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/fitness/plans/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Plan'),
       ),
       body: plansAsync.when(

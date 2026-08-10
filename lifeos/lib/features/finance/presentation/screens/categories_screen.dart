@@ -8,6 +8,7 @@ import '../../domain/entities/category.dart';
 import '../../domain/entities/category_type.dart';
 import '../providers/category_providers.dart';
 import '../widgets/category_avatar.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 /// Manage categories screen: two sections (Income / Expense), each
 /// editable/deletable. Deleting a category never touches transaction
@@ -41,7 +42,7 @@ class CategoriesScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Categories')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/finance/categories/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Category'),
       ),
       body: categoriesAsync.when(

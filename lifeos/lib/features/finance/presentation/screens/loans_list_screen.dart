@@ -7,6 +7,7 @@ import '../../domain/entities/loan.dart';
 import '../../domain/entities/loan_direction.dart';
 import '../providers/loan_providers.dart';
 import '../widgets/loan_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class LoansListScreen extends ConsumerWidget {
   const LoansListScreen({super.key});
@@ -19,7 +20,7 @@ class LoansListScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Loans')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/finance/loans/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Loan'),
       ),
       body: loansAsync.when(

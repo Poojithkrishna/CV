@@ -14,6 +14,7 @@ import '../notifications/calendar_reminders.dart';
 import '../providers/calendar_providers.dart';
 import '../widgets/calendar_event_tile.dart';
 import '../widgets/calendar_task_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 const int _weekStripDays = 7;
 const LinearGradient _gradient = LinearGradient(
@@ -66,7 +67,7 @@ class CalendarHomeScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Calendar & Tasks')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showAddCalendarItemMenu(context),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Add'),
       ),
       body: const CalendarHomeBody(),

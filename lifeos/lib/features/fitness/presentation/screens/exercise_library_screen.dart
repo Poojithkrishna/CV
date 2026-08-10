@@ -7,6 +7,7 @@ import '../../domain/entities/exercise.dart';
 import '../../domain/entities/muscle_group.dart';
 import '../providers/exercise_providers.dart';
 import '../widgets/exercise_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class ExerciseLibraryScreen extends ConsumerStatefulWidget {
   const ExerciseLibraryScreen({super.key});
@@ -27,7 +28,7 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
       appBar: AppBar(title: const Text('Exercise Library')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/fitness/exercises/new'),
-        icon: const Icon(Icons.add_rounded),
+        icon: OriginGlyph(OriginGlyphType.quickAdd, size: 22),
         label: const Text('Exercise'),
       ),
       body: Column(
