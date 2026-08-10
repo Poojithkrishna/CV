@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/calendar/presentation/screens/calendar_home_screen.dart';
 import '../../features/calendar/presentation/screens/event_form_screen.dart';
 import '../../features/calendar/presentation/screens/task_form_screen.dart';
+import '../../features/chronicle/presentation/screens/chronicle_home_screen.dart';
 import '../../features/creator_studio/presentation/screens/clip_form_screen.dart';
 import '../../features/creator_studio/presentation/screens/clip_library_screen.dart';
 import '../../features/creator_studio/presentation/screens/content_analytics_screen.dart';
@@ -74,15 +75,19 @@ import '../../features/journal/domain/entities/journal_entry_type.dart';
 import '../../features/journal/presentation/screens/journal_entry_form_screen.dart';
 import '../../features/journal/presentation/screens/journal_history_screen.dart';
 import '../../features/journal/presentation/screens/journal_home_screen.dart';
-import '../../features/more/presentation/screens/more_home_screen.dart';
 import '../../features/settings/presentation/screens/backup_screen.dart';
 import '../../features/settings/presentation/screens/settings_home_screen.dart';
 import 'app_shell.dart';
 
-/// Root navigation graph. The five bottom-nav tabs (Home, Finance, Habits,
-/// Fitness, More) are [StatefulShellRoute] branches so each keeps its own
-/// back stack and scroll position when switching tabs; every other screen
-/// (module detail pages, forms) is a plain top-level route pushed on top.
+/// Root navigation graph. The seven Rune Dock destinations (Sanctuary,
+/// Wealth, Fitness, Cultivation, Goals, Creator, Chronicle) are
+/// [StatefulShellRoute] branches so each keeps its own back stack and
+/// scroll position when switching tabs — there is no "More" branch, every
+/// primary destination is directly reachable. Journal, Calendar and
+/// Entertainment keep their own top-level routes (used by deep links and
+/// by Chronicle's section content) even though Chronicle is now their
+/// primary front door; every other screen (module detail pages, forms) is
+/// a plain top-level route pushed on top.
 final GoRouter appRouter = GoRouter(
   initialLocation: '/dashboard',
   routes: [
@@ -262,32 +267,6 @@ final GoRouter appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: '/habits',
-              builder: (context, state) => const HabitsListScreen(),
-              routes: [
-                GoRoute(
-                  path: 'new',
-                  builder: (context, state) => const HabitFormScreen(),
-                ),
-                GoRoute(
-                  path: ':id',
-                  builder: (context, state) => HabitDetailScreen(
-                    habitId: state.pathParameters['id']!,
-                  ),
-                ),
-                GoRoute(
-                  path: ':id/edit',
-                  builder: (context, state) => HabitFormScreen(
-                    habitId: state.pathParameters['id'],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
               path: '/fitness',
               builder: (context, state) => const FitnessHomeScreen(),
               routes: [
@@ -454,70 +433,104 @@ final GoRouter appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: '/more',
-              builder: (context, state) => const MoreHomeScreen(),
+              path: '/habits',
+              builder: (context, state) => const HabitsListScreen(),
+              routes: [
+                GoRoute(
+                  path: 'new',
+                  builder: (context, state) => const HabitFormScreen(),
+                ),
+                GoRoute(
+                  path: ':id',
+                  builder: (context, state) => HabitDetailScreen(
+                    habitId: state.pathParameters['id']!,
+                  ),
+                ),
+                GoRoute(
+                  path: ':id/edit',
+                  builder: (context, state) => HabitFormScreen(
+                    habitId: state.pathParameters['id'],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-      ],
-    ),
-    GoRoute(
-      path: '/goals',
-      builder: (context, state) => const GoalsListScreen(),
-      routes: [
-        GoRoute(
-          path: 'new',
-          builder: (context, state) => const GoalFormScreen(),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/goals',
+              builder: (context, state) => const GoalsListScreen(),
+              routes: [
+                GoRoute(
+                  path: 'new',
+                  builder: (context, state) => const GoalFormScreen(),
+                ),
+                GoRoute(
+                  path: ':id',
+                  builder: (context, state) => GoalDetailScreen(
+                    goalId: state.pathParameters['id']!,
+                  ),
+                ),
+                GoRoute(
+                  path: ':id/edit',
+                  builder: (context, state) => GoalFormScreen(
+                    goalId: state.pathParameters['id'],
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-        GoRoute(
-          path: ':id',
-          builder: (context, state) => GoalDetailScreen(
-            goalId: state.pathParameters['id']!,
-          ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/creator-studio',
+              builder: (context, state) => const CreatorStudioHomeScreen(),
+              routes: [
+                GoRoute(
+                  path: 'pipeline',
+                  builder: (context, state) => const ContentPipelineScreen(),
+                ),
+                GoRoute(
+                  path: 'projects/new',
+                  builder: (context, state) => const ContentProjectFormScreen(),
+                ),
+                GoRoute(
+                  path: 'projects/:id/edit',
+                  builder: (context, state) => ContentProjectFormScreen(
+                    projectId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'clips',
+                  builder: (context, state) => const ClipLibraryScreen(),
+                ),
+                GoRoute(
+                  path: 'clips/new',
+                  builder: (context, state) => const ClipFormScreen(),
+                ),
+                GoRoute(
+                  path: 'clips/:id/edit',
+                  builder: (context, state) => ClipFormScreen(
+                    clipId: state.pathParameters['id'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'analytics',
+                  builder: (context, state) => const ContentAnalyticsScreen(),
+                ),
+              ],
+            ),
+          ],
         ),
-        GoRoute(
-          path: ':id/edit',
-          builder: (context, state) => GoalFormScreen(
-            goalId: state.pathParameters['id'],
-          ),
-        ),
-      ],
-    ),
-    GoRoute(
-      path: '/creator-studio',
-      builder: (context, state) => const CreatorStudioHomeScreen(),
-      routes: [
-        GoRoute(
-          path: 'pipeline',
-          builder: (context, state) => const ContentPipelineScreen(),
-        ),
-        GoRoute(
-          path: 'projects/new',
-          builder: (context, state) => const ContentProjectFormScreen(),
-        ),
-        GoRoute(
-          path: 'projects/:id/edit',
-          builder: (context, state) => ContentProjectFormScreen(
-            projectId: state.pathParameters['id'],
-          ),
-        ),
-        GoRoute(
-          path: 'clips',
-          builder: (context, state) => const ClipLibraryScreen(),
-        ),
-        GoRoute(
-          path: 'clips/new',
-          builder: (context, state) => const ClipFormScreen(),
-        ),
-        GoRoute(
-          path: 'clips/:id/edit',
-          builder: (context, state) => ClipFormScreen(
-            clipId: state.pathParameters['id'],
-          ),
-        ),
-        GoRoute(
-          path: 'analytics',
-          builder: (context, state) => const ContentAnalyticsScreen(),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/chronicle',
+              builder: (context, state) => const ChronicleHomeScreen(),
+            ),
+          ],
         ),
       ],
     ),

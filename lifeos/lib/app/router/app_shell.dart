@@ -1,55 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// Bottom-navigation scaffold wrapping the five primary tabs. Everything
-/// else (module detail screens, forms) pushes on top of this shell so the
-/// nav bar stays put while drilling into a module.
+import '../origin/origin_glyphs.dart';
+import '../origin/origin_navigation.dart';
+
+/// Rune Dock scaffold wrapping the seven primary destinations (spec §6).
+/// Everything else (module detail screens, forms) pushes on top of this
+/// shell so the dock stays put while drilling into a domain. There is no
+/// "More" branch — every destination the spec names is reachable directly.
 class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
-  // Icon-only dock (labels stay attached for accessibility/tooltips but
-  // never paint — see NavigationBarThemeData.labelBehavior in app_theme.dart).
-  static const List<_Destination> _destinations = [
-    _Destination('/dashboard', Icons.auto_awesome_outlined, Icons.auto_awesome_rounded, 'Home'),
-    _Destination('/finance', Icons.account_balance_wallet_outlined,
-        Icons.account_balance_wallet_rounded, 'Finance'),
-    _Destination('/habits', Icons.local_fire_department_outlined,
-        Icons.local_fire_department_rounded, 'Habits'),
-    _Destination(
-        '/fitness', Icons.fitness_center_outlined, Icons.fitness_center_rounded, 'Fitness'),
-    _Destination('/more', Icons.hexagon_outlined, Icons.hexagon_rounded, 'More'),
+  static const List<RuneDockDestination> _destinations = [
+    RuneDockDestination(glyph: OriginGlyphType.sanctuary, label: 'Sanctuary'),
+    RuneDockDestination(glyph: OriginGlyphType.wealth, label: 'Wealth'),
+    RuneDockDestination(glyph: OriginGlyphType.fitness, label: 'Fitness'),
+    RuneDockDestination(glyph: OriginGlyphType.cultivation, label: 'Cultivation'),
+    RuneDockDestination(glyph: OriginGlyphType.goals, label: 'Goals'),
+    RuneDockDestination(glyph: OriginGlyphType.creator, label: 'Creator'),
+    RuneDockDestination(glyph: OriginGlyphType.chronicle, label: 'Chronicle'),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: RuneDock(
+        destinations: _destinations,
         selectedIndex: navigationShell.currentIndex,
-        onDestinationSelected: (index) => navigationShell.goBranch(
+        onSelect: (index) => navigationShell.goBranch(
           index,
           initialLocation: index == navigationShell.currentIndex,
         ),
-        destinations: [
-          for (final _Destination destination in _destinations)
-            NavigationDestination(
-              icon: Icon(destination.icon),
-              selectedIcon: Icon(destination.selectedIcon),
-              label: destination.label,
-            ),
-        ],
       ),
     );
   }
-}
-
-class _Destination {
-  const _Destination(this.path, this.icon, this.selectedIcon, this.label);
-
-  final String path;
-  final IconData icon;
-  final IconData selectedIcon;
-  final String label;
 }

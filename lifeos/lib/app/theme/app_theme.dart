@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'app_colors.dart';
+import '../origin/origin_colors.dart';
+import '../origin/origin_shapes.dart';
+import '../origin/origin_typography.dart';
 
-/// Builds the light and dark Material 3 themes for Demon Origin.
+/// Builds the light and dark Material 3 themes for Demon Origin, sourcing
+/// every color from [OriginColors] — the app's design tokens live in one
+/// place (`lib/app/origin/`), not scattered per-screen.
 ///
 /// The app is dark-mode-first (it's a personal, always-on-phone tool used
 /// day and night) but a light theme is fully supported for daytime use.
@@ -11,16 +15,14 @@ class AppTheme {
   AppTheme._();
 
   /// The mythic/gothic display face used only for brand moments (the
-  /// "DEMON ORIGIN" wordmark, rank-up celebrations) — never for dense body
-  /// or list text, where its inscriptional caps hurt legibility at small
-  /// sizes. See `BrandWordmark`.
-  static String get displayFontFamily => GoogleFonts.cinzel().fontFamily!;
+  /// "DEMON ORIGIN" wordmark, rank-up celebrations, ceremonial headings)
+  /// — never for dense body or list text, where its inscriptional caps
+  /// hurt legibility at small sizes. See `OriginTypography.heading`.
+  static String get displayFontFamily => OriginTypography.display;
 
-  /// The angular sci-fi-HUD face for "readout" moments — stat numbers,
-  /// section eyebrows, anything meant to feel like a targeting display
-  /// rather than prose. Pairs the mythic wordmark with a futuristic
-  /// counterpart rather than picking one mood over the other.
-  static String get hudFontFamily => GoogleFonts.rajdhani().fontFamily!;
+  /// The tabular data face for stat numbers and HUD-style eyebrow labels.
+  /// See `OriginTypography.figure`/`eyebrow`.
+  static String get hudFontFamily => OriginTypography.data;
 
   static ThemeData light() => _buildTheme(Brightness.light);
 
@@ -29,46 +31,49 @@ class AppTheme {
   static ThemeData _buildTheme(Brightness brightness) {
     final bool isDark = brightness == Brightness.dark;
 
-    // Built explicitly rather than via `ColorScheme.fromSeed` — a
-    // seed with zero chroma (a true gray) still leaves Material's tonal
-    // palette algorithm to pick an arbitrary hue for secondary/tertiary
-    // roles, which is where a faint, unwanted blue crept into radio
-    // buttons, sliders and the FAB. Every role below is a literal
-    // black/grey/white value instead, and `surfaceTint` is pinned to
-    // transparent so Material 3's elevation tint overlay (which defaults
-    // to tinting elevated surfaces with `primary`) can't reintroduce a
-    // hue on cards, dialogs or the bottom sheet.
+    // Built explicitly rather than via `ColorScheme.fromSeed` — a seed
+    // with zero chroma still leaves Material's tonal palette algorithm to
+    // invent a hue for secondary/tertiary roles (this bit the app once
+    // already, via radio buttons/sliders/the FAB going faintly blue).
+    // Every role below is a literal Origin token instead, and
+    // `surfaceTint` is pinned to transparent so Material 3's elevation
+    // tint overlay (which defaults to tinting elevated surfaces with
+    // `primary`) can't reintroduce an unwanted hue on cards/dialogs.
     final ColorScheme colorScheme = isDark
         ? const ColorScheme.dark(
-            primary: Color(0xFFF2F2F2),
-            onPrimary: Color(0xFF141414),
-            primaryContainer: Color(0xFF2A2A2A),
-            onPrimaryContainer: Color(0xFFF2F2F2),
-            secondary: Color(0xFFBDBDBD),
-            onSecondary: Color(0xFF141414),
-            secondaryContainer: Color(0xFF262626),
-            onSecondaryContainer: Color(0xFFF2F2F2),
-            tertiary: Color(0xFF9E9E9E),
-            onTertiary: Color(0xFF141414),
-            surface: AppColors.darkSurface,
-            onSurface: Color(0xFFF2F2F2),
-            onSurfaceVariant: Color(0xFFA6A6A6),
-            surfaceContainerHigh: Color(0xFF1F1F1F),
-            outline: Color(0xFF4A4A4A),
-            outlineVariant: Color(0xFF2E2E2E),
+            primary: OriginColors.violet,
+            onPrimary: Color(0xFFF5F2F8),
+            primaryContainer: OriginColors.surfaceSecondary,
+            onPrimaryContainer: OriginColors.textPrimary,
+            secondary: OriginColors.violet,
+            onSecondary: Color(0xFFF5F2F8),
+            secondaryContainer: OriginColors.surfaceSecondary,
+            onSecondaryContainer: OriginColors.textPrimary,
+            tertiary: OriginColors.gold,
+            onTertiary: Color(0xFF1A140A),
+            error: OriginColors.negative,
+            onError: Color(0xFFF5F2F8),
+            surface: OriginColors.surface,
+            onSurface: OriginColors.textPrimary,
+            onSurfaceVariant: OriginColors.textSecondary,
+            surfaceContainerHigh: OriginColors.surfaceSecondary,
+            outline: Color(0xFF3A3640),
+            outlineVariant: Color(0xFF242029),
             surfaceTint: Colors.transparent,
           )
         : const ColorScheme.light(
-            primary: Color(0xFF262626),
+            primary: OriginColors.violet,
             onPrimary: Color(0xFFFAFAFA),
-            primaryContainer: Color(0xFFE3E3E3),
-            onPrimaryContainer: Color(0xFF141414),
-            secondary: Color(0xFF5C5C5C),
+            primaryContainer: Color(0xFFE7DEF0),
+            onPrimaryContainer: Color(0xFF2A1F35),
+            secondary: OriginColors.violet,
             onSecondary: Color(0xFFFAFAFA),
-            secondaryContainer: Color(0xFFE9E9E9),
-            onSecondaryContainer: Color(0xFF141414),
-            tertiary: Color(0xFF757575),
-            onTertiary: Color(0xFFFAFAFA),
+            secondaryContainer: Color(0xFFE7DEF0),
+            onSecondaryContainer: Color(0xFF2A1F35),
+            tertiary: OriginColors.gold,
+            onTertiary: Color(0xFF2A2210),
+            error: OriginColors.negative,
+            onError: Color(0xFFFAFAFA),
             surface: Color(0xFFFBFAFF),
             onSurface: Color(0xFF1A1A1A),
             onSurfaceVariant: Color(0xFF5C5C5C),
@@ -80,6 +85,9 @@ class AppTheme {
 
     final TextTheme textTheme = GoogleFonts.manropeTextTheme(
       isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme,
+    ).apply(
+      bodyColor: colorScheme.onSurface,
+      displayColor: colorScheme.onSurface,
     );
 
     return ThemeData(
@@ -91,7 +99,7 @@ class AppTheme {
       // screen; light mode keeps a plain opaque surface.
       scaffoldBackgroundColor: isDark ? Colors.transparent : colorScheme.surface,
       textTheme: textTheme,
-      fontFamily: GoogleFonts.manrope().fontFamily,
+      fontFamily: OriginTypography.body,
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
@@ -103,14 +111,11 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         elevation: 0,
-        color: isDark ? AppColors.darkSurfaceElevated : Colors.white,
+        color: isDark ? OriginColors.surface : Colors.white,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+        shape: OriginShapes.panel(
           side: BorderSide(
-            color: isDark
-                ? AppColors.darkGlassBorder
-                : AppColors.lightGlassBorder,
+            color: isDark ? OriginColors.hairline : const Color(0x1F1A1A1A),
           ),
         ),
         margin: EdgeInsets.zero,
@@ -127,7 +132,7 @@ class AppTheme {
         filled: true,
         fillColor: colorScheme.surfaceContainerHigh,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(OriginShapes.radiusLg),
           borderSide: BorderSide.none,
         ),
         contentPadding:
@@ -137,7 +142,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(OriginShapes.radiusLg),
           ),
           textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
@@ -146,61 +151,37 @@ class AppTheme {
         style: FilledButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(OriginShapes.radiusLg),
           ),
           textStyle: const TextStyle(fontWeight: FontWeight.w600),
-          elevation: 6,
-          shadowColor: AppColors.brandMid.withOpacity(0.5),
+          elevation: 4,
+          shadowColor: OriginColors.violet.withOpacity(0.4),
         ),
-      ),
-      navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: isDark ? AppColors.darkSurfaceElevated : Colors.white,
-        elevation: 0,
-        height: 64,
-        // Icon-only nav — labels stay attached for accessibility/tooltips
-        // but never paint, matching a HUD dock rather than a labeled tab
-        // bar.
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-        surfaceTintColor: Colors.transparent,
-        // A soft silver glow pill behind the selected icon instead of
-        // Material's flat default indicator — the one piece of chrome
-        // visible on every screen, so it carries a lot of the "premium"
-        // impression.
-        indicatorColor: AppColors.brandMid.withOpacity(isDark ? 0.28 : 0.16),
-        indicatorShape: const StadiumBorder(),
-        iconTheme: WidgetStateProperty.resolveWith((states) {
-          final bool selected = states.contains(WidgetState.selected);
-          return IconThemeData(
-            color: selected
-                ? (isDark ? Colors.white : AppColors.brandDeep)
-                : colorScheme.onSurfaceVariant,
-          );
-        }),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(OriginShapes.radiusLg),
         ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: isDark ? AppColors.darkSurfaceElevated : Colors.white,
+        backgroundColor: isDark ? OriginColors.surface : Colors.white,
         surfaceTintColor: Colors.transparent,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(OriginShapes.radiusLg)),
         ),
       ),
       dialogTheme: DialogThemeData(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: isDark ? AppColors.darkSurfaceElevated : Colors.white,
+        backgroundColor: isDark ? OriginColors.surface : Colors.white,
       ),
       popupMenuTheme: PopupMenuThemeData(
         surfaceTintColor: Colors.transparent,
-        color: isDark ? AppColors.darkSurfaceElevated : Colors.white,
+        color: isDark ? OriginColors.surface : Colors.white,
       ),
       dividerTheme: DividerThemeData(
-        color: isDark ? AppColors.darkGlassBorder : AppColors.lightGlassBorder,
+        color: isDark ? OriginColors.hairline : const Color(0x1F1A1A1A),
         space: 1,
       ),
     );

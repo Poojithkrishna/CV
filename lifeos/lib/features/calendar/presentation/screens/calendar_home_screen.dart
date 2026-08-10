@@ -20,49 +20,71 @@ const LinearGradient _gradient = LinearGradient(
   colors: [AppColors.calendar, Color(0xFF1A1A1A)],
 );
 
+/// The task-vs-event choice sheet for "add something new" — a top-level
+/// function (not tied to any widget's State) so both [CalendarHomeScreen]'s
+/// own FAB and Chronicle's shared FAB (when the Calendar section is active)
+/// can trigger the exact same menu.
+Future<void> showAddCalendarItemMenu(BuildContext context) async {
+  final String? choice = await showModalBottomSheet<String>(
+    context: context,
+    builder: (context) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.check_box_outlined),
+            title: const Text('New task'),
+            onTap: () => Navigator.of(context).pop('task'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.event_outlined),
+            title: const Text('New event'),
+            onTap: () => Navigator.of(context).pop('event'),
+          ),
+        ],
+      ),
+    ),
+  );
+  if (!context.mounted || choice == null) return;
+  if (choice == 'task') {
+    context.push('/calendar/tasks/new');
+  } else {
+    context.push('/calendar/events/new');
+  }
+}
+
 /// Entry point for the Calendar & Tasks module: a week-strip day picker,
 /// today's pending count, and the selected day's merged agenda of tasks
-/// and events.
-class CalendarHomeScreen extends ConsumerStatefulWidget {
+/// and events. Reachable both as its own route (deep links, widget taps)
+/// and embedded as Chronicle's Calendar section (see [CalendarHomeBody]).
+class CalendarHomeScreen extends StatelessWidget {
   const CalendarHomeScreen({super.key});
 
   @override
-  ConsumerState<CalendarHomeScreen> createState() => _CalendarHomeScreenState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Calendar & Tasks')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => showAddCalendarItemMenu(context),
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Add'),
+      ),
+      body: const CalendarHomeBody(),
+    );
+  }
 }
 
-class _CalendarHomeScreenState extends ConsumerState<CalendarHomeScreen> {
+class CalendarHomeBody extends ConsumerStatefulWidget {
+  const CalendarHomeBody({super.key});
+
+  @override
+  ConsumerState<CalendarHomeBody> createState() => _CalendarHomeBodyState();
+}
+
+class _CalendarHomeBodyState extends ConsumerState<CalendarHomeBody> {
   static DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
 
   late DateTime _selectedDate = _dateOnly(DateTime.now());
-
-  Future<void> _addMenu() async {
-    final String? choice = await showModalBottomSheet<String>(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.check_box_outlined),
-              title: const Text('New task'),
-              onTap: () => Navigator.of(context).pop('task'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.event_outlined),
-              title: const Text('New event'),
-              onTap: () => Navigator.of(context).pop('event'),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (!mounted || choice == null) return;
-    if (choice == 'task') {
-      context.push('/calendar/tasks/new');
-    } else {
-      context.push('/calendar/events/new');
-    }
-  }
 
   Future<void> _toggleTaskDone(CalendarTask task) async {
     await ref.read(toggleTaskDoneUseCaseProvider).call(task.id);
@@ -84,19 +106,9 @@ class _CalendarHomeScreenState extends ConsumerState<CalendarHomeScreen> {
             ? eventsAsync.error
             : null;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Calendar & Tasks')),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _addMenu,
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Add'),
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : error != null
-              ? Center(child: Text('Something went wrong: $error'))
-              : _buildBody(context, tasksAsync.value!, eventsAsync.value!),
-    );
+    if (isLoading) return const Center(child: CircularProgressIndicator());
+    if (error != null) return Center(child: Text('Something went wrong: $error'));
+    return _buildBody(context, tasksAsync.value!, eventsAsync.value!);
   }
 
   Widget _buildBody(BuildContext context, List<CalendarTask> tasks, List<CalendarEvent> events) {
@@ -184,7 +196,7 @@ class _CalendarHomeScreenState extends ConsumerState<CalendarHomeScreen> {
             title: 'Nothing scheduled',
             message: 'Add a task or event for this day.',
             actionLabel: 'Add something',
-            onAction: _addMenu,
+            onAction: () => showAddCalendarItemMenu(context),
           )
         else ...[
           if (dayEvents.isNotEmpty) ...[
