@@ -89,7 +89,7 @@ class _RuneDockItem extends StatelessWidget {
             color: selected ? OriginColors.surfaceSecondary : Colors.transparent,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: selected ? OriginColors.violet.withOpacity(0.55) : Colors.transparent,
+              color: selected ? OriginColors.accent.withOpacity(0.55) : Colors.transparent,
             ),
           ),
           child: OriginGlyph(

@@ -111,7 +111,7 @@ class DashboardScreen extends ConsumerWidget {
                         size: 72,
                         strokeWidth: 4,
                         trackColor: OriginColors.hairline,
-                        valueColor: OriginColors.violet,
+                        valueColor: OriginColors.accent,
                         child: OriginGlyph(
                           OriginGlyphType.sanctuary,
                           size: 30,

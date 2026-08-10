@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
 /// Arcane Futurism's fixed palette — the single source of truth every
-/// other Origin* token and every screen pulls from. Values are exactly the
-/// hexes in the Demon Origin Premium Redesign Spec (v1), not approximations.
+/// other Origin* token and every screen pulls from.
 ///
-/// Gold and violet are accents, not base colors — see each screen's usage:
-/// gold marks rare/ceremonial moments (rank-up, a hero stat), violet marks
-/// ordinary interactive/selected state. Most of the UI stays obsidian and
-/// text-gray.
+/// Kept intentionally close to the app icon's own black/white/grey
+/// artwork rather than the redesign spec's violet/gold accent pair — per
+/// direct feedback, the palette should read as an extension of the icon,
+/// not an invented brand color. [accent] is a near-white silver used for
+/// ordinary interactive/selected state (buttons, the selected nav glyph,
+/// progress fills); [gold] is kept defined but unused for now, reserved in
+/// case a future rare/ceremonial moment (e.g. a rank-up flash) calls for a
+/// single deliberate exception — it must stay rare if it's ever used.
 class OriginColors {
   OriginColors._();
 
@@ -18,7 +21,7 @@ class OriginColors {
   static const Color textPrimary = Color(0xFFD9D5DE);
   static const Color textSecondary = Color(0xFF918B98);
 
-  static const Color violet = Color(0xFF76558F);
+  static const Color accent = Color(0xFFEDEBEF);
   static const Color gold = Color(0xFFB89A5A);
   static const Color negative = Color(0xFFA95746);
 

@@ -23,7 +23,7 @@ class OriginProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color fillColor = color ?? OriginColors.violet;
+    final Color fillColor = color ?? OriginColors.accent;
     final Widget bar = LayoutBuilder(
       builder: (context, constraints) {
         return Stack(

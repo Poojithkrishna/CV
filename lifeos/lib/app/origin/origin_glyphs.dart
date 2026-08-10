@@ -144,29 +144,56 @@ class _GlyphPainter extends CustomPainter {
     canvas.drawCircle(c, 2, stroke);
   }
 
-  // Heraldic coin + vault: a circle (coin) with a slot, orbited by a short
-  // arc suggesting a vault door.
+  // A treasure chest — domed lid, banded body, a lock plate. Reads
+  // instantly as "treasury" at a glance, where the previous coin+vault
+  // abstraction didn't.
   void _paintWealth(Canvas canvas, Paint stroke, Paint fill) {
-    const Offset c = Offset(12, 12.5);
-    if (filled) canvas.drawCircle(c, 7.5, fill);
-    canvas.drawCircle(c, 7.5, stroke);
-    canvas.drawLine(const Offset(12, 7.5), const Offset(12, 17.5), stroke);
-    canvas.drawLine(const Offset(9, 9.5), const Offset(9, 15.5), stroke);
-    canvas.drawLine(const Offset(15, 9.5), const Offset(15, 15.5), stroke);
-    final Rect vault = Rect.fromCircle(center: c, radius: 10.5);
-    canvas.drawArc(vault, -math.pi * 0.85, math.pi * 0.3, false, stroke);
+    final Path body = Path()
+      ..moveTo(4, 12)
+      ..lineTo(4, 18)
+      ..quadraticBezierTo(4, 20, 6, 20)
+      ..lineTo(18, 20)
+      ..quadraticBezierTo(20, 20, 20, 18)
+      ..lineTo(20, 12)
+      ..close();
+    if (filled) canvas.drawPath(body, fill);
+    canvas.drawPath(body, stroke);
+
+    final Path lid = Path()
+      ..moveTo(4, 12)
+      ..quadraticBezierTo(12, 2.5, 20, 12)
+      ..close();
+    canvas.drawPath(lid, stroke);
+
+    // Reinforcing straps, so the silhouette reads as a bound chest rather
+    // than a plain box/briefcase.
+    canvas.drawLine(const Offset(7.5, 12), const Offset(7.5, 20), stroke);
+    canvas.drawLine(const Offset(16.5, 12), const Offset(16.5, 20), stroke);
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(const Rect.fromLTWH(10, 13, 4, 4), const Radius.circular(1)),
+      stroke,
+    );
   }
 
-  // Crossed relic blades — two tapered lines crossing at the center with a
-  // small crossguard, evoking a stylized barbell/rune rather than swords.
+  // A single upright relic blade — pointed blade, crossguard, grip and
+  // pommel. Reads as "training/combat" clearly, where crossed lines read
+  // as a plain cancel/close mark instead.
   void _paintFitness(Canvas canvas, Paint stroke, Paint fill) {
-    canvas.drawLine(const Offset(5, 5), const Offset(19, 19), stroke);
-    canvas.drawLine(const Offset(19, 5), const Offset(5, 19), stroke);
-    canvas.drawLine(const Offset(3.5, 3.5), const Offset(6.5, 6.5), stroke);
-    canvas.drawLine(const Offset(17.5, 17.5), const Offset(20.5, 20.5), stroke);
-    canvas.drawLine(const Offset(20.5, 3.5), const Offset(17.5, 6.5), stroke);
-    canvas.drawLine(const Offset(6.5, 17.5), const Offset(3.5, 20.5), stroke);
-    canvas.drawCircle(const Offset(12, 12), 2, filled ? fill : stroke);
+    final Path blade = Path()
+      ..moveTo(12, 3)
+      ..lineTo(13.4, 14)
+      ..lineTo(12, 16)
+      ..lineTo(10.6, 14)
+      ..close();
+    if (filled) canvas.drawPath(blade, fill);
+    canvas.drawPath(blade, stroke);
+
+    canvas.drawLine(const Offset(8, 15.5), const Offset(16, 15.5), stroke);
+    canvas.drawLine(const Offset(8, 15.5), const Offset(7, 17), stroke);
+    canvas.drawLine(const Offset(16, 15.5), const Offset(17, 17), stroke);
+    canvas.drawLine(const Offset(12, 16), const Offset(12, 19.5), stroke);
+    canvas.drawCircle(const Offset(12, 20.5), 1.1, filled ? fill : stroke);
   }
 
   // A flame contained inside a shield outline.
@@ -182,18 +209,16 @@ class _GlyphPainter extends CustomPainter {
     if (filled) canvas.drawPath(shield, fill);
     canvas.drawPath(shield, stroke);
 
+    // A classic two-curve flame silhouette (outer lick, inner notch)
+    // rather than the busy multi-cubic version this replaced.
     final Path flame = Path()
       ..moveTo(12, 8)
-      ..cubicTo(14, 10.5, 14.5, 12.5, 13, 14.5)
-      ..cubicTo(14.5, 14, 15, 12.5, 14, 11)
-      ..cubicTo(15.5, 12.5, 15.5, 15.5, 13.5, 17)
-      ..cubicTo(11, 18.5, 8.5, 17, 9, 14.5)
-      ..cubicTo(9.3, 16, 10.5, 16.3, 10.5, 15)
-      ..cubicTo(9.5, 15, 9, 13.5, 9.7, 12)
-      ..cubicTo(10, 13, 10.7, 13, 11, 12)
-      ..cubicTo(10.5, 10.5, 11, 9, 12, 8)
+      ..cubicTo(15, 11, 15, 14.5, 12.5, 16.5)
+      ..cubicTo(13.3, 15, 12.4, 13.6, 11.4, 13.2)
+      ..cubicTo(11.7, 14.4, 10.9, 15.2, 10.6, 16.5)
+      ..cubicTo(8.2, 14, 8.6, 10.5, 12, 8)
       ..close();
-    canvas.drawPath(flame, stroke);
+    canvas.drawPath(flame, Paint()..color = color);
   }
 
   // Ascending standard/banner — a pole with a pennant tapering upward.
@@ -210,25 +235,24 @@ class _GlyphPainter extends CustomPainter {
     canvas.drawPath(pennant, stroke);
   }
 
-  // A camera aperture (radiating blades) inside a seal ring.
+  // A clapperboard — instantly reads as "content creation," where the
+  // previous camera-aperture abstraction looked like a burst of lines.
   void _paintCreator(Canvas canvas, Paint stroke, Paint fill) {
-    const Offset c = Offset(12, 12);
-    canvas.drawCircle(c, 9.5, stroke);
-    const int blades = 6;
-    const double r1 = 2.2, r2 = 6.2;
-    for (int i = 0; i < blades; i++) {
-      final double a = (2 * math.pi / blades) * i;
-      final double aNext = a + (2 * math.pi / blades) * 0.62;
-      final Offset p1 = c + Offset(math.cos(a), math.sin(a)) * r1;
-      final Offset p2 = c + Offset(math.cos(a), math.sin(a)) * r2;
-      final Offset p3 = c + Offset(math.cos(aNext), math.sin(aNext)) * r1;
-      final Path blade = Path()
-        ..moveTo(p1.dx, p1.dy)
-        ..lineTo(p2.dx, p2.dy)
-        ..lineTo(p3.dx, p3.dy);
-      canvas.drawPath(blade, stroke);
-    }
-    if (filled) canvas.drawCircle(c, r1, fill);
+    final RRect board =
+        RRect.fromRectAndRadius(const Rect.fromLTWH(4.5, 9, 15, 11), const Radius.circular(1.5));
+    if (filled) canvas.drawRRect(board, fill);
+    canvas.drawRRect(board, stroke);
+
+    final Path clapperTop = Path()
+      ..moveTo(4.5, 9)
+      ..lineTo(19.5, 9)
+      ..lineTo(18, 5)
+      ..lineTo(3, 5)
+      ..close();
+    canvas.drawPath(clapperTop, stroke);
+    canvas.drawLine(const Offset(6.6, 5), const Offset(8.3, 9), stroke);
+    canvas.drawLine(const Offset(10.6, 5), const Offset(12.3, 9), stroke);
+    canvas.drawLine(const Offset(14.6, 5), const Offset(16.3, 9), stroke);
   }
 
   // Three-card/play sigil — overlapping card shapes with a small play mark.
@@ -269,21 +293,25 @@ class _GlyphPainter extends CustomPainter {
     canvas.drawCircle(const Offset(15, 19.5), 0.9, Paint()..color = color);
   }
 
-  // A simplified arcane gear — six blunt teeth around a ring, one inner
-  // circle. Deliberately less busy than a literal mechanical gear icon.
+  // An arcane gear — blocky rectangular teeth around a ring, reading as an
+  // actual gear rather than a sun/clock-like radiating-line mark.
   void _paintSettings(Canvas canvas, Paint stroke, Paint fill) {
     const Offset c = Offset(12, 12);
-    const double rOuter = 9, rInner = 6.4, toothLen = 2.4;
-    const int teeth = 6;
+    const double ringR = 6.0;
+    const int teeth = 8;
+    canvas.drawCircle(c, ringR, stroke);
     for (int i = 0; i < teeth; i++) {
-      final double a = (2 * math.pi / teeth) * i;
-      final Offset from = c + Offset(math.cos(a), math.sin(a)) * rInner;
-      final Offset to = c + Offset(math.cos(a), math.sin(a)) * (rInner + toothLen);
-      canvas.drawLine(from, to, stroke);
+      final double angle = (2 * math.pi / teeth) * i;
+      canvas.save();
+      canvas.translate(c.dx, c.dy);
+      canvas.rotate(angle);
+      final Rect tooth = Rect.fromLTWH(ringR - 0.6, -1.6, 2.8, 3.2);
+      if (filled) canvas.drawRect(tooth, fill);
+      canvas.drawRect(tooth, stroke);
+      canvas.restore();
     }
-    canvas.drawCircle(c, rOuter - toothLen, stroke);
-    if (filled) canvas.drawCircle(c, 2.6, fill);
-    canvas.drawCircle(c, 2.6, stroke);
+    if (filled) canvas.drawCircle(c, 2.3, fill);
+    canvas.drawCircle(c, 2.3, stroke);
   }
 
   // A small diamond Origin mark for branded quick-add actions.

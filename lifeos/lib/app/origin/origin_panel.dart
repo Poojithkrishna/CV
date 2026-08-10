@@ -50,7 +50,7 @@ class OriginPanel extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         splashFactory: NoSplash.splashFactory,
-        highlightColor: OriginColors.violet.withOpacity(0.06),
+        highlightColor: OriginColors.accent.withOpacity(0.06),
         child: Padding(padding: padding, child: child),
       ),
     );
@@ -62,7 +62,7 @@ class OriginPanel extends StatelessWidget {
         borderRadius: BorderRadius.circular(OriginShapes.radiusMd),
         boxShadow: [
           BoxShadow(
-            color: OriginColors.violet.withOpacity(0.16),
+            color: OriginColors.accent.withOpacity(0.16),
             blurRadius: 32,
             spreadRadius: -4,
           ),
