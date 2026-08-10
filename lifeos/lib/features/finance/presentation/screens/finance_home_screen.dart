@@ -142,6 +142,7 @@ class FinanceHomeScreen extends ConsumerWidget {
                   SliverFillRemaining(
                     hasScrollBody: false,
                     child: EmptyState(
+                      glyph: OriginGlyphType.wealth,
                       icon: Icons.account_balance_wallet_outlined,
                       title: 'No accounts yet',
                       message:
@@ -196,6 +197,7 @@ class FinanceHomeScreen extends ConsumerWidget {
                         if (recent.isEmpty) {
                           return SliverToBoxAdapter(
                             child: EmptyState(
+                              glyph: OriginGlyphType.wealth,
                               icon: Icons.receipt_long_outlined,
                               title: 'No transactions yet',
                               message: 'Log your first income or expense.',

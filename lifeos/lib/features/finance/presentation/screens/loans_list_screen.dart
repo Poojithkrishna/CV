@@ -29,6 +29,7 @@ class LoansListScreen extends ConsumerWidget {
         data: (List<Loan> loans) {
           if (loans.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.wealth,
               icon: Icons.handshake_outlined,
               title: 'No loans yet',
               message: 'Track money you\'ve lent out or borrowed, with partial payments.',

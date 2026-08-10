@@ -122,6 +122,7 @@ class CreatorStudioHomeScreen extends ConsumerWidget {
               const SizedBox(height: 8),
               if (recentPublished.isEmpty)
                 EmptyState(
+                  glyph: OriginGlyphType.creator,
                   icon: Icons.videocam_outlined,
                   title: 'Nothing published yet',
                   message: 'Move a project through the pipeline to see it here.',

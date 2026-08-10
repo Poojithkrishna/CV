@@ -29,6 +29,7 @@ class CardioListScreen extends ConsumerWidget {
         data: (List<CardioSession> sessions) {
           if (sessions.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.fitness,
               icon: Icons.directions_run_rounded,
               title: 'No cardio logged yet',
               message: 'Log a run, ride, swim or any cardio session here.',

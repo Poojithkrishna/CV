@@ -30,6 +30,7 @@ class InvestmentsListScreen extends ConsumerWidget {
         data: (List<Investment> investments) {
           if (investments.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.wealth,
               icon: Icons.trending_up_rounded,
               title: 'No investments yet',
               message: 'Track stocks, mutual funds, crypto and more here.',

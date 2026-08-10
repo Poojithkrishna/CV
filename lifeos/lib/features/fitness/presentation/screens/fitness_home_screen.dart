@@ -10,6 +10,7 @@ import '../../domain/entities/workout_session.dart';
 import '../providers/workout_plan_providers.dart';
 import '../providers/workout_session_providers.dart';
 import '../widgets/session_history_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 const int _recentSessionsLimit = 5;
 
@@ -195,6 +196,7 @@ class FitnessHomeScreen extends ConsumerWidget {
             data: (List<WorkoutSession> sessions) {
               if (sessions.isEmpty) {
                 return EmptyState(
+                  glyph: OriginGlyphType.fitness,
                   icon: Icons.fitness_center_outlined,
                   title: 'No workouts yet',
                   message: 'Start your first workout to see it here.',

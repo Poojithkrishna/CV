@@ -112,6 +112,7 @@ class EntertainmentHomeBody extends ConsumerWidget {
             const SizedBox(height: 8),
             if (inProgress.isEmpty)
               EmptyState(
+                glyph: OriginGlyphType.entertainment,
                 icon: Icons.play_circle_outline_rounded,
                 title: 'Nothing in progress',
                 message: 'Mark something as In Progress to see it here.',

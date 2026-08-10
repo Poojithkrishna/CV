@@ -28,6 +28,7 @@ class GoalsListScreen extends ConsumerWidget {
         data: (List<Goal> goals) {
           if (goals.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.goals,
               icon: Icons.flag_outlined,
               title: 'No goals yet',
               message: 'Set a target, break it into milestones, and link the '

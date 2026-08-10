@@ -98,6 +98,7 @@ class _EntertainmentLibraryScreenState extends ConsumerState<EntertainmentLibrar
               Expanded(
                 child: filtered.isEmpty
                     ? EmptyState(
+                      glyph: OriginGlyphType.entertainment,
                         icon: Icons.local_movies_outlined,
                         title: items.isEmpty ? 'Your library is empty' : 'Nothing matches these filters',
                         message: items.isEmpty

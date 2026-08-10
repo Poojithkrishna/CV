@@ -28,6 +28,7 @@ class FoodLibraryScreen extends ConsumerWidget {
         data: (List<FoodItem> items) {
           if (items.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.fitness,
               icon: Icons.restaurant_outlined,
               title: 'No foods here yet',
               message: 'Add a food to build your library.',

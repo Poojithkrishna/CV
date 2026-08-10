@@ -39,6 +39,7 @@ class TransactionsListScreen extends ConsumerWidget {
         data: (List<TransactionEntry> transactions) {
           if (transactions.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.wealth,
               icon: Icons.receipt_long_outlined,
               title: 'No transactions yet',
               message: 'Log income, expenses and transfers to see them here.',

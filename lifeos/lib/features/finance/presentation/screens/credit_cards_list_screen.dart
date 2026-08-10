@@ -28,6 +28,7 @@ class CreditCardsListScreen extends ConsumerWidget {
         data: (List<CreditCard> cards) {
           if (cards.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.wealth,
               icon: Icons.credit_card_outlined,
               title: 'No credit cards yet',
               message: 'Add a card to track its limit, usage and due dates.',

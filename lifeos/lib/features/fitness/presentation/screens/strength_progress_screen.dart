@@ -11,6 +11,7 @@ import '../../domain/services/strength_progress_stats.dart';
 import '../providers/exercise_providers.dart';
 import '../providers/workout_session_providers.dart';
 import '../widgets/exercise_picker_field.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 final Color _accentColor = AppGradients.fitness.colors.first;
 
@@ -48,6 +49,7 @@ class _StrengthProgressScreenState extends ConsumerState<StrengthProgressScreen>
             else
               const Expanded(
                 child: EmptyState(
+                  glyph: OriginGlyphType.fitness,
                   icon: Icons.show_chart_rounded,
                   title: 'No exercises yet',
                   message: 'Add an exercise to your library to track its progress.',
@@ -78,6 +80,7 @@ class _ExerciseProgress extends ConsumerWidget {
 
         if (trend.isEmpty) {
           return const EmptyState(
+            glyph: OriginGlyphType.fitness,
             icon: Icons.show_chart_rounded,
             title: 'No sets logged yet',
             message: 'Log a working set for this exercise during a workout to see its trend here.',

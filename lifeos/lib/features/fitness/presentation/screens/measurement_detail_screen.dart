@@ -86,6 +86,7 @@ class MeasurementDetailScreen extends ConsumerWidget {
         data: (List<MeasurementEntry> ascending) {
           if (ascending.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.fitness,
               icon: type.icon,
               title: 'No entries yet',
               message: 'Log ${type.label.toLowerCase()} regularly to track your progress.',

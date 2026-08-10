@@ -71,6 +71,7 @@ class _JournalHistoryScreenState extends ConsumerState<JournalHistoryScreen> {
               Expanded(
                 child: filtered.isEmpty
                     ? EmptyState(
+                      glyph: OriginGlyphType.chronicle,
                         icon: Icons.menu_book_outlined,
                         title: entries.isEmpty ? 'Nothing written yet' : 'Nothing matches this filter',
                         message: entries.isEmpty

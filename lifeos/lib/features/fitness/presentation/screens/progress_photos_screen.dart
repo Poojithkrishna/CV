@@ -10,6 +10,7 @@ import '../../domain/entities/photo_category.dart';
 import '../../domain/entities/progress_photo.dart';
 import '../providers/progress_photo_providers.dart';
 import '../widgets/progress_photo_thumbnail.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 final Uuid _uuid = Uuid();
 
@@ -149,6 +150,7 @@ class _ProgressPhotosScreenState extends ConsumerState<ProgressPhotosScreen> {
               data: (List<ProgressPhoto> photos) {
                 if (photos.isEmpty) {
                   return EmptyState(
+                    glyph: OriginGlyphType.fitness,
                     icon: Icons.photo_camera_outlined,
                     title: 'No photos yet',
                     message: 'Take a progress photo to start your visual timeline.',

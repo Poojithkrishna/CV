@@ -11,6 +11,7 @@ class EmptyState extends StatelessWidget {
     this.message,
     this.actionLabel,
     this.onAction,
+    this.glyph,
   });
 
   final IconData icon;
@@ -18,6 +19,12 @@ class EmptyState extends StatelessWidget {
   final String? message;
   final String? actionLabel;
   final VoidCallback? onAction;
+
+  /// When set, renders this module's Origin Glyph emblem instead of
+  /// [icon] in the circle above the title — the generic Material icon
+  /// otherwise leaves module empty-states looking untouched by the
+  /// Origin redesign even after the nav and FABs were reworked.
+  final OriginGlyphType? glyph;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +41,9 @@ class EmptyState extends StatelessWidget {
                 color: colorScheme.surfaceContainerHigh,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 40, color: colorScheme.primary),
+              child: glyph != null
+                  ? OriginGlyph(glyph!, size: 40)
+                  : Icon(icon, size: 40, color: colorScheme.primary),
             ),
             const SizedBox(height: 20),
             Text(

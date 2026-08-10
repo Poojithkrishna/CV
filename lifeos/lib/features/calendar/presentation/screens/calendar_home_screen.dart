@@ -193,6 +193,7 @@ class _CalendarHomeBodyState extends ConsumerState<CalendarHomeBody> {
         const SizedBox(height: 20),
         if (dayEvents.isEmpty && dayTasks.isEmpty)
           EmptyState(
+            glyph: OriginGlyphType.chronicle,
             icon: Icons.event_available_outlined,
             title: 'Nothing scheduled',
             message: 'Add a task or event for this day.',

@@ -32,6 +32,7 @@ class RecurringPaymentsListScreen extends ConsumerWidget {
         data: (List<RecurringPayment> payments) {
           if (payments.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.wealth,
               icon: Icons.receipt_long_outlined,
               title: 'No bills or subscriptions yet',
               message: 'Track rent, subscriptions and other recurring payments here.',

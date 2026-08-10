@@ -29,6 +29,7 @@ class AssetsListScreen extends ConsumerWidget {
         data: (List<Asset> assets) {
           if (assets.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.wealth,
               icon: Icons.inventory_2_outlined,
               title: 'No assets yet',
               message: 'Track real estate, vehicles, jewelry and other valuables here.',

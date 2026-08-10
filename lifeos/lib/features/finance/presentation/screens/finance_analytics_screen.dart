@@ -9,6 +9,7 @@ import '../../domain/entities/monthly_totals.dart';
 import '../providers/finance_analytics_providers.dart';
 import '../widgets/category_spending_chart.dart';
 import '../widgets/income_expense_chart.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class FinanceAnalyticsScreen extends ConsumerWidget {
   const FinanceAnalyticsScreen({super.key});
@@ -45,6 +46,7 @@ class FinanceAnalyticsScreen extends ConsumerWidget {
 
               if (totalIncome == 0 && totalExpense == 0) {
                 return EmptyState(
+                  glyph: OriginGlyphType.wealth,
                   icon: Icons.insights_outlined,
                   title: 'No transactions yet',
                   message: 'Log some income and expenses to see your trends here.',

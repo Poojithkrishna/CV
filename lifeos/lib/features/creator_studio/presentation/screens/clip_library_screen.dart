@@ -28,6 +28,7 @@ class ClipLibraryScreen extends ConsumerWidget {
         data: (List<Clip> clips) {
           if (clips.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.creator,
               icon: Icons.movie_creation_outlined,
               title: 'No clips yet',
               message: 'Save highlights and clips here to build your content from later.',

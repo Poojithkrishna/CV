@@ -30,6 +30,7 @@ class SupplementsScreen extends ConsumerWidget {
         data: (List<Supplement> supplements) {
           if (supplements.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.fitness,
               icon: Icons.medication_outlined,
               title: 'No supplements yet',
               message: 'Add the vitamins and supplements you take regularly.',

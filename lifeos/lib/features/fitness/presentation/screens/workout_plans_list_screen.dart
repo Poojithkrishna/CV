@@ -39,6 +39,7 @@ class WorkoutPlansListScreen extends ConsumerWidget {
         data: (List<WorkoutPlan> plans) {
           if (plans.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.fitness,
               icon: Icons.event_note_outlined,
               title: 'No workout plans yet',
               message: 'Create a plan for the gym, home, travel or however you train — '

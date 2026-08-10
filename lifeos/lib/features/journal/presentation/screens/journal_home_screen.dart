@@ -129,6 +129,7 @@ class JournalHomeBody extends ConsumerWidget {
             const SizedBox(height: 8),
             if (recent.isEmpty)
               EmptyState(
+                glyph: OriginGlyphType.chronicle,
                 icon: Icons.menu_book_outlined,
                 title: 'Nothing written yet',
                 message: 'Start with a morning journal, a gratitude list, or just free write.',

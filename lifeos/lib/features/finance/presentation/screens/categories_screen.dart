@@ -51,6 +51,7 @@ class CategoriesScreen extends ConsumerWidget {
         data: (List<Category> categories) {
           if (categories.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.wealth,
               icon: Icons.category_outlined,
               title: 'No categories yet',
               message: 'Create categories to organize your income and expenses.',

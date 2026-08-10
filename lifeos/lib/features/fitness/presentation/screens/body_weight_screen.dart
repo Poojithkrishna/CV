@@ -81,6 +81,7 @@ class BodyWeightScreen extends ConsumerWidget {
         data: (List<BodyWeightEntry> ascending) {
           if (ascending.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.fitness,
               icon: Icons.monitor_weight_outlined,
               title: 'No weigh-ins yet',
               message: 'Log your weight regularly to see your trend over time.',

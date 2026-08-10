@@ -28,6 +28,7 @@ class HabitsListScreen extends ConsumerWidget {
         data: (List<Habit> habits) {
           if (habits.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.cultivation,
               icon: Icons.local_fire_department_outlined,
               title: 'No habits yet',
               message: 'Track anything recurring — yes/no, a counter, a timer, '

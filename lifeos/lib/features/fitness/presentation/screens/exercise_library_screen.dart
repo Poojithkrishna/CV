@@ -66,6 +66,7 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
               data: (List<Exercise> exercises) {
                 if (exercises.isEmpty) {
                   return EmptyState(
+                    glyph: OriginGlyphType.fitness,
                     icon: Icons.fitness_center_outlined,
                     title: 'No exercises here yet',
                     message: 'Add an exercise to build your library.',

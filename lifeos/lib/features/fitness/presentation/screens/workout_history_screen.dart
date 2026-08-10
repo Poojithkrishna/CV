@@ -6,6 +6,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../domain/entities/workout_session.dart';
 import '../providers/workout_session_providers.dart';
 import '../widgets/session_history_tile.dart';
+import '../../../../app/origin/origin_glyphs.dart';
 
 class WorkoutHistoryScreen extends ConsumerWidget {
   const WorkoutHistoryScreen({super.key});
@@ -27,6 +28,7 @@ class WorkoutHistoryScreen extends ConsumerWidget {
         data: (List<WorkoutSession> sessions) {
           if (sessions.isEmpty) {
             return EmptyState(
+              glyph: OriginGlyphType.fitness,
               icon: Icons.fitness_center_outlined,
               title: 'No workouts logged yet',
               message: 'Start a workout from a plan, or jump in ad hoc.',
